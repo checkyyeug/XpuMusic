@@ -1,0 +1,2 @@
+/usr/bin/ar qc lib/libplatform_abstraction.a CMakeFiles/platform_abstraction.dir/platform/audio_output_factory.cpp.o CMakeFiles/platform_abstraction.dir/platform/linux/audio_output_stub.cpp.o
+/usr/bin/ranlib lib/libplatform_abstraction.a

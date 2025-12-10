@@ -1,0 +1,46 @@
+# CMakeLists.txt - Simplified and Honest
+# Project: WAV Audio Player (Monolithic)
+# Version: 1.0.0 (Production Ready)
+# Architecture: Direct WASAPI (No Plugin System)
+
+# SIMPLIFIED PROJECT - Only includes actually used components
+
+cmake_minimum_required(VERSION 3.20)
+project(WAVPlayer VERSION 1.0.0 LANGUAGES CXX)
+
+# Basic setup
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+# Find packages
+find_package(Threads REQUIRED)
+
+# Main WAV Player (the only functional application)
+add_executable(music-player
+    src/music_player.cpp
+)
+
+target_link_libraries(music-player
+    PRIVATE
+        ole32.lib
+        uuid.lib
+)
+
+# Audio Diagnostic Utility (useful tool)
+add_executable(test_wav_simple
+    src/simple_wav_test.cpp
+)
+
+target_link_libraries(test_wav_simple
+    PRIVATE
+        ole32.lib
+        uuid.lib
+)
+
+# Install targets
+install(TARGETS music-player test_wav_simple
+    RUNTIME DESTINATION bin
+)
+
+# Build test audio resources
+configure_file(${CMAKE_SOURCE_DIR}/test.wav ${CMAKE_BINARY_DIR}/bin/test.wav COPYONLY)

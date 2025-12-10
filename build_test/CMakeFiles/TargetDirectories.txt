@@ -1,0 +1,12 @@
+/data/checky/foobar/Qoder_foobar/build_test/CMakeFiles/core_engine.dir
+/data/checky/foobar/Qoder_foobar/build_test/CMakeFiles/platform_abstraction.dir
+/data/checky/foobar/Qoder_foobar/build_test/CMakeFiles/sdk_impl.dir
+/data/checky/foobar/Qoder_foobar/build_test/CMakeFiles/music-player.dir
+/data/checky/foobar/Qoder_foobar/build_test/CMakeFiles/test_audio_direct.dir
+/data/checky/foobar/Qoder_foobar/build_test/CMakeFiles/test_cross_platform.dir
+/data/checky/foobar/Qoder_foobar/build_test/CMakeFiles/final_wav_player.dir
+/data/checky/foobar/Qoder_foobar/build_test/CMakeFiles/test-universal-converter.dir
+/data/checky/foobar/Qoder_foobar/build_test/CMakeFiles/test-resampler.dir
+/data/checky/foobar/Qoder_foobar/build_test/CMakeFiles/music-player-plugin.dir
+/data/checky/foobar/Qoder_foobar/build_test/CMakeFiles/edit_cache.dir
+/data/checky/foobar/Qoder_foobar/build_test/CMakeFiles/rebuild_cache.dir

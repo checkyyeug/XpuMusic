@@ -1,0 +1,34 @@
+# Simple test to verify audio works
+
+cmake_minimum_required(VERSION 3.10)
+project(TestAudio CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+
+# Add direct audio test
+add_executable(test_audio_direct
+    src/play_sound.cpp
+)
+
+target_include_directories(test_audio_direct
+    PRIVATE
+        ${CMAKE_SOURCE_DIR}/platform
+        ${CMAKE_SOURCE_DIR}/core
+)
+
+# Link Windows libraries
+if(WIN32)
+    target_link_libraries(test_audio_direct
+        PRIVATE
+            ole32.lib
+            uuid.lib
+            shlwapi.lib
+    )
+endif()
+
+# Copy to binary directory
+add_custom_command(TARGET test_audio_direct POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy 
+        $<TARGET_FILE:test_audio_direct>
+        ${CMAKE_BINARY_DIR}/bin/$<CONFIG>/test_audio_direct${CMAKE_EXECUTABLE_SUFFIX}
+)

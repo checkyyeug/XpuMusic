@@ -1,0 +1,517 @@
+# ============================================================================
+# XpuMusic - Cross-Platform CMakeLists.txt
+# Working version for immediate testing
+# ============================================================================
+
+cmake_minimum_required(VERSION 3.20)
+project(XpuMusic VERSION 0.3.0 LANGUAGES C CXX)
+
+# Set C++ standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Enable C language for minimp3
+enable_language(C)
+
+# Build configuration
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+# Build type
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
+endif()
+
+# Output directories
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+# Find required packages
+find_package(Threads REQUIRED)
+
+# Find audio decoder libraries
+find_path(FLAC_INCLUDE_DIR FLAC/stream_decoder.h)
+find_path(VORBIS_INCLUDE_DIR vorbis/codec.h)
+
+# Try to find the libraries
+find_library(FLAC_LIBRARY NAMES FLAC)
+find_library(VORBIS_LIBRARY NAMES vorbis)
+find_library(VORBISENC_LIBRARY NAMES vorbisenc)
+find_library(OGG_LIBRARY NAMES ogg)
+
+# Platform detection and configuration
+if(WIN32)
+    set(MP_PLATFORM_WINDOWS TRUE)
+    add_definitions(-DMP_PLATFORM_WINDOWS=1)
+    message(STATUS "Platform: Windows")
+    set(PLATFORM_LIBS ole32 uuid)
+elseif(APPLE)
+    if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+        set(MP_PLATFORM_MACOS TRUE)
+        add_definitions(-DMP_PLATFORM_MACOS=1)
+        message(STATUS "Platform: macOS")
+    endif()
+elseif(UNIX)
+    set(MP_PLATFORM_LINUX TRUE)
+    add_definitions(-DMP_PLATFORM_LINUX=1)
+    message(STATUS "Platform: Linux")
+
+    # Try to find ALSA
+    find_package(PkgConfig QUIET)
+    if(PkgConfig_FOUND)
+        pkg_check_modules(ALSA QUIET alsa)
+        if(ALSA_FOUND)
+            set(HAVE_ALSA TRUE)
+            add_definitions(-DHAVE_ALSA=1)
+            set(PLATFORM_LIBS ${ALSA_LIBRARIES})
+            message(STATUS "ALSA found: ${ALSA_VERSION}")
+        else()
+            message(WARNING "ALSA not found - using stub audio")
+        endif()
+    endif()
+endif()
+
+# Architecture detection
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64")
+    add_definitions(-DMP_ARCH_X64=1)
+elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "i386|i686")
+    add_definitions(-DMP_ARCH_X86=1)
+elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "arm64|aarch64")
+    add_definitions(-DMP_ARCH_ARM64=1)
+endif()
+
+# Compiler detection
+if(MSVC)
+    add_definitions(-DMP_COMPILER_MSVC=1)
+    add_compile_options(/W4)
+    add_compile_definitions(MP_EXPORTS)
+elseif(CMAKE_COMPILER_IS_GNUCXX)
+    add_definitions(-DMP_COMPILER_GCC=1)
+    add_compile_options(-Wall -Wextra)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    add_definitions(-DMP_COMPILER_CLANG=1)
+    add_compile_options(-Wall -Wextra)
+endif()
+
+# ============================================================================
+# Core Targets
+# ============================================================================
+
+# Core Engine Library
+add_library(core_engine STATIC
+    core/core_engine.cpp
+    core/service_registry.cpp
+    core/event_bus.cpp
+    core/plugin_host.cpp
+    core/config_manager.cpp
+    core/playlist_manager.cpp
+    core/playback_engine.cpp
+    core/visualization_engine.cpp
+)
+
+target_include_directories(core_engine PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/core
+    ${CMAKE_CURRENT_SOURCE_DIR}/sdk/headers
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_link_libraries(core_engine PRIVATE
+    ${PLATFORM_LIBS}
+    Threads::Threads
+)
+
+# Platform Abstraction Layer
+add_library(platform_abstraction STATIC
+    platform/audio_output_factory.cpp
+)
+
+target_include_directories(platform_abstraction PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform
+    ${CMAKE_CURRENT_SOURCE_DIR}/core
+)
+
+target_link_libraries(platform_abstraction PRIVATE ${PLATFORM_LIBS})
+
+# Add Linux ALSA stub if needed
+if(MP_PLATFORM_LINUX)
+    target_sources(platform_abstraction PRIVATE
+        platform/linux/audio_output_stub.cpp
+    )
+endif()
+
+# ============================================================================
+# Compatibility Layer
+# ============================================================================
+
+# SDK Implementations - Temporarily exclude due to compatibility issues
+# add_library(sdk_impl STATIC
+#     compat/sdk_implementations/service_base.cpp
+#     compat/sdk_implementations/abort_callback.impl.cpp
+#     compat/sdk_implementations/file_info_impl.cpp
+#     compat/sdk_implementations/audio_chunk_impl.cpp
+#     compat/sdk_implementations/metadb_handle_impl.cpp
+# )
+
+# target_include_directories(sdk_impl PUBLIC
+#     ${CMAKE_CURRENT_SOURCE_DIR}/compat/sdk_implementations
+#     ${CMAKE_CURRENT_SOURCE_DIR}/compat/xpumusic_sdk
+# )
+
+# ============================================================================
+# Audio Decoder Plugins
+# ============================================================================
+
+# Check for required libraries
+set(AUDIO_DECODERS_AVAILABLE TRUE)
+
+if(NOT FLAC_INCLUDE_DIR OR NOT FLAC_LIBRARY)
+    message(STATUS "FLAC library not found, FLAC decoder will be disabled")
+    set(FLAC_AVAILABLE FALSE)
+else()
+    set(FLAC_AVAILABLE TRUE)
+    message(STATUS "FLAC library found")
+endif()
+
+if(NOT VORBIS_INCLUDE_DIR OR NOT VORBIS_LIBRARY OR NOT OGG_LIBRARY)
+    message(STATUS "Vorbis library not found, OGG/Vorbis decoder will be disabled")
+    set(VORBIS_AVAILABLE FALSE)
+else()
+    set(VORBIS_AVAILABLE TRUE)
+    message(STATUS "Vorbis library found")
+endif()
+
+# minimp3 implementation
+add_library(minimp3 STATIC
+    third_party/minimp3/minimp3.c
+)
+set_target_properties(minimp3 PROPERTIES LINKER_LANGUAGE C)
+
+target_include_directories(minimp3 PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party/minimp3
+)
+
+# MP3 Decoder (minimp3 - header only, always available)
+add_library(mp3_decoder STATIC
+    plugins/decoders/mp3_decoder.cpp
+    plugins/decoders/mp3_decoder_impl.cpp
+)
+
+target_include_directories(mp3_decoder PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/plugins
+    ${CMAKE_CURRENT_SOURCE_DIR}/sdk/headers
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party/minimp3
+)
+
+target_link_libraries(mp3_decoder PRIVATE plugin_base minimp3)
+
+# FLAC Decoder
+if(FLAC_AVAILABLE)
+    add_library(flac_decoder STATIC
+        plugins/decoders/flac_decoder.cpp
+    )
+
+    target_include_directories(flac_decoder PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/plugins
+        ${CMAKE_CURRENT_SOURCE_DIR}/sdk/headers
+        ${FLAC_INCLUDE_DIR}
+    )
+
+    target_link_libraries(flac_decoder PUBLIC ${FLAC_LIBRARY})
+else()
+    # Create stub library
+    add_library(flac_decoder INTERFACE)
+endif()
+
+# OGG/Vorbis Decoder
+if(VORBIS_AVAILABLE)
+    add_library(ogg_vorbis_decoder STATIC
+        plugins/decoders/ogg_vorbis_decoder.cpp
+    )
+
+    target_include_directories(ogg_vorbis_decoder PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/plugins
+        ${CMAKE_CURRENT_SOURCE_DIR}/sdk/headers
+        ${VORBIS_INCLUDE_DIR}
+    )
+
+    target_link_libraries(ogg_vorbis_decoder PUBLIC
+        ${VORBIS_LIBRARY}
+        ${VORBISENC_LIBRARY}
+        ${OGG_LIBRARY}
+    )
+else()
+    # Create stub library
+    add_library(ogg_vorbis_decoder INTERFACE)
+endif()
+
+# Audio Decoder Registry and Manager
+add_library(audio_decoder_core STATIC
+    core/audio_decoder_registry.cpp
+    core/audio_format_detector.cpp
+    core/audio_decoder_manager.cpp
+    core/event_bus.cpp
+)
+
+target_include_directories(audio_decoder_core PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/core
+    ${CMAKE_CURRENT_SOURCE_DIR}/sdk/headers
+)
+
+# Add plugin base implementation
+add_library(plugin_base STATIC
+    sdk/plugin_base.cpp
+)
+
+target_link_libraries(audio_decoder_core PUBLIC
+    plugin_base
+    mp3_decoder
+    flac_decoder
+    ogg_vorbis_decoder
+    ${PLATFORM_LIBS}
+    Threads::Threads
+)
+
+# Audio Decoder Test Program
+add_executable(audio_decoder_test
+    examples/audio_decoder_test_simple.cpp
+)
+
+target_include_directories(audio_decoder_test PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/examples
+    ${CMAKE_CURRENT_SOURCE_DIR}/plugins
+    ${CMAKE_CURRENT_SOURCE_DIR}/core
+    ${CMAKE_CURRENT_SOURCE_DIR}/sdk/headers
+)
+
+target_link_libraries(audio_decoder_test PRIVATE
+    audio_decoder_core
+)
+
+# ============================================================================
+# Plugin Ecosystem
+# ============================================================================
+
+message(STATUS "Plugin system: Core framework ready, decoders available")
+
+# ============================================================================
+# Main Executables
+# ============================================================================
+
+# Main Music Player (Linux only with ALSA)
+if(UNIX AND NOT APPLE)
+    add_executable(music-player
+        src/music_player_simple.cpp
+    )
+
+    target_include_directories(music-player PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/core
+        ${CMAKE_CURRENT_SOURCE_DIR}/platform
+        ${CMAKE_CURRENT_SOURCE_DIR}/compat
+    )
+
+    target_link_libraries(music-player PRIVATE
+        core_engine
+        platform_abstraction
+        # sdk_impl
+        ${PLATFORM_LIBS}
+        Threads::Threads
+        asound
+    )
+endif()
+
+# Test audio executable
+add_executable(test_audio_direct
+    src/play_sound.cpp
+)
+
+target_include_directories(test_audio_direct PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform
+)
+
+target_link_libraries(test_audio_direct PRIVATE
+    platform_abstraction
+    ${PLATFORM_LIBS}
+)
+
+# Cross-platform test
+add_executable(test_cross_platform
+    test_cross_platform.cpp
+    platform/audio_output_factory.cpp
+)
+
+target_include_directories(test_cross_platform PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/core
+    ${CMAKE_CURRENT_SOURCE_DIR}/sdk/headers
+    ${CMAKE_CURRENT_SOURCE_DIR}/platform
+    ${CMAKE_CURRENT_SOURCE_DIR}/compat
+)
+
+target_link_libraries(test_cross_platform PRIVATE ${PLATFORM_LIBS})
+
+if(WIN32)
+    target_sources(test_cross_platform PRIVATE
+        platform/windows/audio_output_wasapi.cpp
+    )
+    target_link_libraries(test_cross_platform PRIVATE ole32 uuid)
+elseif(APPLE)
+    target_sources(test_cross_platform PRIVATE
+        src/audio/audio_output_coreaudio.cpp
+    )
+    target_link_libraries(test_cross_platform PRIVATE
+        "-framework CoreAudio"
+        "-framework AudioUnit"
+        "-framework CoreFoundation"
+    )
+elseif(UNIX)
+    target_sources(test_cross_platform PRIVATE
+        platform/linux/audio_output_stub.cpp
+    )
+endif()
+
+# WAV Player Test
+add_executable(final_wav_player
+    src/final_wav_player.cpp
+)
+
+target_include_directories(final_wav_player PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/compat/sdk_implementations
+    ${CMAKE_CURRENT_SOURCE_DIR}/compat/xpumusic_sdk
+)
+
+target_link_libraries(final_wav_player PRIVATE Threads::Threads)
+
+# Universal Sample Rate Converter Test
+add_executable(test-universal-converter
+    src/audio/universal_sample_rate_converter.cpp
+    src/audio/sample_rate_converter.cpp
+    src/audio/wav_writer.cpp
+    src/audio/test_universal_converter.cpp
+)
+
+target_include_directories(test-universal-converter PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/audio
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+if(UNIX AND NOT APPLE)
+    target_link_libraries(test-universal-converter PRIVATE m)
+endif()
+
+# Sample Rate Converter Test
+add_executable(test-resampler
+    src/audio/sample_rate_converter.cpp
+    src/audio/wav_writer.cpp
+    src/audio/test_resampler.cpp
+)
+
+target_include_directories(test-resampler PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/audio
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+if(UNIX AND NOT APPLE)
+    target_link_libraries(test-resampler PRIVATE m)
+endif()
+
+# Plugin-Aware Music Player with XpuMusic compatibility
+add_executable(music-player-plugin
+    src/music_player_plugin.cpp
+    src/audio/plugin_audio_decoder.cpp
+    src/audio/enhanced_sample_rate_converter.cpp
+    src/audio/adaptive_resampler.cpp
+    src/audio/sample_rate_converter.cpp
+    src/audio/cubic_resampler.cpp
+    src/audio/sinc_resampler.cpp
+    src/audio/wav_writer.cpp
+    compat/plugin_loader/plugin_loader.cpp
+    # compat/sdk_implementations/service_base_impl.cpp
+    # compat/sdk_implementations/input_decoder_impl.cpp
+    compat/xpumusic_sdk/foobar2000.cpp
+    compat/xpumusic_compat_manager.cpp
+    compat/data_migration_manager.cpp
+)
+
+target_include_directories(music-player-plugin PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/audio
+    ${CMAKE_CURRENT_SOURCE_DIR}/compat
+    ${CMAKE_CURRENT_SOURCE_DIR}/compat/plugin_loader
+    ${CMAKE_CURRENT_SOURCE_DIR}/compat/sdk_implementations
+    ${CMAKE_CURRENT_SOURCE_DIR}/compat/xpumusic_sdk
+    ${CMAKE_CURRENT_SOURCE_DIR}/core
+    ${CMAKE_CURRENT_SOURCE_DIR}/sdk/headers
+)
+
+target_link_libraries(music-player-plugin PRIVATE
+    ${PLATFORM_LIBS}
+    Threads::Threads
+)
+
+# Platform-specific linking
+if(WIN32)
+    target_link_libraries(music-player-plugin PRIVATE dsound winmm)
+elseif(UNIX AND NOT APPLE)
+    # Link math library on Linux
+    target_link_libraries(music-player-plugin PRIVATE m)
+    # Link dl for dynamic loading on Linux
+    target_link_libraries(music-player-plugin PRIVATE ${CMAKE_DL_LIBS})
+elseif(UNIX)
+    # Link dl for dynamic loading on macOS
+    target_link_libraries(music-player-plugin PRIVATE ${CMAKE_DL_LIBS})
+endif()
+
+# ============================================================================
+# Summary
+# ============================================================================
+
+message(STATUS "")
+message(STATUS "=== Cross-Platform Music Player ===")
+message(STATUS "")
+message(STATUS "Platform: ${CMAKE_SYSTEM_NAME}")
+message(STATUS "Architecture: ${CMAKE_SYSTEM_PROCESSOR}")
+message(STATUS "Compiler: ${CMAKE_CXX_COMPILER_ID}")
+message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "")
+
+message(STATUS "Audio Backend:")
+if(WIN32)
+    message(STATUS "  ✓ WASAPI (Windows)")
+elseif(APPLE)
+    message(STATUS "  ✓ CoreAudio (macOS)")
+else()
+    if(HAVE_ALSA)
+        message(STATUS "  ✓ ALSA (Linux)")
+    else()
+        message(STATUS "  ⚠ Stub (Linux - no ALSA)")
+    endif()
+endif()
+
+message(STATUS "")
+message(STATUS "Audio Decoders:")
+message(STATUS "  ✓ WAV decoder (built-in)")
+message(STATUS "  ✓ MP3 decoder (minimp3)")
+if(FLAC_AVAILABLE)
+    message(STATUS "  ✓ FLAC decoder (libFLAC)")
+else()
+    message(STATUS "  ✗ FLAC decoder (libFLAC not found)")
+endif()
+if(VORBIS_AVAILABLE)
+    message(STATUS "  ✓ OGG/Vorbis decoder (libvorbis)")
+else()
+    message(STATUS "  ✗ OGG/Vorbis decoder (libvorbis not found)")
+endif()
+
+message(STATUS "")
+message(STATUS "Plugin System:")
+message(STATUS "  ✓ XpuMusic plugin support")
+message(STATUS "  ✓ Dynamic plugin loading")
+message(STATUS "  ✓ Hot reload capability")
+message(STATUS "  ✓ Configuration persistence")
+message(STATUS "  ✓ Format auto-detection")
+message(STATUS "")
+message(STATUS "✅ Configuration complete!")

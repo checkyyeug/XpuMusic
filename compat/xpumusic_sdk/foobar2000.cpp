@@ -1,0 +1,49 @@
+/**
+ * @file foobar2000.cpp
+ * @brief foobar2000 SDK compatibility implementations
+ * @date 2025-12-10
+ */
+
+#include "foobar2000.h"
+#include <cstring>
+#include <map>
+
+namespace foobar2000 {
+
+// Service GUID definitions
+namespace service_ids {
+    const GUID input_decoder_v2 = {0x56A2550F, 0x4243, 0xB877, {0xE8, 0x6F, 0xB3, 0x2A, 0xE4, 0x11, 0x92, 0x27}};
+    const GUID metadb_v2 = {0x3809B788, 0xF0CD, 0x4E77, {0xBE, 0xF7, 0x13, 0x32, 0x52, 0xE4, 0x7A, 0xE7}};
+    const GUID output_v2 = {0x5768AB6A, 0x4C87, 0x40C6, {0x87, 0x07, 0x79, 0x6B, 0xB3, 0x74, 0x18, 0x88}};
+    const GUID playback_control_v2 = {0x6DC56043, 0x29E6, 0x488B, {0x96, 0xDA, 0x9C, 0x7D, 0x9B, 0xA4, 0xB8, 0x7D}};
+}
+
+namespace input_decoders {
+    const GUID mpg = {0x5F1EC7F9, 0xD1CE, 0x452C, {0x8D, 0x86, 0x5D, 0x0B, 0x94, 0x35, 0xD2, 0x20}};
+    const GUID pcm = {0x8D221051, 0x86CE, 0x425C, {0xA5, 0xB4, 0x1F, 0x7C, 0x57, 0x44, 0xE8, 0x2B}};
+    const GUID flac = {0xE65F6A3C, 0x81B8, 0x4EC0, {0xAE, 0x7B, 0x33, 0xB8, 0x62, 0x55, 0x73, 0xF6}};
+    const GUID wav = {0x8D221051, 0x86CE, 0x425C, {0xA5, 0xB4, 0x1F, 0x7C, 0x57, 0x44, 0xE8, 0x2B}};
+}
+
+// Global service registry
+namespace {
+    std::map<GUID, std::unique_ptr<service_base>> g_services;
+}
+
+// Service registration
+bool register_service(const GUID& guid, std::unique_ptr<service_base> service) {
+    g_services[guid] = std::move(service);
+    return true;
+}
+
+// Service query implementation with C interface
+extern "C" FOOBAR2000_EXPORT bool service_query(const foobar2000::GUID& guid, void** out) {
+    auto it = g_services.find(guid);
+    if (it != g_services.end()) {
+        *out = static_cast<void*>(it->second.get());
+        return true;
+    }
+    return false;
+}
+
+} // namespace foobar2000

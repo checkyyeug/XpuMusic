@@ -1,0 +1,2 @@
+/usr/bin/ar qc lib/libcore_engine.a CMakeFiles/core_engine.dir/core/core_engine.cpp.o CMakeFiles/core_engine.dir/core/service_registry.cpp.o CMakeFiles/core_engine.dir/core/event_bus.cpp.o CMakeFiles/core_engine.dir/core/plugin_host.cpp.o CMakeFiles/core_engine.dir/core/config_manager.cpp.o CMakeFiles/core_engine.dir/core/playlist_manager.cpp.o CMakeFiles/core_engine.dir/core/playback_engine.cpp.o CMakeFiles/core_engine.dir/core/visualization_engine.cpp.o
+/usr/bin/ranlib lib/libcore_engine.a

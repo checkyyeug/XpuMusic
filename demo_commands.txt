@@ -1,0 +1,10 @@
+load test_440hz.wav
+play
+status
+pause
+status
+seek 50
+play
+status
+stop
+quit

@@ -1,0 +1,104 @@
+{
+    "name": "Dark Theme",
+    "version": "1.0.0",
+    "description": "Dark theme for XpuMusic",
+
+    "colors": {
+        "background": "#2D2D30",
+        "foreground": "#F1F1F1",
+        "accent": "#569CD6",
+        "secondary": "#3E3E42",
+        "border": "#3E3E42",
+        "highlight": "#252526",
+        "selection": "#062F4A",
+        "text_selection": "#FFFFFF",
+
+        "player": {
+            "background": "#1E1E1E",
+            "control_background": "#333337",
+            "control_hover": "#3E3E42",
+            "button_text": "#F1F1F1",
+            "progress_bar": "#007ACC",
+            "progress_background": "#3E3E42",
+            "volume_slider": "#569CD6",
+            "time_display": "#969696"
+        },
+
+        "playlist": {
+            "background": "#252526",
+            "alternate_row": "#2D2D30",
+            "playing": "#1E3A1E",
+            "selected": "#062F4A",
+            "text": "#F1F1F1",
+            "playing_text": "#4EC9B0",
+            "header": "#2D2D30",
+            "header_text": "#969696",
+            "border": "#3E3E42"
+        },
+
+        "visualizer": {
+            "background": "#0C0C0C",
+            "foreground": "#00FF00",
+            "peak": "#FF0000",
+            "grid": "#1E1E1E"
+        },
+
+        "console": {
+            "background": "#0C0C0C",
+            "foreground": "#F1F1F1",
+            "selection": "#264F78",
+            "cursor": "#FFFFFF"
+        }
+    },
+
+    "fonts": {
+        "default": {
+            "family": "Segoe UI",
+            "size": 12.0,
+            "weight": "normal",
+            "style": "normal"
+        },
+        "ui": {
+            "family": "Segoe UI",
+            "size": 11.0,
+            "weight": "normal"
+        },
+        "console": {
+            "family": "Consolas",
+            "size": 10.0,
+            "weight": "normal"
+        },
+        "playlist": {
+            "family": "Segoe UI",
+            "size": 12.0,
+            "weight": "normal"
+        }
+    },
+
+    "dimensions": {
+        "controls": {
+            "button_height": 32,
+            "button_width": 32,
+            "button_spacing": 4,
+            "slider_height": 4
+        },
+        "playlist": {
+            "row_height": 24,
+            "indent_size": 16,
+            "icon_size": 16
+        },
+        "window": {
+            "min_width": 800,
+            "min_height": 600,
+            "default_width": 1024,
+            "default_height": 768
+        }
+    },
+
+    "effects": {
+        "rounding": 4,
+        "shadows": true,
+        "animations": true,
+        "transitions": true
+    }
+}

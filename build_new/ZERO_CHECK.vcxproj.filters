@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\workspaces\foobar\XpuMusic\build_new\CMakeFiles\ca56939404abe21cf1cf98530d3106c7\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{18AC1B4C-3B1A-3655-B8A1-EE347090B6A9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,111 @@
+#include "audio_decoder_manager.h"
+#include <iostream>
+
+namespace xpumusic::core {
+
+AudioDecoderManager& AudioDecoderManager::get_instance() {
+    static AudioDecoderManager instance;
+    return instance;
+}
+
+void AudioDecoderManager::initialize() {
+    if (initialized_) {
+        return;
+    }
+
+    // 初始化格式检测器（会自动注册内置格式）
+    AudioFormatDetector::get_instance();
+
+    // 注册内置解码器会通过 QODER_AUTO_REGISTER_DECODER 宏自动进行
+    // 这里只需要确保已初始化
+
+    initialized_ = true;
+}
+
+std::unique_ptr<IAudioDecoder> AudioDecoderManager::get_decoder_for_file(const std::string& file_path) {
+    if (!initialized_) {
+        initialize();
+    }
+
+    auto& registry = AudioDecoderRegistry::get_instance();
+    return registry.get_decoder(file_path);
+}
+
+AudioFormatInfo AudioDecoderManager::detect_format(const std::string& file_path) {
+    if (!initialized_) {
+        initialize();
+    }
+
+    auto& detector = AudioFormatDetector::get_instance();
+    return detector.detect_format(file_path);
+}
+
+std::unique_ptr<IAudioDecoder> AudioDecoderManager::open_audio_file(const std::string& file_path) {
+    auto decoder = get_decoder_for_file(file_path);
+    if (decoder && decoder->open(file_path)) {
+        return decoder;
+    }
+    return nullptr;
+}
+
+bool AudioDecoderManager::supports_file(const std::string& file_path) {
+    if (!initialized_) {
+        initialize();
+    }
+
+    auto& detector = AudioFormatDetector::get_instance();
+    AudioFormatInfo info = detector.detect_format(file_path);
+    return info.supported;
+}
+
+std::vector<std::string> AudioDecoderManager::get_supported_formats() {
+    if (!initialized_) {
+        initialize();
+    }
+
+    auto& detector = AudioFormatDetector::get_instance();
+    return detector.get_supported_formats();
+}
+
+std::vector<PluginInfo> AudioDecoderManager::get_available_decoders() {
+    if (!initialized_) {
+        initialize();
+    }
+
+    auto& registry = AudioDecoderRegistry::get_instance();
+    return registry.get_registered_decoders();
+}
+
+void AudioDecoderManager::set_default_decoder(const std::string& format, const std::string& decoder_name) {
+    if (!initialized_) {
+        initialize();
+    }
+
+    auto& registry = AudioDecoderRegistry::get_instance();
+    registry.set_default_decoder(format, decoder_name);
+}
+
+json_map AudioDecoderManager::get_metadata(const std::string& file_path) {
+    auto decoder = open_audio_file(file_path);
+    if (decoder) {
+        auto metadata_items = decoder->get_metadata();
+        json_map metadata;
+        for (const auto& item : metadata_items) {
+            metadata[item.key] = item.value;
+        }
+        return metadata;
+    }
+    return json_map{};
+}
+
+double AudioDecoderManager::get_duration(const std::string& file_path) {
+    // 先尝试通过解码器获取
+    auto decoder = open_audio_file(file_path);
+    if (decoder) {
+        // Use the standard interface get_duration
+        return decoder->get_duration();
+    }
+    return -1.0;
+}
+
+} // namespace xpumusic::core

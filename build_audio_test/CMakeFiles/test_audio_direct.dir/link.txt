@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -DNDEBUG CMakeFiles/test_audio_direct.dir/src/play_sound.cpp.o -o bin/test_audio_direct  lib/libplatform_abstraction.a -lasound 

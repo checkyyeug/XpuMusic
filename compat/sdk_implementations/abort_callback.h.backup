@@ -1,0 +1,37 @@
+/**
+ * @file abort_callback.h
+ * @brief abort_callback 的实现类
+ * @date 2025-12-09
+ */
+
+#pragma once
+
+#include "../foobar_sdk/foobar2000_sdk.h"
+#include <functional>
+
+namespace foobar2000_sdk {
+
+// abort_callback 的具体实现
+class abort_callback_impl : public abort_callback {
+public:
+    abort_callback_impl();
+    virtual ~abort_callback_impl();
+    
+    // abort_callback 接口
+    bool is_aborting() const override;
+    
+    // 扩展接口
+    void set_aborted();
+    void add_abort_callback(std::function<bool()> callback);
+    void reset();
+    
+    // 线程安全的检查（非 const，内部使用）
+    bool check_is_aborting();
+    
+private:
+    // 实现细节在 cpp 文件中
+    class impl;
+    std::unique_ptr<impl> p_impl;
+};
+
+} // namespace foobar2000_sdk

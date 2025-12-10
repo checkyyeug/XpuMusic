@@ -1,0 +1,113 @@
+{
+    "version": "2.0.0",
+    "config_version": "1.0",
+
+    "audio": {
+        "output_device": "default",
+        "sample_rate": 44100,
+        "channels": 2,
+        "bits_per_sample": 32,
+        "use_float": true,
+        "buffer_size": 4096,
+        "buffer_count": 4,
+        "volume": 0.8,
+        "mute": false,
+        "equalizer_preset": "flat"
+    },
+
+    "plugins": {
+        "plugin_directories": [
+            "./plugins",
+            "~/.xpumusic/plugins",
+            "/usr/lib/xpumusic/plugins",
+            "/usr/local/lib/xpumusic/plugins"
+        ],
+        "auto_load_plugins": true,
+        "plugin_scan_interval": 0,
+        "plugin_timeout": 5000
+    },
+
+    "resampler": {
+        "quality": "adaptive",
+        "floating_precision": 64,
+        "enable_adaptive": true,
+        "cpu_threshold": 0.8,
+        "use_anti_aliasing": true,
+        "cutoff_ratio": 0.95,
+        "filter_taps": 101,
+        "format_quality": {
+            "mp3": "good",
+            "flac": "best",
+            "wav": "fast",
+            "ogg": "good",
+            "aac": "good",
+            "m4a": "good",
+            "wma": "fast",
+            "ape": "high"
+        }
+    },
+
+    "player": {
+        "repeat": false,
+        "shuffle": false,
+        "crossfade": false,
+        "crossfade_duration": 2.0,
+        "preferred_backend": "auto",
+        "show_console_output": true,
+        "show_progress_bar": true,
+        "show_plugin_info": false,
+        "key_bindings": {
+            "play": "space",
+            "pause": "p",
+            "stop": "s",
+            "next": "n",
+            "previous": "b",
+            "quit": "q",
+            "seek_forward": "right",
+            "seek_backward": "left",
+            "volume_up": "up",
+            "volume_down": "down",
+            "toggle_repeat": "r",
+            "toggle_shuffle": "z"
+        },
+        "max_history": 1000,
+        "save_history": true,
+        "history_file": "~/.xpumusic/history.json"
+    },
+
+    "logging": {
+        "level": "info",
+        "console_output": true,
+        "file_output": false,
+        "log_file": "~/.xpumusic/xpumusic.log",
+        "enable_rotation": true,
+        "max_file_size": 10485760,
+        "max_files": 5,
+        "include_timestamp": true,
+        "include_thread_id": false,
+        "include_function_name": true
+    },
+
+    "ui": {
+        "theme": "default",
+        "language": "en",
+        "font_family": "default",
+        "font_size": 12.0,
+        "save_window_size": true,
+        "window_width": 1024,
+        "window_height": 768,
+        "start_maximized": false
+    },
+
+    "metadata": {
+        "user_name": "",
+        "default_music_directory": "~/Music",
+        "playlist_directory": "~/.xpumusic/playlists"
+    },
+
+    "network": {
+        "enable_network": false,
+        "check_updates": true,
+        "update_server": "https://api.xpumusic.com"
+    }
+}

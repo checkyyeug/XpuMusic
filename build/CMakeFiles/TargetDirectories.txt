@@ -1,0 +1,12 @@
+D:/workspaces/foobar/XpuMusic/build/CMakeFiles/core_engine.dir
+D:/workspaces/foobar/XpuMusic/build/CMakeFiles/platform_abstraction.dir
+D:/workspaces/foobar/XpuMusic/build/CMakeFiles/sdk_impl.dir
+D:/workspaces/foobar/XpuMusic/build/CMakeFiles/plugin_wav_decoder.dir
+D:/workspaces/foobar/XpuMusic/build/CMakeFiles/plugin_mp3_decoder.dir
+D:/workspaces/foobar/XpuMusic/build/CMakeFiles/plugin_flac_decoder.dir
+D:/workspaces/foobar/XpuMusic/build/CMakeFiles/music-player.dir
+D:/workspaces/foobar/XpuMusic/build/CMakeFiles/test_audio_direct.dir
+D:/workspaces/foobar/XpuMusic/build/CMakeFiles/test_cross_platform.dir
+D:/workspaces/foobar/XpuMusic/build/CMakeFiles/final_wav_player.dir
+D:/workspaces/foobar/XpuMusic/build/CMakeFiles/ALL_BUILD.dir
+D:/workspaces/foobar/XpuMusic/build/CMakeFiles/ZERO_CHECK.dir
