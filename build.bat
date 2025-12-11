@@ -1,160 +1,139 @@
 @echo off
-setlocal enabledelayedexpansion
 REM ============================================================================
-REM Build Script for XpuMusic - Windows Batch File
-REM Includes both Release and Debug build configurations
+REM Build Script for XpuMusic
 REM ============================================================================
 
-echo Starting XpuMusic Build Process...
+echo ========================================
+echo XpuMusic Build Script
+echo ========================================
 echo.
 
-REM Check if build directory exists, create if not
-if not exist "build" (
-    echo Creating build directory...
-    mkdir build
-)
-
-REM Detect available build system
-echo Detecting build system...
-set CMAKE_GENERATOR=
-set IS_VS=0
-
-where cl >nul 2>nul
-if !ERRORLEVEL! EQU 0 (
-    set CMAKE_GENERATOR="Visual Studio 16 2019"
-    set IS_VS=1
-    echo Found MSVC compiler, using Visual Studio generator
-) else (
-    where g++ >nul 2>nul
-    if !ERRORLEVEL! EQU 0 (
-        set CMAKE_GENERATOR="MinGW Makefiles"
-        echo Found MinGW/GCC compiler, using MinGW Makefiles
-    ) else (
-        where clang++ >nul 2>nul
-        if !ERRORLEVEL! EQU 0 (
-            set CMAKE_GENERATOR="NMake Makefiles"
-            echo Found Clang compiler, using NMake Makefiles
-        ) else (
-            echo Error: No supported C++ compiler found ^(MSVC, GCC, or Clang^)
-            echo Please install a C++ compiler toolchain
-            echo.
-            echo Recommended options:
-            echo 1. Install Visual Studio 2019/2022 with C++ development tools
-            echo 2. Install MinGW-w64
-            echo 3. Install LLVM/Clang
-            pause
-            exit /b 1
-        )
-    )
-)
-
-REM ============================================================================
-REM Release Build
-REM ============================================================================
-echo ========================================
-echo Building Release Configuration
-echo ========================================
-
-cd build
-
-REM Create release build directory
-if not exist "release" (
-    echo Creating release build directory...
-    mkdir release
-)
-
-cd release
-
-echo Running CMake for Release build...
-cmake -G %CMAKE_GENERATOR% -DCMAKE_BUILD_TYPE=Release ../.. || (
-    echo CMake Release configuration failed!
+REM Check if CMake is installed
+cmake --version >nul 2>&1
+if %ERRORLEVEL% NEQ 0 (
+    echo Error: CMake not found in PATH
+    echo Please install CMake from https://cmake.org/download/
     pause
     exit /b 1
 )
 
-echo Building Release targets...
-if !IS_VS! EQU 1 (
-    cmake --build . --config Release --parallel
-) else if "!CMAKE_GENERATOR!"=="MinGW Makefiles" (
-    mingw32-make -j%NUMBER_OF_PROCESSORS%
-) else (
-    nmake
+REM Create build directory
+if not exist "build" mkdir build
+cd build
+
+echo.
+echo [1/4] Configuring Release build...
+echo.
+
+REM Try different generators in order of preference
+set GENERATOR_FOUND=0
+
+REM Try Visual Studio 2022
+cmake -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Release .. >nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+    set GENERATOR_FOUND=1
+    echo Using Visual Studio 2022 generator
+    goto :BUILD_RELEASE
 )
 
-if !ERRORLEVEL! NEQ 0 (
+REM Try Visual Studio 2019
+cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release .. >nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+    set GENERATOR_FOUND=1
+    echo Using Visual Studio 2019 generator
+    goto :BUILD_RELEASE
+)
+
+REM Try MinGW
+cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release .. >nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+    set GENERATOR_FOUND=1
+    echo Using MinGW Makefiles generator
+    goto :BUILD_RELEASE
+)
+
+REM Try default generator
+cmake -DCMAKE_BUILD_TYPE=Release ..
+if %ERRORLEVEL% NEQ 0 (
+    echo.
+    echo ERROR: Failed to configure project
+    echo.
+    echo Please ensure you have a C++ compiler installed:
+    echo   - Visual Studio 2019/2022 (recommended)
+    echo   - MinGW-w64
+    echo   - Or another C++17 compatible compiler
+    echo.
+    pause
+    exit /b 1
+)
+
+:BUILD_RELEASE
+echo.
+echo [2/4] Building Release...
+echo.
+
+cmake --build . --config Release --parallel
+if %ERRORLEVEL% NEQ 0 (
     echo Release build failed!
     pause
     exit /b 1
 )
 
 echo Release build completed successfully!
-echo.
 
-REM Go back to main build directory
+REM Create debug directory
 cd ..
-
-REM ============================================================================
-REM Debug Build
-REM ============================================================================
-echo ========================================
-echo Building Debug Configuration
-echo ========================================
-
-REM Create debug build directory
-if not exist "debug" (
-    echo Creating debug build directory...
-    mkdir debug
-)
-
+if not exist "build\debug" mkdir debug
 cd debug
 
-echo Running CMake for Debug build...
-cmake -G %CMAKE_GENERATOR% -DCMAKE_BUILD_TYPE=Debug ../.. || (
-    echo CMake Debug configuration failed!
-    pause
-    exit /b 1
-)
+echo.
+echo [3/4] Configuring Debug build...
+echo.
 
-echo Building Debug targets...
-if !IS_VS! EQU 1 (
-    cmake --build . --config Debug --parallel
-) else if "!CMAKE_GENERATOR!"=="MinGW Makefiles" (
-    mingw32-make -j%NUMBER_OF_PROCESSORS%
-) else (
-    nmake
-)
+REM Try the same generator that worked for Release
+cmake -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Debug .. >nul 2>&1
+if %ERRORLEVEL% EQU 0 goto :BUILD_DEBUG
 
-if !ERRORLEVEL! NEQ 0 (
+cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Debug .. >nul 2>&1
+if %ERRORLEVEL% EQU 0 goto :BUILD_DEBUG
+
+cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Debug .. >nul 2>&1
+if %ERRORLEVEL% EQU 0 goto :BUILD_DEBUG
+
+cmake -DCMAKE_BUILD_TYPE=Debug ..
+
+:BUILD_DEBUG
+echo.
+echo [4/4] Building Debug...
+echo.
+
+cmake --build . --config Debug --parallel
+if %ERRORLEVEL% NEQ 0 (
     echo Debug build failed!
     pause
     exit /b 1
 )
 
 echo Debug build completed successfully!
-echo.
 
 REM Go back to project root
 cd ..
 
+echo.
 echo ========================================
 echo Build Summary
 echo ========================================
 echo.
-echo Release binaries available at: build\release\bin\
-echo Debug binaries available at: build\debug\bin\
+echo Release build: build\Release\
+if exist "build\Release" (
+    dir /b build\Release\*.exe 2>nul
+)
 echo.
-echo Main executables:
-echo   - music-player.exe
-echo   - test_audio_direct.exe
-echo   - test_cross_platform.exe
-echo   - final_wav_player.exe
+echo Debug build: build\Debug\
+if exist "build\Debug" (
+    dir /b build\Debug\*.exe 2>nul
+)
 echo.
-echo Libraries:
-echo   - core_engine.lib (static)
-echo   - platform_abstraction.lib (static)
-echo   - sdk_impl.lib (static)
-echo   - plugin_*_decoder.dll (dynamic)
-echo.
-echo Build process completed successfully!
+echo Build completed successfully!
 echo.
 pause
