@@ -11,11 +11,16 @@
 
 namespace foobar2000_sdk {
 
+// 使用 xpumusic_sdk 中的类型
+using xpumusic_sdk::audio_info;
+using xpumusic_sdk::file_stats;
+using xpumusic_sdk::field_value;
+
 //==============================================================================
 // file_info_impl 实现
 //==============================================================================
 
-file_info_impl::file_info_impl() {
+file_info_impl::file_info_impl() : file_info_interface() {
     // 默认音频信息
     audio_info_.m_sample_rate = 44100;
     audio_info_.m_channels = 2;
@@ -27,7 +32,7 @@ file_info_impl::file_info_impl() {
     stats_.m_timestamp = 0;
 }
 
-file_info_impl::file_info_impl(const file_info_impl& other) {
+file_info_impl::file_info_impl(const file_info_impl& other) : file_info_interface() {
     std::lock_guard<std::mutex> lock(other.mutex_);
     
     meta_fields_ = other.meta_fields_;
@@ -138,7 +143,7 @@ bool file_info_impl::meta_set(const char* p_name, const char* p_value) {
     
     std::lock_guard<std::mutex> lock(mutex_);
     
-    field_value& field = get_or_create_field(p_name);
+    xpumusic_sdk::field_value& field = get_or_create_field(p_name);
     field.values.clear();          // 移除所有现有值
     field.values.push_back(p_value); // 添加新值
     field.cache_valid = false;     // 使缓存失效
@@ -166,7 +171,7 @@ bool file_info_impl::meta_add(const char* p_name, const char* p_value) {
     
     std::lock_guard<std::mutex> lock(mutex_);
     
-    field_value& field = get_or_create_field(p_name);
+    xpumusic_sdk::field_value& field = get_or_create_field(p_name);
     field.values.push_back(p_value);  // 添加到值列表
     field.cache_valid = false;        // 使缓存失效
     
@@ -262,41 +267,39 @@ void file_info_impl::reset() {
 }
 
 void file_info_impl::copy_from(const file_info_interface& other) {
-    // 动态转换到 file_info_impl 以访问私有成员
-    const file_info_impl* other_impl = dynamic_cast<const file_info_impl*>(&other);
-    if (!other_impl) {
-        // 不是我们的实现，使用公共接口
-        *this = file_info_impl();  // 重置
-        
-        // 复制音频信息
-        audio_info_ = other.get_audio_info();
-        
-        // 复制文件统计
-        stats_ = other.get_file_stats();
-        
-        // 复制元数据字段
-        std::lock_guard<std::mutex> lock(mutex_);
-        for (const auto& field_name : meta_enum_field_names()) {
-            size_t count = other.meta_get_count(field_name.c_str());
-            for (size_t i = 0; i < count; ++i) {
-                const char* value = other.meta_get(field_name.c_str(), i);
-                if (value) {
-                    meta_add(field_name.c_str(), value);
-                }
+    // 使用公共接口复制数据
+    reset();  // 重置
+
+    // 复制音频信息
+    const xpumusic_sdk::audio_info& other_audio = other.get_audio_info();
+    audio_info_.m_sample_rate = other_audio.m_sample_rate;
+    audio_info_.m_channels = other_audio.m_channels;
+    audio_info_.m_bitrate = other_audio.m_bitrate;
+    audio_info_.m_length = other_audio.m_length;
+
+    // 复制文件统计
+    const xpumusic_sdk::file_stats& other_stats = other.get_file_stats();
+    stats_.m_size = other_stats.m_size;
+    stats_.m_timestamp = other_stats.m_timestamp;
+
+    // 复制元数据字段
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (const auto& field_name : meta_enum_field_names()) {
+        size_t count = other.meta_get_count(field_name.c_str());
+        for (size_t i = 0; i < count; ++i) {
+            const char* value = other.meta_get(field_name.c_str(), i);
+            if (value) {
+                meta_add(field_name.c_str(), value);
             }
         }
-        return;
     }
-    
-    // 是 file_info_impl，直接复制内部数据
-    *this = *other_impl;
 }
 
 void file_info_impl::merge_from(const file_info_interface& other) {
     std::lock_guard<std::mutex> lock(mutex_);
     
     // 合并音频信息（保留非零值）
-    const audio_info& other_audio = other.get_audio_info();
+    const xpumusic_sdk::audio_info& other_audio = other.get_audio_info();
 
     if (other_audio.m_sample_rate != 0) audio_info_.m_sample_rate = other_audio.m_sample_rate;
     if (other_audio.m_channels != 0) audio_info_.m_channels = other_audio.m_channels;
@@ -304,12 +307,20 @@ void file_info_impl::merge_from(const file_info_interface& other) {
     if (other_audio.m_length != 0) audio_info_.m_length = other_audio.m_length;
     
     // 合并文件统计（保留最大值）
-    const file_stats& other_stats = other.get_file_stats();
+    const xpumusic_sdk::file_stats& other_stats = other.get_file_stats();
     if (other_stats.m_size > stats_.m_size) stats_.m_size = other_stats.m_size;
     if (other_stats.m_timestamp > stats_.m_timestamp) stats_.m_timestamp = other_stats.m_timestamp;
     
     // 合并非空字段
-    std::vector<std::string> field_names = meta_enum_field_names();
+    std::vector<std::string> field_names;
+    // 获取字段名列表 - 使用接口方法
+    // 这里需要遍历可能的字段名，暂时使用常见的字段名
+    const char* common_fields[] = {"artist", "title", "album", "date", "genre", "comment"};
+    for (const char* field_name : common_fields) {
+        if (other.meta_get_count(field_name) > 0) {
+            field_names.push_back(field_name);
+        }
+    }
     for (const auto& field_name : field_names) {
         size_t count = other.meta_get_count(field_name.c_str());
         for (size_t i = 0; i < count; ++i) {

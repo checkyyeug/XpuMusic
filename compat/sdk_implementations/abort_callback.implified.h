@@ -7,6 +7,9 @@
 #pragma once
 
 #include "../xpumusic_sdk/foobar2000_sdk.h"
+
+// 使用 xpumusic_sdk 命名空间中的类型
+using xpumusic_sdk::abort_callback;
 #include <functional>
 #include <vector>
 #include <mutex>

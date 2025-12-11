@@ -138,7 +138,7 @@ add_library(sdk_impl STATIC
     compat/sdk_implementations/abort_callback.impl.cpp
     compat/sdk_implementations/file_info_impl.cpp
     compat/sdk_implementations/audio_chunk_impl.cpp
-    compat/sdk_implementations/metadb_handle_impl.cpp
+    # compat/sdk_implementations/metadb_handle_impl.cpp  # 暂时禁用，使用简化版本
 )
 
 target_include_directories(sdk_impl PUBLIC
@@ -161,7 +161,7 @@ target_include_directories(plugin_wav_decoder PRIVATE
 
 # MP3 Decoder (always available with minimp3)
 add_library(plugin_mp3_decoder SHARED
-    plugins/decoders/mp3_decoder.cpp
+    plugins/decoders/mp3_decoder_basic.cpp
 )
 
 target_include_directories(plugin_mp3_decoder PRIVATE
@@ -169,9 +169,9 @@ target_include_directories(plugin_mp3_decoder PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/sdk/external/minimp3
 )
 
-# FLAC Decoder (stub - always available)
+# FLAC Decoder (stub - requires FLAC dev libs)
 add_library(plugin_flac_decoder SHARED
-    plugins/decoders/flac_decoder_new.cpp
+    plugins/decoders/flac_decoder_minimal.cpp
 )
 
 target_include_directories(plugin_flac_decoder PRIVATE
@@ -183,9 +183,15 @@ target_include_directories(plugin_flac_decoder PRIVATE
 # ============================================================================
 
 # Main Music Player
-add_executable(music-player
-    src/music_player_simple.cpp
-)
+if(WIN32)
+    add_executable(music-player
+        src/music_player_legacy.cpp
+    )
+else()
+    add_executable(music-player
+        src/music_player_simple.cpp
+    )
+endif()
 
 target_include_directories(music-player PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -202,9 +208,43 @@ target_link_libraries(music-player PRIVATE
     Threads::Threads
 )
 
+# Windows audio libraries
+if(WIN32)
+    target_link_libraries(music-player PRIVATE ole32 uuid)
+endif()
+
+# Foobar2000 Compatible Player (Experimental)
+add_executable(foobar2k-player
+    src/foobar2k_compatible_player.cpp
+)
+
+target_include_directories(foobar2k-player PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/compat
+    ${CMAKE_CURRENT_SOURCE_DIR}/compat/sdk_implementations
+    ${CMAKE_CURRENT_SOURCE_DIR}/compat/xpumusic_sdk
+)
+
+target_link_libraries(foobar2k-player PRIVATE
+    core_engine
+    platform_abstraction
+    sdk_impl
+    ${PLATFORM_LIBS}
+    Threads::Threads
+)
+
+if(WIN32)
+    target_link_libraries(foobar2k-player PRIVATE ole32 uuid)
+endif()
+
 # Test audio executable
 add_executable(test_audio_direct
     src/play_sound.cpp
+)
+
+# Test decoders executable
+add_executable(test_decoders
+    test_decoders.cpp
 )
 
 target_include_directories(test_audio_direct PRIVATE

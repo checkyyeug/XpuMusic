@@ -1,0 +1,23 @@
+# 测试 SDK 修复的 CMake 配置
+cmake_minimum_required(VERSION 3.20)
+project(TestSdkFix)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# 添加测试可执行文件
+add_executable(test_sdk_fix test_sdk_fix.cpp 
+    compat/sdk_implementations/service_base.cpp
+    compat/sdk_implementations/abort_callback.impl.cpp
+    compat/sdk_implementations/file_info_impl.cpp
+    compat/sdk_implementations/audio_chunk_impl.cpp
+)
+
+target_include_directories(test_sdk_fix PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/compat/sdk_implementations
+    ${CMAKE_CURRENT_SOURCE_DIR}/compat/xpumusic_sdk
+)
+
+# 链接线程库
+target_link_libraries(test_sdk_fix PRIVATE Threads::Threads)

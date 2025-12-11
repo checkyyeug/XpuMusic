@@ -12,6 +12,13 @@
 #include <string>
 #include <mutex>
 
+// 前向声明 xpumusic_sdk 中的类型
+namespace xpumusic_sdk {
+struct audio_info;
+struct file_stats;
+struct field_value;
+}
+
 namespace foobar2000_sdk {
 
 /**
@@ -21,6 +28,9 @@ namespace foobar2000_sdk {
 class file_info_interface {
 public:
     virtual ~file_info_interface() = default;
+    
+    // 默认构造函数
+    file_info_interface() = default;
     
     /**
      * @brief 从元数据获取字段值
@@ -86,37 +96,37 @@ public:
      * @brief 设置音频流信息
      * @param p_info 音频信息
      */
-    virtual void set_audio_info(const audio_info& p_info) = 0;
+    virtual void set_audio_info(const xpumusic_sdk::audio_info& p_info) = 0;
     
     /**
      * @brief 获取音频流信息（const 版本）
      * @return 音频信息引用
      */
-    virtual const audio_info& get_audio_info() const = 0;
+    virtual const xpumusic_sdk::audio_info& get_audio_info() const = 0;
     
     /**
      * @brief 获取音频流信息（非 const 版本）
      * @return 音频信息引用
      */
-    virtual audio_info& get_audio_info() = 0;
+    virtual xpumusic_sdk::audio_info& get_audio_info() = 0;
     
     /**
      * @brief 设置文件统计信息（大小、时间戳）
      * @param p_stats 文件统计
      */
-    virtual void set_file_stats(const file_stats& p_stats) = 0;
+    virtual void set_file_stats(const xpumusic_sdk::file_stats& p_stats) = 0;
     
     /**
      * @brief 获取文件统计信息（const 版本）
      * @return 文件统计引用
      */
-    virtual const file_stats& get_file_stats() const = 0;
+    virtual const xpumusic_sdk::file_stats& get_file_stats() const = 0;
     
     /**
      * @brief 获取文件统计信息（非 const 版本）
      * @return 文件统计引用
      */
-    virtual file_stats& get_file_stats() = 0;
+    virtual xpumusic_sdk::file_stats& get_file_stats() = 0;
     
     /**
      * @brief 重置所有元数据（清空所有字段）

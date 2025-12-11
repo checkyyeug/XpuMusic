@@ -18,7 +18,19 @@
 #include <memory>
 #include <mutex>
 
+// 前向声明 xpumusic_sdk 中的类型
+namespace xpumusic_sdk {
+struct audio_info;
+struct file_stats;
+struct field_value;
+}
+
 namespace foobar2000_sdk {
+
+// 使用 xpumusic_sdk 中的类型
+using xpumusic_sdk::audio_info;
+using xpumusic_sdk::file_stats;
+using xpumusic_sdk::field_value;
 
 /**
  * @class file_info_impl
@@ -31,15 +43,28 @@ namespace foobar2000_sdk {
  * - 与 foobar2000 查询语法的兼容性
  */
 class file_info_impl : public file_info_interface {
+public:
+    // 构造函数
+    file_info_impl();
+    
+    // 复制构造函数
+    file_info_impl(const file_info_impl& other);
+    
+    // 赋值操作符
+    file_info_impl& operator=(const file_info_impl& other);
+    
+    // 析构函数
+    ~file_info_impl() override = default;
+
 private:
     // 元数据字段映射：字段名 -> 值列表
-    std::unordered_map<std::string, field_value> meta_fields_;
+    std::unordered_map<std::string, xpumusic_sdk::field_value> meta_fields_;
     
     // 音频信息（采样率、通道数等）
-    audio_info audio_info_;
+    xpumusic_sdk::audio_info audio_info_;
     
     // 文件统计信息（大小、时间戳）
-    file_stats stats_;
+    xpumusic_sdk::file_stats stats_;
     
     // 互斥锁，用于线程安全操作
     mutable std::mutex mutex_;
@@ -62,25 +87,6 @@ private:
     std::string normalize_field_name(const std::string& name) const;
 
 public:
-    /**
-     * @brief 构造函数
-     */
-    file_info_impl();
-    
-    /**
-     * @brief 析构函数
-     */
-    ~file_info_impl() override = default;
-    
-    /**
-     * @brief 复制构造函数
-     */
-    file_info_impl(const file_info_impl& other);
-    
-    /**
-     * @brief 赋值操作符
-     */
-    file_info_impl& operator=(const file_info_impl& other);
     
     //==================================================================
     // file_info 接口实现
@@ -130,7 +136,7 @@ public:
      * @param p_value 要删除的值
      * @return true 如果值存在并被删除
      */
-    bool meta_remove_value(const char* p_name, const char* p_value);
+    bool meta_remove_value(const char* p_name, const char* p_value) override;
     
     /**
      * @brief 删除字段的特定索引值
@@ -138,13 +144,13 @@ public:
      * @param p_index 值索引
      * @return true 如果值存在并被删除
      */
-    bool meta_remove_index(const char* p_name, size_t p_index);
+    bool meta_remove_index(const char* p_name, size_t p_index) override;
     
     /**
      * @brief 获取所有字段名
      * @return 字段名向量
      */
-    std::vector<std::string> meta_enum_field_names() const;
+    std::vector<std::string> meta_enum_field_names() const override;
     
     //==================================================================
     // 音频信息访问
@@ -152,18 +158,18 @@ public:
     
     /**
      * @brief 设置音频流信息
-     * @param p_info 音频信息
+     * @param info 音频信息
      */
-    void set_audio_info(const audio_info& p_info) override {
+    void set_audio_info(const xpumusic_sdk::audio_info& info) override {
         std::lock_guard<std::mutex> lock(mutex_);
-        audio_info_ = p_info;
+        audio_info_ = info;
     }
     
     /**
      * @brief 获取音频流信息（const 版本）
      * @return 音频信息引用
      */
-    const audio_info& get_audio_info() const override { 
+    const xpumusic_sdk::audio_info& get_audio_info() const override { 
         std::lock_guard<std::mutex> lock(mutex_);
         return audio_info_; 
     }
@@ -172,7 +178,7 @@ public:
      * @brief 获取音频流信息（非 const 版本）
      * @return 音频信息引用
      */
-    audio_info& get_audio_info() override { 
+    xpumusic_sdk::audio_info& get_audio_info() override { 
         std::lock_guard<std::mutex> lock(mutex_);
         return audio_info_; 
     }
@@ -183,18 +189,18 @@ public:
     
     /**
      * @brief 设置文件统计信息（大小、时间戳）
-     * @param p_stats 文件统计
+     * @param stats 文件统计
      */
-    void set_file_stats(const file_stats& p_stats) override { 
+    void set_file_stats(const xpumusic_sdk::file_stats& stats) override { 
         std::lock_guard<std::mutex> lock(mutex_);
-        stats_ = p_stats; 
+        stats_ = stats; 
     }
     
     /**
      * @brief 获取文件统计信息（const 版本）
      * @return 文件统计引用
      */
-    const file_stats& get_file_stats() const override { 
+    const xpumusic_sdk::file_stats& get_file_stats() const override { 
         std::lock_guard<std::mutex> lock(mutex_);
         return stats_; 
     }
@@ -203,7 +209,7 @@ public:
      * @brief 获取文件统计信息（非 const 版本）
      * @return 文件统计引用
      */
-    file_stats& get_file_stats() override { 
+    xpumusic_sdk::file_stats& get_file_stats() override { 
         std::lock_guard<std::mutex> lock(mutex_);
         return stats_; 
     }
@@ -211,7 +217,7 @@ public:
     /**
      * @brief 重置所有元数据（清空所有字段）
      */
-    void reset();
+    void reset() override;
     
     /**
      * @brief 从另一个 file_info 对象复制所有数据

@@ -1,1 +1,0 @@
-/usr/bin/c++ -O3 -DNDEBUG CMakeFiles/music-player.dir/src/music_player_simple.cpp.o -o bin/music-player  lib/libcore_engine.a lib/libplatform_abstraction.a lib/libsdk_impl.a -lasound 

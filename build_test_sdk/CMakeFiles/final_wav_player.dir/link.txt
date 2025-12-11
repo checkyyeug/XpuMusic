@@ -1,1 +1,0 @@
-/usr/bin/c++ -O3 -DNDEBUG CMakeFiles/final_wav_player.dir/src/final_wav_player.cpp.o -o bin/final_wav_player 

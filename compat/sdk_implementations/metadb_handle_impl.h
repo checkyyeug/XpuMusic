@@ -13,6 +13,7 @@
 #include "metadb_handle_interface.h"
 #include "file_info_impl.h"
 #include "file_info_types.h"
+#include "metadb_handle_types.h"
 #include "../../sdk/headers/mp_types.h"
 #include <memory>
 #include <string>
@@ -20,6 +21,9 @@
 #include <mutex>
 
 namespace foobar2000_sdk {
+
+// 使用 xpumusic_sdk 中的类型
+using xpumusic_sdk::abort_callback;
 
 // 前向声明
 class metadb_impl;
@@ -47,7 +51,7 @@ private:
     TrackStatistics stats_;
     
     // 文件标识（用于检测文件变化）
-    file_stats file_stats_;
+    xpumusic_sdk::file_stats file_stats_;
     
     // 指向 metadb 的指针（用于反向引用）
     metadb_impl* parent_db_ = nullptr;

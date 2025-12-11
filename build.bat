@@ -25,35 +25,29 @@ echo.
 echo [1/4] Configuring Release build...
 echo.
 
-REM Try different generators in order of preference
-set GENERATOR_FOUND=0
-
 REM Try Visual Studio 2022
-cmake -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Release .. >nul 2>&1
+cmake -G "Visual Studio 17 2022" -A x64 ..
 if %ERRORLEVEL% EQU 0 (
-    set GENERATOR_FOUND=1
     echo Using Visual Studio 2022 generator
     goto :BUILD_RELEASE
 )
 
 REM Try Visual Studio 2019
-cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release .. >nul 2>&1
+cmake -G "Visual Studio 16 2019" -A x64 ..
 if %ERRORLEVEL% EQU 0 (
-    set GENERATOR_FOUND=1
     echo Using Visual Studio 2019 generator
     goto :BUILD_RELEASE
 )
 
 REM Try MinGW
-cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release .. >nul 2>&1
+cmake -G "MinGW Makefiles" ..
 if %ERRORLEVEL% EQU 0 (
-    set GENERATOR_FOUND=1
     echo Using MinGW Makefiles generator
     goto :BUILD_RELEASE
 )
 
 REM Try default generator
-cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake ..
 if %ERRORLEVEL% NEQ 0 (
     echo.
     echo ERROR: Failed to configure project
@@ -66,13 +60,14 @@ if %ERRORLEVEL% NEQ 0 (
     pause
     exit /b 1
 )
+echo Using default generator
 
 :BUILD_RELEASE
 echo.
 echo [2/4] Building Release...
 echo.
 
-cmake --build . --config Release --parallel
+cmake --build . --config Release
 if %ERRORLEVEL% NEQ 0 (
     echo Release build failed!
     pause
@@ -81,33 +76,40 @@ if %ERRORLEVEL% NEQ 0 (
 
 echo Release build completed successfully!
 
-REM Create debug directory
+REM Go back to project root
 cd ..
-if not exist "build\debug" mkdir debug
-cd debug
+
+REM Create debug directory in build
+if not exist "build\debug" mkdir build\debug
+cd build\debug
 
 echo.
 echo [3/4] Configuring Debug build...
 echo.
 
 REM Try the same generator that worked for Release
-cmake -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Debug .. >nul 2>&1
+cmake -G "Visual Studio 17 2022" -A x64 ..
 if %ERRORLEVEL% EQU 0 goto :BUILD_DEBUG
 
-cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Debug .. >nul 2>&1
+cmake -G "Visual Studio 16 2019" -A x64 ..
 if %ERRORLEVEL% EQU 0 goto :BUILD_DEBUG
 
-cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Debug .. >nul 2>&1
+cmake -G "MinGW Makefiles" ..
 if %ERRORLEVEL% EQU 0 goto :BUILD_DEBUG
 
-cmake -DCMAKE_BUILD_TYPE=Debug ..
+cmake ..
+if %ERRORLEVEL% NEQ 0 (
+    echo Debug configuration failed!
+    pause
+    exit /b 1
+)
 
 :BUILD_DEBUG
 echo.
 echo [4/4] Building Debug...
 echo.
 
-cmake --build . --config Debug --parallel
+cmake --build . --config Debug
 if %ERRORLEVEL% NEQ 0 (
     echo Debug build failed!
     pause
@@ -117,7 +119,7 @@ if %ERRORLEVEL% NEQ 0 (
 echo Debug build completed successfully!
 
 REM Go back to project root
-cd ..
+cd ..\..
 
 echo.
 echo ========================================

@@ -13,9 +13,6 @@
     <ClCompile Include="D:\workspaces\foobar\XpuMusic\compat\sdk_implementations\audio_chunk_impl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\workspaces\foobar\XpuMusic\compat\sdk_implementations\metadb_handle_impl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="D:\workspaces\foobar\XpuMusic\CMakeLists.txt" />

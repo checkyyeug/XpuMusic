@@ -19,6 +19,9 @@
 
 namespace foobar2000_sdk {
 
+// 使用 xpumusic_sdk 中的类型
+using xpumusic_sdk::abort_callback;
+
 // TrackStatistics 实现
 typedef std::chrono::system_clock::time_point time_point;
 typedef std::chrono::system_clock::duration duration;
@@ -43,7 +46,7 @@ void metadb_handle_impl::reset() {
     location_ = playable_location();
     info_ = std::make_unique<file_info_impl>();
     stats_ = TrackStatistics();
-    file_stats_ = file_stats();
+    file_stats_ = xpumusic_sdk::file_stats();
     parent_db_ = nullptr;
     initialized_ = false;
 }
@@ -71,7 +74,7 @@ Result metadb_handle_impl::load_metadata_from_file() {
     // 这个实现是简化的
     // 真正的实现需要调用解码器来获取元数据
     
-    const char* path = location_.get_path();
+    const std::string& path = location_.get_path();
     if (!path || strlen(path) == 0) {
         return Result::InvalidParameter;
     }
@@ -165,7 +168,7 @@ void metadb_handle_impl::refresh_info(abort_callback& p_abort) {
 std::string metadb_handle_impl::get_filename() const {
     std::lock_guard<std::mutex> lock(mutex_);
     
-    const char* path = location_.get_path();
+    const std::string& path = location_.get_path();
     if (!path || strlen(path) == 0) {
         return "";
     }
@@ -183,7 +186,7 @@ std::string metadb_handle_impl::get_filename() const {
 std::string metadb_handle_impl::get_directory() const {
     std::lock_guard<std::mutex> lock(mutex_);
     
-    const char* path = location_.get_path();
+    const std::string& path = location_.get_path();
     if (!path || strlen(path) == 0) {
         return "";
     }
@@ -224,7 +227,7 @@ std::string metadb_handle_impl::get_identifier() const {
     ss << location_.get_path();
     ss << "|" << file_stats_.m_size;
     ss << "|" << file_stats_.m_timestamp;
-    ss << "|" << location_.get_subsong();
+    ss << "|" << location_.get_subsong_index();
     
     return ss.str();
 }
@@ -237,7 +240,7 @@ bool metadb_handle_impl::equals(const metadb_handle_impl& other) const {
     
     // 比较位置（路径 + subsong）
     return location_.get_path() == other_impl->location_.get_path() &&
-           location_.get_subsong() == other_impl->location_.get_subsong();
+           location_.get_subsong_index() == other_impl->location_.get_subsong_index();
 }
 
 // 辅助函数

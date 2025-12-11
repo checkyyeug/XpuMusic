@@ -6,6 +6,9 @@
 
 #include "abort_callback.implified.h"
 
+// 使用 xpumusic_sdk 命名空间中的类型
+using xpumusic_sdk::abort_callback;
+
 // 实际实现都在头文件中，这个文件只是确保编译
 namespace foobar2000_sdk {
 
