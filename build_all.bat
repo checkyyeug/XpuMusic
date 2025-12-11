@@ -6,14 +6,50 @@ echo.
 
 REM Set the correct build directory
 set BUILD_DIR=D:\workspaces\foobar\XpuMusic\build
+
+REM Check if build directory exists
+if not exist "%BUILD_DIR%" (
+    echo Creating build directory...
+    mkdir "%BUILD_DIR%"
+)
+
+REM Go to build directory
 cd /d "%BUILD_DIR%"
 
 REM Check if this is a valid CMake build directory
 if not exist "CMakeCache.txt" (
-    echo ERROR: Not a CMake build directory!
-    echo Please run CMake configuration first:
-    echo   cmake -S .. -B . -G "Visual Studio 17 2022" -A x64
-    exit /b 1
+    echo CMake cache not found. Running configuration...
+    echo.
+    echo Detecting compiler...
+
+    REM Detect Visual Studio
+    where cl >nul 2>nul
+    if %ERRORLEVEL% EQU 0 (
+        echo Found: Microsoft Visual C++ Compiler
+        set CMAKE_GENERATOR="Visual Studio 17 2022"
+        set CMAKE_ARCH=-A x64
+        set IS_VS=1
+    ) else (
+        echo Visual Studio compiler not found in PATH
+        echo Please run from Visual Studio Developer Command Prompt
+        exit /b 1
+    )
+
+    echo.
+    echo Running CMake configuration...
+    echo cmake -S .. -B . -G %CMAKE_GENERATOR% %CMAKE_ARCH%
+    cmake -S .. -B . -G %CMAKE_GENERATOR% %CMAKE_ARCH%
+
+    if %ERRORLEVEL% NEQ 0 (
+        echo.
+        echo CMake configuration failed!
+        echo Please check error messages above.
+        exit /b 1
+    )
+
+    echo.
+    echo CMake configuration successful!
+    echo.
 )
 
 echo Build directory: %BUILD_DIR%

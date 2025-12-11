@@ -1,1 +1,0 @@
-/usr/bin/c++ -O3 -DNDEBUG CMakeFiles/test-universal-converter.dir/src/audio/universal_sample_rate_converter.cpp.o CMakeFiles/test-universal-converter.dir/src/audio/sample_rate_converter.cpp.o CMakeFiles/test-universal-converter.dir/src/audio/wav_writer.cpp.o CMakeFiles/test-universal-converter.dir/src/audio/test_universal_converter.cpp.o -o bin/test-universal-converter  -lm 

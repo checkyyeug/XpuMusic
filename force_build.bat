@@ -7,6 +7,16 @@ echo.
 REM Change to project root
 cd /d "D:\workspaces\foobar\XpuMusic"
 
+REM Check if build directory exists
+if not exist "build" (
+    echo Build directory not found. Running build_all.bat first...
+    echo.
+    call build_all.bat
+    echo.
+    echo Force build will now continue...
+    echo.
+)
+
 REM Set target directory
 set TARGET_DIR=build\bin\Debug
 set TARGET_NAME=%1
@@ -37,7 +47,11 @@ if exist "%TARGET_DIR%\%TARGET_NAME%.pdb" (
 REM Step 3: Delete object files to force recompilation
 echo.
 echo Step 2: Cleaning object files...
-cd build
+cd build 2>nul || (
+    echo ERROR: Build directory not found!
+    echo Please run build_all.bat first.
+    exit /b 1
+)
 if exist "build\%TARGET_NAME%.dir\Debug\*.obj" (
     del /f /q "%TARGET_NAME%.dir\Debug\*.obj"
     echo   Cleaned object files

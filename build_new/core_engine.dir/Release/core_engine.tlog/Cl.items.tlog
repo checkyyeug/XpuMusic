@@ -1,8 +1,0 @@
-D:\workspaces\foobar\XpuMusic\core\core_engine.cpp;D:\workspaces\foobar\XpuMusic\build_new\core_engine.dir\Release\core_engine.obj
-D:\workspaces\foobar\XpuMusic\core\service_registry.cpp;D:\workspaces\foobar\XpuMusic\build_new\core_engine.dir\Release\service_registry.obj
-D:\workspaces\foobar\XpuMusic\core\event_bus.cpp;D:\workspaces\foobar\XpuMusic\build_new\core_engine.dir\Release\event_bus.obj
-D:\workspaces\foobar\XpuMusic\core\plugin_host.cpp;D:\workspaces\foobar\XpuMusic\build_new\core_engine.dir\Release\plugin_host.obj
-D:\workspaces\foobar\XpuMusic\core\config_manager.cpp;D:\workspaces\foobar\XpuMusic\build_new\core_engine.dir\Release\config_manager.obj
-D:\workspaces\foobar\XpuMusic\core\playlist_manager.cpp;D:\workspaces\foobar\XpuMusic\build_new\core_engine.dir\Release\playlist_manager.obj
-D:\workspaces\foobar\XpuMusic\core\playback_engine.cpp;D:\workspaces\foobar\XpuMusic\build_new\core_engine.dir\Release\playback_engine.obj
-D:\workspaces\foobar\XpuMusic\core\visualization_engine.cpp;D:\workspaces\foobar\XpuMusic\build_new\core_engine.dir\Release\visualization_engine.obj

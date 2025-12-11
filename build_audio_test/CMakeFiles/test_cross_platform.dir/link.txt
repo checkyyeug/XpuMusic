@@ -1,1 +1,0 @@
-/usr/bin/c++ -O3 -DNDEBUG CMakeFiles/test_cross_platform.dir/test_cross_platform.cpp.o CMakeFiles/test_cross_platform.dir/platform/audio_output_factory.cpp.o CMakeFiles/test_cross_platform.dir/platform/linux/audio_output_stub.cpp.o -o bin/test_cross_platform  -lasound 
