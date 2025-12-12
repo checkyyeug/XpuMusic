@@ -102,7 +102,7 @@ for %%F in (bin\Debug\*.exe) do (
     echo   %%~nF.exe: %%~zF bytes
 )
 echo.
-echo Build complete! 🎵
+echo Build complete!
 
 REM Return to original directory
 cd /d "%ORIGINAL_DIR%"
