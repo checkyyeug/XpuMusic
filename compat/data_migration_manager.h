@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file data_migration_manager.h
  * @brief Data migration manager for foobar2000 compatibility
  * @date 2025-12-10

@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @file foobar_adapter.h
- * @brief XpuMusic插件兼容适配器
+ * @brief XpuMusic鎻掍欢鍏煎閫傞厤鍣?
  * @date 2025-12-10
  */
 
@@ -15,7 +15,7 @@
 namespace xpumusic::compat {
 
 /**
- * @brief XpuMusic解码器到XpuMusic接口的适配器
+ * @brief XpuMusic瑙ｇ爜鍣ㄥ埌XpuMusic鎺ュ彛鐨勯€傞厤鍣?
  */
 class FoobarDecoderAdapter : public IAudioDecoder {
 private:
@@ -28,7 +28,7 @@ public:
     explicit FoobarDecoderAdapter(xpumusic::input_decoder* decoder);
     ~FoobarDecoderAdapter() override = default;
 
-    // IPlugin接口
+    // IPlugin鎺ュ彛
     bool initialize() override;
     void finalize() override;
     PluginInfo get_info() const override;
@@ -36,7 +36,7 @@ public:
     void set_state(PluginState state) override;
     std::string get_last_error() const override;
 
-    // IAudioDecoder接口
+    // IAudioDecoder鎺ュ彛
     bool can_decode(const std::string& file_path) override;
     std::vector<std::string> get_supported_extensions() override;
     bool open(const std::string& file_path) override;
@@ -53,7 +53,7 @@ public:
 };
 
 /**
- * @brief XpuMusic插件包装器
+ * @brief XpuMusic鎻掍欢鍖呰鍣?
  */
 class FoobarPluginWrapper {
 private:
@@ -65,26 +65,26 @@ public:
     FoobarPluginWrapper();
     ~FoobarPluginWrapper();
 
-    // 加载XpuMusic插件
+    // 鍔犺浇XpuMusic鎻掍欢
     bool load_plugin(const std::string& path);
 
-    // 获取适配后的解码器
+    // 鑾峰彇閫傞厤鍚庣殑瑙ｇ爜鍣?
     std::vector<std::unique_ptr<IAudioDecoder>> get_decoders();
 
-    // 获取插件信息
+    // 鑾峰彇鎻掍欢淇℃伅
     std::vector<PluginInfo> get_plugin_info() const;
 
 private:
-    // 枚举插件提供的服务
+    // 鏋氫妇鎻掍欢鎻愪緵鐨勬湇鍔?
     void enumerate_services();
 
-    // 创建解码器适配器
+    // 鍒涘缓瑙ｇ爜鍣ㄩ€傞厤鍣?
     void create_decoder_adapter(const xpumusic::GUID& guid,
                                 const std::string& name);
 };
 
 /**
- * @brief foobar解码器适配器工厂
+ * @brief foobar瑙ｇ爜鍣ㄩ€傞厤鍣ㄥ伐鍘?
  */
 class FoobarDecoderFactory : public ITypedPluginFactory<IAudioDecoder> {
 private:

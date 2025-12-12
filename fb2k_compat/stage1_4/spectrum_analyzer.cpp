@@ -1,4 +1,4 @@
-#include "audio_analyzer.h"
+﻿#include "audio_analyzer.h"
 #include <cmath>
 #include <algorithm>
 #include <numeric>
@@ -11,7 +11,7 @@
 
 namespace fb2k {
 
-// FFT处理器实现
+// FFT澶勭悊鍣ㄥ疄鐜?
 class fft_processor_impl {
 public:
     fft_processor_impl(int size);
@@ -28,7 +28,7 @@ private:
     int window_type_;
     std::vector<float> window_;
     
-    // 简单的FFT实现（使用复数运算）
+    // 绠€鍗曠殑FFT瀹炵幇锛堜娇鐢ㄥ鏁拌繍绠楋級
     void perform_fft(const std::vector<std::complex<float>>& input, std::vector<std::complex<float>>& output);
     void apply_window_to_signal(std::vector<float>& signal);
     std::vector<float> create_window_function(int type, int size);
@@ -48,17 +48,17 @@ bool fft_processor_impl::process(const std::vector<float>& input, std::vector<st
     
     output.resize(size_);
     
-    // 应用窗口函数
+    // 搴旂敤绐楀彛鍑芥暟
     std::vector<float> windowed_input = input;
     apply_window_to_signal(windowed_input);
     
-    // 转换为复数
+    // 杞崲涓哄鏁?
     std::vector<std::complex<float>> complex_input(size_);
     for (int i = 0; i < size_; ++i) {
         complex_input[i] = std::complex<float>(windowed_input[i], 0.0f);
     }
     
-    // 执行FFT
+    // 鎵цFFT
     perform_fft(complex_input, output);
     
     return true;
@@ -73,7 +73,7 @@ bool fft_processor_impl::process_real(const std::vector<float>& input, std::vect
     magnitudes.resize(size_ / 2 + 1);
     phases.resize(size_ / 2 + 1);
     
-    // 计算幅度和相位（只取正频率部分）
+    // 璁＄畻骞呭害鍜岀浉浣嶏紙鍙彇姝ｉ鐜囬儴鍒嗭級
     for (int i = 0; i <= size_ / 2; ++i) {
         magnitudes[i] = std::abs(fft_output[i]);
         phases[i] = std::arg(fft_output[i]);
@@ -99,11 +99,11 @@ std::vector<double> fft_processor_impl::get_frequency_bins(double sample_rate) c
 }
 
 void fft_processor_impl::perform_fft(const std::vector<std::complex<float>>& input, std::vector<std::complex<float>>& output) {
-    // 简化的FFT实现（Cooley-Tukey算法）
+    // 绠€鍖栫殑FFT瀹炵幇锛圕ooley-Tukey绠楁硶锛?
     int n = input.size();
     output = input;
     
-    // 位反转重排列
+    // 浣嶅弽杞噸鎺掑垪
     int j = 0;
     for (int i = 1; i < n; ++i) {
         int bit = n >> 1;
@@ -117,7 +117,7 @@ void fft_processor_impl::perform_fft(const std::vector<std::complex<float>>& inp
         }
     }
     
-    // FFT计算
+    // FFT璁＄畻
     for (int len = 2; len <= n; len <<= 1) {
         double angle = -2.0 * M_PI / len;
         std::complex<float> wlen(std::cos(angle), std::sin(angle));
@@ -149,23 +149,23 @@ std::vector<float> fft_processor_impl::create_window_function(int type, int size
     std::vector<float> window(size);
     
     switch (type) {
-        case 0: // 矩形窗
+        case 0: // 鐭╁舰绐?
             std::fill(window.begin(), window.end(), 1.0f);
             break;
             
-        case 1: // Hann窗
+        case 1: // Hann绐?
             for (int i = 0; i < size; ++i) {
                 window[i] = 0.5f * (1.0f - std::cos(2.0f * M_PI * i / (size - 1)));
             }
             break;
             
-        case 2: // Hamming窗
+        case 2: // Hamming绐?
             for (int i = 0; i < size; ++i) {
                 window[i] = 0.54f - 0.46f * std::cos(2.0f * M_PI * i / (size - 1));
             }
             break;
             
-        case 3: // Blackman窗
+        case 3: // Blackman绐?
             for (int i = 0; i < size; ++i) {
                 window[i] = 0.42f - 0.5f * std::cos(2.0f * M_PI * i / (size - 1)) + 
                            0.08f * std::cos(4.0f * M_PI * i / (size - 1));
@@ -180,11 +180,11 @@ std::vector<float> fft_processor_impl::create_window_function(int type, int size
     return window;
 }
 
-// 频谱分析仪实现
+// 棰戣氨鍒嗘瀽浠疄鐜?
 spectrum_analyzer::spectrum_analyzer()
     : analysis_mode_(0)
     , fft_size_(ANALYZER_DEFAULT_FFT_SIZE)
-    , window_type_(1) // Hann窗
+    , window_type_(1) // Hann绐?
     , overlap_factor_(0.5)
     , enable_rms_(true)
     , enable_peak_(true)
@@ -195,23 +195,23 @@ spectrum_analyzer::spectrum_analyzer()
     
     fft_proc_ = std::make_unique<fft_processor_impl>(fft_size_);
     
-    // 初始化分析数据
+    // 鍒濆鍖栧垎鏋愭暟鎹?
     current_analysis_.is_valid = false;
     current_analysis_.time_stamp = 0.0;
     
-    // 初始化统计信息
+    // 鍒濆鍖栫粺璁′俊鎭?
     reset_statistics();
 }
 
 spectrum_analyzer::~spectrum_analyzer() = default;
 
 HRESULT spectrum_analyzer::do_initialize() {
-    std::cout << "[Spectrum Analyzer] 初始化频谱分析仪" << std::endl;
+    std::cout << "[Spectrum Analyzer] 鍒濆鍖栭璋卞垎鏋愪华" << std::endl;
     return S_OK;
 }
 
 HRESULT spectrum_analyzer::do_shutdown() {
-    std::cout << "[Spectrum Analyzer] 关闭频谱分析仪" << std::endl;
+    std::cout << "[Spectrum Analyzer] 鍏抽棴棰戣氨鍒嗘瀽浠? << std::endl;
     return S_OK;
 }
 
@@ -222,7 +222,7 @@ HRESULT spectrum_analyzer::analyze_chunk(const audio_chunk& chunk, audio_feature
     
     std::lock_guard<std::mutex> lock(analysis_mutex_);
     
-    // 提取基本特征
+    // 鎻愬彇鍩烘湰鐗瑰緛
     if (enable_rms_) {
         features.rms_level = calculate_rms_level(chunk);
     }
@@ -235,7 +235,7 @@ HRESULT spectrum_analyzer::analyze_chunk(const audio_chunk& chunk, audio_feature
         features.loudness = calculate_loudness(chunk);
     }
     
-    // 计算派生特征
+    // 璁＄畻娲剧敓鐗瑰緛
     if (features.rms_level > 0 && features.peak_level > 0) {
         features.crest_factor = features.peak_level / features.rms_level;
         features.dynamic_range = 20.0 * std::log10(features.peak_level / features.rms_level);
@@ -244,20 +244,20 @@ HRESULT spectrum_analyzer::analyze_chunk(const audio_chunk& chunk, audio_feature
     features.dc_offset = calculate_dc_offset(chunk);
     features.stereo_correlation = calculate_stereo_correlation(chunk);
     
-    // 时域特征
+    // 鏃跺煙鐗瑰緛
     extract_temporal_features(chunk, features);
     
-    // 更新实时分析
+    // 鏇存柊瀹炴椂鍒嗘瀽
     update_real_time_analysis(features, spectrum_data());
     
-    // 更新统计信息
+    // 鏇存柊缁熻淇℃伅
     update_statistics(features);
     
-    // 保存历史数据
+    // 淇濆瓨鍘嗗彶鏁版嵁
     {
         std::lock_guard<std::mutex> history_lock(history_mutex_);
         feature_history_.push_back(features);
-        if (feature_history_.size() > 1000) { // 限制历史数据大小
+        if (feature_history_.size() > 1000) { // 闄愬埗鍘嗗彶鏁版嵁澶у皬
             feature_history_.erase(feature_history_.begin());
         }
     }
@@ -275,15 +275,15 @@ HRESULT spectrum_analyzer::analyze_spectrum(const audio_chunk& chunk, spectrum_d
     const float* data = chunk.get_data();
     double sample_rate = chunk.get_sample_rate();
     
-    // 准备FFT输入数据
+    // 鍑嗗FFT杈撳叆鏁版嵁
     std::vector<float> fft_input(fft_size_, 0.0f);
     
-    // 混合声道或取第一个声道
+    // 娣峰悎澹伴亾鎴栧彇绗竴涓０閬?
     if (channels == 1) {
         int copy_samples = std::min(num_samples, fft_size_);
         std::memcpy(fft_input.data(), data, copy_samples * sizeof(float));
     } else {
-        // 混合声道
+        // 娣峰悎澹伴亾
         int copy_samples = std::min(num_samples, fft_size_);
         for (int i = 0; i < copy_samples; ++i) {
             float mixed_sample = 0.0f;
@@ -294,7 +294,7 @@ HRESULT spectrum_analyzer::analyze_spectrum(const audio_chunk& chunk, spectrum_d
         }
     }
     
-    // 执行FFT
+    // 鎵цFFT
     std::vector<float> magnitudes;
     std::vector<float> phases;
     
@@ -302,10 +302,10 @@ HRESULT spectrum_analyzer::analyze_spectrum(const audio_chunk& chunk, spectrum_d
         return E_FAIL;
     }
     
-    // 填充频谱数据
+    // 濉厖棰戣氨鏁版嵁
     spectrum.sample_rate = sample_rate;
     spectrum.fft_size = fft_size_;
-    spectrum.hop_size = fft_size_ / 2; // 50%重叠
+    spectrum.hop_size = fft_size_ / 2; // 50%閲嶅彔
     spectrum.window_type = window_type_;
     
     spectrum.frequencies = fft_proc_->get_frequency_bins(sample_rate);
@@ -313,26 +313,26 @@ HRESULT spectrum_analyzer::analyze_spectrum(const audio_chunk& chunk, spectrum_d
     spectrum.phases.resize(phases.size());
     spectrum.power_density.resize(magnitudes.size());
     
-    // 转换为dB并计算功率密度
+    // 杞崲涓篸B骞惰绠楀姛鐜囧瘑搴?
     for (size_t i = 0; i < magnitudes.size(); ++i) {
-        // 幅度转dB
+        // 骞呭害杞琩B
         double magnitude_db = 20.0 * std::log10(std::max(magnitudes[i], 1e-10f));
         spectrum.magnitudes[i] = magnitude_db;
         
         spectrum.phases[i] = phases[i];
         
-        // 功率密度 (功率/Hz)
+        // 鍔熺巼瀵嗗害 (鍔熺巼/Hz)
         double power = magnitudes[i] * magnitudes[i];
         double bandwidth = (i == 0) ? spectrum.frequencies[1] : 
                           (spectrum.frequencies[i] - spectrum.frequencies[i-1]);
         spectrum.power_density[i] = power / bandwidth;
     }
     
-    // 提取频谱特征
+    // 鎻愬彇棰戣氨鐗瑰緛
     audio_features features;
     extract_spectral_features(spectrum, features);
     
-    // 保存历史数据
+    // 淇濆瓨鍘嗗彶鏁版嵁
     {
         std::lock_guard<std::mutex> history_lock(history_mutex_);
         spectrum_history_.push_back(spectrum);
@@ -350,7 +350,7 @@ HRESULT spectrum_analyzer::get_real_time_analysis(real_time_analysis& analysis) 
     return S_OK;
 }
 
-// 配置管理
+// 閰嶇疆绠＄悊
 HRESULT spectrum_analyzer::set_fft_size(int size) {
     if (size < 128 || size > 65536) return E_INVALIDARG;
     
@@ -423,7 +423,7 @@ HRESULT spectrum_analyzer::is_feature_enabled(int feature, bool& enabled) const 
     return S_OK;
 }
 
-// 频率分析
+// 棰戠巼鍒嗘瀽
 HRESULT spectrum_analyzer::get_frequency_band_level(frequency_band band, double& level) const {
     std::lock_guard<std::mutex> lock(analysis_mutex_);
     
@@ -451,14 +451,14 @@ HRESULT spectrum_analyzer::get_frequency_response(const std::vector<double>& fre
     
     magnitudes.resize(frequencies.size());
     
-    // 插值计算频率响应
+    // 鎻掑€艰绠楅鐜囧搷搴?
     for (size_t i = 0; i < frequencies.size(); ++i) {
-        // 这里应该使用插值算法从频谱数据计算指定频率的响应
-        // 简化实现：使用最近的频率点
+        // 杩欓噷搴旇浣跨敤鎻掑€肩畻娉曚粠棰戣氨鏁版嵁璁＄畻鎸囧畾棰戠巼鐨勫搷搴?
+        // 绠€鍖栧疄鐜帮細浣跨敤鏈€杩戠殑棰戠巼鐐?
         double target_freq = frequencies[i];
-        double closest_mag = -80.0; // 默认-80dB
+        double closest_mag = -80.0; // 榛樿-80dB
         
-        // 在实际实现中，这里应该使用线性插值或更高阶插值
+        // 鍦ㄥ疄闄呭疄鐜颁腑锛岃繖閲屽簲璇ヤ娇鐢ㄧ嚎鎬ф彃鍊兼垨鏇撮珮闃舵彃鍊?
         magnitudes[i] = closest_mag;
     }
     
@@ -474,7 +474,7 @@ HRESULT spectrum_analyzer::detect_peaks(std::vector<std::pair<double, double>>& 
     
     peaks.clear();
     
-    // 简化的峰值检测算法
+    // 绠€鍖栫殑宄板€兼娴嬬畻娉?
     const auto& spectrum = current_analysis_.spectrum_values;
     if (spectrum.size() < 3) return S_OK;
     
@@ -482,7 +482,7 @@ HRESULT spectrum_analyzer::detect_peaks(std::vector<std::pair<double, double>>& 
         if (spectrum[i] > threshold && 
             spectrum[i] > spectrum[i-1] && 
             spectrum[i] > spectrum[i+1]) {
-            // 计算精确的峰值频率（抛物线插值）
+            // 璁＄畻绮剧‘鐨勫嘲鍊奸鐜囷紙鎶涚墿绾挎彃鍊硷級
             double freq_bin = static_cast<double>(i);
             double magnitude = spectrum[i];
             peaks.push_back({freq_bin, magnitude});
@@ -492,31 +492,31 @@ HRESULT spectrum_analyzer::detect_peaks(std::vector<std::pair<double, double>>& 
     return S_OK;
 }
 
-// 节奏和音调分析（简化实现）
+// 鑺傚鍜岄煶璋冨垎鏋愶紙绠€鍖栧疄鐜帮級
 HRESULT spectrum_analyzer::detect_onsets(std::vector<double>& onset_times, double threshold) const {
-    // 这里应该实现onset检测算法
-    // 简化实现：返回空结果
+    // 杩欓噷搴旇瀹炵幇onset妫€娴嬬畻娉?
+    // 绠€鍖栧疄鐜帮細杩斿洖绌虹粨鏋?
     onset_times.clear();
     return S_OK;
 }
 
 HRESULT spectrum_analyzer::detect_beats(std::vector<double>& beat_times, double& tempo) const {
-    // 这里应该实现beat检测算法
-    // 简化实现：返回默认结果
+    // 杩欓噷搴旇瀹炵幇beat妫€娴嬬畻娉?
+    // 绠€鍖栧疄鐜帮細杩斿洖榛樿缁撴灉
     beat_times.clear();
-    tempo = 120.0; // 默认120 BPM
+    tempo = 120.0; // 榛樿120 BPM
     return S_OK;
 }
 
 HRESULT spectrum_analyzer::detect_key(int& key, double& confidence) const {
-    // 这里应该实现key检测算法
-    // 简化实现：返回C大调
+    // 杩欓噷搴旇瀹炵幇key妫€娴嬬畻娉?
+    // 绠€鍖栧疄鐜帮細杩斿洖C澶ц皟
     key = 0; // C major
     confidence = 0.5;
     return S_OK;
 }
 
-// 统计和报告
+// 缁熻鍜屾姤鍛?
 HRESULT spectrum_analyzer::get_analysis_statistics(std::map<std::string, double>& statistics) const {
     std::lock_guard<std::mutex> lock(stats_mutex_);
     statistics = statistics_;
@@ -533,16 +533,16 @@ HRESULT spectrum_analyzer::generate_report(std::string& report) const {
     std::lock_guard<std::mutex> lock(stats_mutex_);
     
     std::stringstream ss;
-    ss << "频谱分析报告\n";
+    ss << "棰戣氨鍒嗘瀽鎶ュ憡\n";
     ss << "================\n\n";
     
-    ss << "配置信息:\n";
-    ss << "  FFT大小: " << fft_size_ << "\n";
-    ss << "  窗口类型: " << window_type_ << "\n";
-    ss << "  重叠因子: " << overlap_factor_ << "\n";
-    ss << "  分析模式: " << analysis_mode_ << "\n\n";
+    ss << "閰嶇疆淇℃伅:\n";
+    ss << "  FFT澶у皬: " << fft_size_ << "\n";
+    ss << "  绐楀彛绫诲瀷: " << window_type_ << "\n";
+    ss << "  閲嶅彔鍥犲瓙: " << overlap_factor_ << "\n";
+    ss << "  鍒嗘瀽妯″紡: " << analysis_mode_ << "\n\n";
     
-    ss << "统计信息:\n";
+    ss << "缁熻淇℃伅:\n";
     for (const auto& [key, value] : statistics_) {
         ss << "  " << key << ": " << std::fixed << std::setprecision(3) << value << "\n";
     }
@@ -551,7 +551,7 @@ HRESULT spectrum_analyzer::generate_report(std::string& report) const {
     return S_OK;
 }
 
-// 核心分析函数实现
+// 鏍稿績鍒嗘瀽鍑芥暟瀹炵幇
 double spectrum_analyzer::calculate_rms_level(const audio_chunk& chunk) const {
     const float* data = chunk.get_data();
     int total_samples = chunk.get_sample_count() * chunk.get_channels();
@@ -578,8 +578,8 @@ double spectrum_analyzer::calculate_peak_level(const audio_chunk& chunk) const {
 }
 
 double spectrum_analyzer::calculate_loudness(const audio_chunk& chunk) const {
-    // 简化的响度计算（应该使用ITU-R BS.1770标准）
-    return calculate_rms_level(chunk) + 3.0; // 粗略估计
+    // 绠€鍖栫殑鍝嶅害璁＄畻锛堝簲璇ヤ娇鐢↖TU-R BS.1770鏍囧噯锛?
+    return calculate_rms_level(chunk) + 3.0; // 绮楃暐浼拌
 }
 
 double spectrum_analyzer::calculate_dc_offset(const audio_chunk& chunk) const {
@@ -632,8 +632,8 @@ void spectrum_analyzer::extract_spectral_features(const spectrum_data& spectrum,
     features.spectral_bandwidth[0] = calculate_spectral_bandwidth(spectrum.magnitudes, features.spectral_centroid[0], spectrum.sample_rate);
     features.spectral_rolloff[0] = calculate_spectral_rolloff(spectrum.magnitudes, spectrum.sample_rate);
     
-    // 计算频谱通量（需要前一个频谱）
-    // 简化实现：使用当前频谱
+    // 璁＄畻棰戣氨閫氶噺锛堥渶瑕佸墠涓€涓璋憋級
+    // 绠€鍖栧疄鐜帮細浣跨敤褰撳墠棰戣氨
     features.spectral_flux[0] = 0.0;
 }
 
@@ -644,7 +644,7 @@ void spectrum_analyzer::extract_temporal_features(const audio_chunk& chunk, audi
     features.zero_crossing_rate_time.resize(1);
     features.zero_crossing_rate_time[0] = calculate_zero_crossing_rate(std::vector<float>(data, data + num_samples));
     
-    // 其他时域特征...
+    // 鍏朵粬鏃跺煙鐗瑰緛...
     features.energy_envelope.clear();
     features.attack_time.clear();
     features.release_time.clear();
@@ -686,7 +686,7 @@ double spectrum_analyzer::calculate_spectral_rolloff(const std::vector<double>& 
     }
     
     double cumulative_energy = 0.0;
-    double threshold_energy = total_energy * 0.85; // 85%能量阈值
+    double threshold_energy = total_energy * 0.85; // 85%鑳介噺闃堝€?
     double freq_resolution = sample_rate / fft_size_;
     
     for (size_t i = 0; i < magnitudes.size(); ++i) {
@@ -721,12 +721,12 @@ void spectrum_analyzer::update_real_time_analysis(const audio_features& features
         std::chrono::steady_clock::now().time_since_epoch()).count();
     current_analysis_.is_valid = true;
     
-    // 更新频谱数据
+    // 鏇存柊棰戣氨鏁版嵁
     if (!spectrum.magnitudes.empty()) {
         current_analysis_.spectrum_values = spectrum.magnitudes;
     }
     
-    // 更新频段电平
+    // 鏇存柊棰戞鐢靛钩
     current_analysis_.band_levels.resize(static_cast<int>(frequency_band::count));
     for (int i = 0; i < static_cast<int>(frequency_band::count); ++i) {
         frequency_band band = static_cast<frequency_band>(i);
@@ -735,7 +735,7 @@ void spectrum_analyzer::update_real_time_analysis(const audio_features& features
         current_analysis_.band_levels[i] = level;
     }
     
-    // 保存历史数据
+    // 淇濆瓨鍘嗗彶鏁版嵁
     {
         std::lock_guard<std::mutex> history_lock(history_mutex_);
         analysis_history_.push_back(current_analysis_);
@@ -755,13 +755,13 @@ void spectrum_analyzer::update_statistics(const audio_features& features) {
     statistics_["spectral_centroid_mean"] = features.spectral_centroid.empty() ? 0.0 : features.spectral_centroid[0];
 }
 
-// 接口IID定义
+// 鎺ュ彛IID瀹氫箟
 template<> const GUID audio_analyzer::iid = 
     { 0x12345678, 0x9abc, 0xdef0, { 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0 } };
 
 template<> const char* audio_analyzer::interface_name = "IAudioAnalyzer";
 
-// 注册频谱分析仪
+// 娉ㄥ唽棰戣氨鍒嗘瀽浠?
 FB2K_REGISTER_SERVICE(spectrum_analyzer, audio_analyzer::iid)
 
 } // namespace fb2k

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file test_quality_comparison.cpp
  * @brief Compare quality of different resamplers
  * @date 2025-12-10
@@ -59,7 +59,7 @@ void test_converter_quality(ResamplerQuality quality, const float* input,
     auto converter = ImprovedSampleRateConverterFactory::create(quality, true);
 
     if (!converter->initialize(input_rate, output_rate, channels)) {
-        std::cout << "❌ Failed to initialize converter\n";
+        std::cout << "鉂?Failed to initialize converter\n";
         return;
     }
 
@@ -91,9 +91,9 @@ void test_converter_quality(ResamplerQuality quality, const float* input,
     WAVWriter writer;
     if (writer.write(filename.c_str(), output.data(), output_frames,
                     output_rate, channels, 24)) {
-        std::cout << "✅ Saved: " << filename << "\n";
+        std::cout << "鉁?Saved: " << filename << "\n";
     } else {
-        std::cout << "❌ Failed to save: " << filename << "\n";
+        std::cout << "鉂?Failed to save: " << filename << "\n";
     }
 }
 
@@ -131,7 +131,7 @@ int main() {
     }
 
     // Test downsampling (more challenging)
-    std::cout << "\n\n=== Test 2: Downsampling (96kHz → 44.1kHz) ===\n";
+    std::cout << "\n\n=== Test 2: Downsampling (96kHz 鈫?44.1kHz) ===\n";
     int downsample_rate = 44100;
     int downsample_frames = 96000 * duration_seconds;
     std::vector<float> downsample_input(downsample_frames * channels);
@@ -144,7 +144,7 @@ int main() {
     }
 
     // Test upsampling with square wave
-    std::cout << "\n\n=== Test 3: Square Wave Upsampling (44.1kHz → 96kHz) ===\n";
+    std::cout << "\n\n=== Test 3: Square Wave Upsampling (44.1kHz 鈫?96kHz) ===\n";
     for (auto quality : qualities) {
         test_converter_quality(quality, test_signal_square.data(),
                               input_frames, input_rate, 96000,
@@ -220,11 +220,11 @@ int main() {
     std::cout << "   - Similar to foobar2000's best mode\n\n";
 
     std::cout << "=== Recommendations ===\n";
-    std::cout << "• Use 'Fast' for: Games, real-time communication, embedded systems\n";
-    std::cout << "• Use 'Good' for: General music playback, most applications\n";
-    std::cout << "• Use 'High' for: Music production, audiophile listening\n";
-    std::cout << "• Use 'Very High' for: Professional audio work\n";
-    std::cout << "• Use 'Best' for: Critical applications, archival processing\n\n";
+    std::cout << "鈥?Use 'Fast' for: Games, real-time communication, embedded systems\n";
+    std::cout << "鈥?Use 'Good' for: General music playback, most applications\n";
+    std::cout << "鈥?Use 'High' for: Music production, audiophile listening\n";
+    std::cout << "鈥?Use 'Very High' for: Professional audio work\n";
+    std::cout << "鈥?Use 'Best' for: Critical applications, archival processing\n\n";
 
     std::cout << "Generated test files:\n";
     std::cout << "- quality_*.wav: Different quality levels\n";
@@ -232,7 +232,7 @@ int main() {
     std::cout << "- Square wave files show ringing and transient response\n";
     std::cout << "- Sweep files show frequency response flatness\n\n";
 
-    std::cout << "✅ Quality comparison complete!\n";
+    std::cout << "鉁?Quality comparison complete!\n";
 
     return 0;
 }

@@ -1,12 +1,12 @@
-#include "dsp_interfaces.h"
+﻿#include "dsp_interfaces.h"
 #include <cstring>
 #include <algorithm>
 #include <sstream>
 
 namespace fb2k {
 
-// 简化的DSP预设实现
-// 用于测试和演示基本功能
+// 绠€鍖栫殑DSP棰勮瀹炵幇
+// 鐢ㄤ簬娴嬭瘯鍜屾紨绀哄熀鏈姛鑳?
 
 class simple_dsp_preset : public dsp_preset {
 private:
@@ -19,7 +19,7 @@ public:
     simple_dsp_preset() : is_valid_(false) {}
     explicit simple_dsp_preset(const std::string& name) : name_(name), is_valid_(true) {}
     
-    // IUnknown实现
+    // IUnknown瀹炵幇
     HRESULT QueryInterfaceImpl(REFIID riid, void** ppvObject) override {
         if(IsEqualGUID(riid, __uuidof(dsp_preset))) {
             *ppvObject = static_cast<dsp_preset*>(this);
@@ -28,7 +28,7 @@ public:
         return ServiceBase::QueryInterfaceImpl(riid, ppvObject);
     }
     
-    // 基础管理
+    // 鍩虹绠＄悊
     void reset() override {
         name_.clear();
         float_params_.clear();
@@ -46,17 +46,17 @@ public:
         name_ = source.get_name();
         is_valid_ = source.is_valid();
         
-        // 复制浮点参数
+        // 澶嶅埗娴偣鍙傛暟
         float_params_.clear();
-        // 这里需要遍历source的所有float参数
-        // 简化实现：只复制已知参数
+        // 杩欓噷闇€瑕侀亶鍘唖ource鐨勬墍鏈塮loat鍙傛暟
+        // 绠€鍖栧疄鐜帮細鍙鍒跺凡鐭ュ弬鏁?
         
-        // 复制字符串参数
+        // 澶嶅埗瀛楃涓插弬鏁?
         string_params_.clear();
-        // 简化实现
+        // 绠€鍖栧疄鐜?
     }
     
-    // 名称管理
+    // 鍚嶇О绠＄悊
     const char* get_name() const override {
         return name_.c_str();
     }
@@ -65,7 +65,7 @@ public:
         if(name) name_ = name;
     }
     
-    // 参数管理
+    // 鍙傛暟绠＄悊
     bool has_parameter(const char* name) const override {
         if(!name) return false;
         std::string param_name(name);
@@ -97,17 +97,17 @@ public:
         string_params_[name] = value;
     }
     
-    // 序列化 - 简化JSON格式
+    // 搴忓垪鍖?- 绠€鍖朖SON鏍煎紡
     void serialize(std::vector<uint8_t>& data) const override {
         data.clear();
         
-        // 创建JSON格式的字符串
+        // 鍒涘缓JSON鏍煎紡鐨勫瓧绗︿覆
         std::stringstream json;
         json << "{\n";
         json << "  \"name\": \"" << name_ << "\",\n";
         json << "  \"valid\": " << (is_valid_ ? "true" : "false") << ",\n";
         
-        // 浮点参数
+        // 娴偣鍙傛暟
         json << "  \"float_params\": {\n";
         bool first = true;
         for(const auto& [key, value] : float_params_) {
@@ -117,7 +117,7 @@ public:
         }
         json << "\n  },\n";
         
-        // 字符串参数
+        // 瀛楃涓插弬鏁?
         json << "  \"string_params\": {\n";
         first = true;
         for(const auto& [key, value] : string_params_) {
@@ -135,14 +135,14 @@ public:
     bool deserialize(const uint8_t* data, size_t size) override {
         if(!data || size == 0) return false;
         
-        reset(); // 先重置
+        reset(); // 鍏堥噸缃?
         
         std::string json_str(reinterpret_cast<const char*>(data), size);
         
-        // 简化的JSON解析
-        // 实际实现需要完整的JSON解析器
+        // 绠€鍖栫殑JSON瑙ｆ瀽
+        // 瀹為檯瀹炵幇闇€瑕佸畬鏁寸殑JSON瑙ｆ瀽鍣?
         
-        // 查找名称
+        // 鏌ユ壘鍚嶇О
         size_t name_pos = json_str.find("\"name\":");
         if(name_pos != std::string::npos) {
             size_t name_start = json_str.find("\"", name_pos + 7) + 1;
@@ -152,7 +152,7 @@ public:
             }
         }
         
-        // 查找valid标志
+        // 鏌ユ壘valid鏍囧織
         size_t valid_pos = json_str.find("\"valid\":");
         if(valid_pos != std::string::npos) {
             size_t valid_start = valid_pos + 8;
@@ -161,21 +161,21 @@ public:
             }
         }
         
-        // 简化参数解析（实际实现需要完整JSON解析）
-        // 这里只是演示基本思路
+        // 绠€鍖栧弬鏁拌В鏋愶紙瀹為檯瀹炵幇闇€瑕佸畬鏁碕SON瑙ｆ瀽锛?
+        // 杩欓噷鍙槸婕旂ず鍩烘湰鎬濊矾
         
         is_valid_ = true;
         return true;
     }
     
-    // 比较
+    // 姣旇緝
     bool operator==(const dsp_preset& other) const override {
         if(!is_valid_ || !other.is_valid()) return false;
         if(name_ != other.get_name()) return false;
         
-        // 需要比较所有参数
-        // 简化实现：只比较float参数的数量
-        return float_params_.size() == 0; // 简化比较
+        // 闇€瑕佹瘮杈冩墍鏈夊弬鏁?
+        // 绠€鍖栧疄鐜帮細鍙瘮杈僨loat鍙傛暟鐨勬暟閲?
+        return float_params_.size() == 0; // 绠€鍖栨瘮杈?
     }
     
     bool operator!=(const dsp_preset& other) const override {
@@ -183,7 +183,7 @@ public:
     }
 };
 
-// 基础DSP效果器实现（用于测试）
+// 鍩虹DSP鏁堟灉鍣ㄥ疄鐜帮紙鐢ㄤ簬娴嬭瘯锛?
 class test_dsp_effect : public dsp {
 private:
     std::string name_;
@@ -196,7 +196,7 @@ public:
     test_dsp_effect(const std::string& name = "TestDSP") 
         : name_(name), is_instantiated_(false), sample_rate_(44100), channels_(2), gain_(1.0f) {}
     
-    // IUnknown实现
+    // IUnknown瀹炵幇
     HRESULT QueryInterfaceImpl(REFIID riid, void** ppvObject) override {
         if(IsEqualGUID(riid, __uuidof(dsp))) {
             *ppvObject = static_cast<dsp*>(this);
@@ -205,7 +205,7 @@ public:
         return ServiceBase::QueryInterfaceImpl(riid, ppvObject);
     }
     
-    // DSP接口实现
+    // DSP鎺ュ彛瀹炵幇
     bool instantiate(audio_chunk& chunk, uint32_t sample_rate, uint32_t channels) override {
         sample_rate_ = sample_rate;
         channels_ = channels;
@@ -225,7 +225,7 @@ public:
         
         if(chunk.is_empty()) return;
         
-        // 简单的增益效果（用于测试）
+        // 绠€鍗曠殑澧炵泭鏁堟灉锛堢敤浜庢祴璇曪級
         float* data = chunk.get_data();
         size_t total_samples = chunk.get_sample_count() * chunk.get_channels();
         
@@ -235,7 +235,7 @@ public:
             }
         }
         
-        printf("[%s] 处理音频数据: %zu 采样, 增益: %.2f\n", 
+        printf("[%s] 澶勭悊闊抽鏁版嵁: %zu 閲囨牱, 澧炵泭: %.2f\n", 
                name_.c_str(), chunk.get_sample_count(), gain_);
     }
     
@@ -255,11 +255,11 @@ public:
     }
     
     bool need_track_change_mark() const override {
-        return false; // 不需要音轨变化标记
+        return false; // 涓嶉渶瑕侀煶杞ㄥ彉鍖栨爣璁?
     }
     
     double get_latency() const override {
-        return 0.0; // 无延迟
+        return 0.0; // 鏃犲欢杩?
     }
     
     const char* get_name() const override {
@@ -280,7 +280,7 @@ public:
     }
 };
 
-// DSP效果器工厂
+// DSP鏁堟灉鍣ㄥ伐鍘?
 class dsp_effect_factory {
 public:
     static std::unique_ptr<dsp> create_test_effect(const std::string& name = "TestDSP") {
@@ -288,10 +288,10 @@ public:
     }
     
     static std::unique_ptr<dsp> create_passthrough_effect(const std::string& name = "PassThrough") {
-        // 创建一个直通效果器（不改变音频）
+        // 鍒涘缓涓€涓洿閫氭晥鏋滃櫒锛堜笉鏀瑰彉闊抽锛?
         auto effect = std::make_unique<test_dsp_effect>(name);
         
-        // 创建预设并设置为直通（增益=1.0）
+        // 鍒涘缓棰勮骞惰缃负鐩撮€氾紙澧炵泭=1.0锛?
         auto preset = std::make_unique<simple_dsp_preset>(name);
         preset->set_parameter_float("gain", 1.0f);
         effect->set_preset(*preset);
@@ -314,7 +314,7 @@ public:
         
         auto preset = std::make_unique<simple_dsp_preset>("Equalizer");
         
-        // 设置均衡器参数
+        // 璁剧疆鍧囪　鍣ㄥ弬鏁?
         for(size_t i = 0; i < bands.size(); ++i) {
             std::string param_name = "band_" + std::to_string(i);
             preset->set_parameter_float(param_name.c_str(), bands[i]);
@@ -325,23 +325,23 @@ public:
     }
 };
 
-// DSP系统初始化器
+// DSP绯荤粺鍒濆鍖栧櫒
 class dsp_system_initializer {
 public:
     static bool initialize_dsp_system() {
-        printf("[DSP] 初始化DSP系统...\n");
+        printf("[DSP] 鍒濆鍖朌SP绯荤粺...\n");
         
-        // 这里可以添加DSP系统的初始化逻辑
-        // 例如：注册标准DSP效果，初始化DSP库等
+        // 杩欓噷鍙互娣诲姞DSP绯荤粺鐨勫垵濮嬪寲閫昏緫
+        // 渚嬪锛氭敞鍐屾爣鍑咲SP鏁堟灉锛屽垵濮嬪寲DSP搴撶瓑
         
-        printf("[DSP] DSP系统初始化完成\n");
+        printf("[DSP] DSP绯荤粺鍒濆鍖栧畬鎴怽n");
         return true;
     }
     
     static void shutdown_dsp_system() {
-        printf("[DSP] 关闭DSP系统\n");
+        printf("[DSP] 鍏抽棴DSP绯荤粺\n");
         
-        // 清理DSP系统资源
+        // 娓呯悊DSP绯荤粺璧勬簮
     }
 };
 

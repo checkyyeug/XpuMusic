@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file audio_diagnostic.cpp
  * @brief Audio system diagnostic tool
  */
@@ -34,11 +34,11 @@ public:
     bool initialize() {
         HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
         if (FAILED(hr) && hr != RPC_E_CHANGED_MODE) {
-            std::cerr << "❌ Failed to initialize COM" << std::endl;
+            std::cerr << "鉂?Failed to initialize COM" << std::endl;
             return false;
         }
         
-        std::cout << "✓ COM initialized" << std::endl;
+        std::cout << "鉁?COM initialized" << std::endl;
         
         // Get device enumerator
         IMMDeviceEnumerator* enumerator = nullptr;
@@ -47,23 +47,23 @@ public:
                               (void**)&enumerator);
         
         if (FAILED(hr)) {
-            std::cerr << "❌ Failed to create device enumerator: 0x" << std::hex << hr << std::endl;
+            std::cerr << "鉂?Failed to create device enumerator: 0x" << std::hex << hr << std::endl;
             return false;
         }
         
-        std::cout << "✓ Device enumerator created" << std::endl;
+        std::cout << "鉁?Device enumerator created" << std::endl;
         
         // Get default audio device
         IMMDevice* device = nullptr;
         hr = enumerator->GetDefaultAudioEndpoint(eRender, eConsole, &device);
         
         if (FAILED(hr)) {
-            std::cerr << "❌ Failed to get default audio endpoint: 0x" << std::hex << hr << std::endl;
+            std::cerr << "鉂?Failed to get default audio endpoint: 0x" << std::hex << hr << std::endl;
             enumerator->Release();
             return false;
         }
         
-        std::cout << "✓ Default audio device obtained" << std::endl;
+        std::cout << "鉁?Default audio device obtained" << std::endl;
         
         // Get device name
         IPropertyStore* props = nullptr;
@@ -75,7 +75,7 @@ public:
             if (SUCCEEDED(hr) && pv.vt == VT_LPWSTR) {
                 char friendly_name[256];
                 WideCharToMultiByte(CP_UTF8, 0, pv.pwszVal, -1, friendly_name, 256, NULL, NULL);
-                std::cout << "✓ Device: " << friendly_name << std::endl;
+                std::cout << "鉁?Device: " << friendly_name << std::endl;
                 PropVariantClear(&pv);
             }
             props->Release();
@@ -86,27 +86,27 @@ public:
                              NULL, (void**)&client_);
         
         if (FAILED(hr)) {
-            std::cerr << "❌ Failed to activate audio client: 0x" << std::hex << hr << std::endl;
+            std::cerr << "鉂?Failed to activate audio client: 0x" << std::hex << hr << std::endl;
             device->Release();
             enumerator->Release();
             return false;
         }
         
-        std::cout << "✓ Audio client activated" << std::endl;
+        std::cout << "鉁?Audio client activated" << std::endl;
         
         // Get mix format
         WAVEFORMATEX* mix_format = nullptr;
         hr = client_->GetMixFormat(&mix_format);
         
         if (FAILED(hr)) {
-            std::cerr << "❌ Failed to get mix format: 0x" << std::hex << hr << std::endl;
+            std::cerr << "鉂?Failed to get mix format: 0x" << std::hex << hr << std::endl;
             device->Release();
             enumerator->Release();
             client_->Release();
             return false;
         }
         
-        std::cout << "✓ Mix format obtained:" << std::endl;
+        std::cout << "鉁?Mix format obtained:" << std::endl;
         std::cout << "  - Sample Rate: " << mix_format->nSamplesPerSec << " Hz" << std::endl;
         std::cout << "  - Channels: " << mix_format->nChannels << std::endl;
         std::cout << "  - Bits per Sample: " << mix_format->wBitsPerSample << std::endl;
@@ -134,12 +134,12 @@ public:
                                 0, 10000000, 0, (WAVEFORMATEX*)&wfx, NULL);
         
         if (FAILED(hr)) {
-            std::cout << "⚠️  Failed with custom format, trying system default..." << std::endl;
+            std::cout << "鈿狅笍  Failed with custom format, trying system default..." << std::endl;
             hr = client_->Initialize(AUDCLNT_SHAREMODE_SHARED,
                                     0, 10000000, 0, mix_format, NULL);
             
             if (FAILED(hr)) {
-                std::cerr << "❌ Failed to initialize audio client: 0x" << std::hex << hr << std::endl;
+                std::cerr << "鉂?Failed to initialize audio client: 0x" << std::hex << hr << std::endl;
                 CoTaskMemFree(mix_format);
                 device->Release();
                 enumerator->Release();
@@ -149,26 +149,26 @@ public:
         }
         
         CoTaskMemFree(mix_format);
-        std::cout << "✓ Audio client initialized" << std::endl;
+        std::cout << "鉁?Audio client initialized" << std::endl;
         
         // Get buffer size
         UINT32 buffer_size = 0;
         hr = client_->GetBufferSize(&buffer_size);
         if (SUCCEEDED(hr)) {
-            std::cout << "✓ Buffer size: " << buffer_size << " frames" << std::endl;
+            std::cout << "鉁?Buffer size: " << buffer_size << " frames" << std::endl;
         }
         
         // Get render client
         hr = client_->GetService(__uuidof(IAudioRenderClient), (void**)&render_);
         if (FAILED(hr)) {
-            std::cerr << "❌ Failed to get render client: 0x" << std::hex << hr << std::endl;
+            std::cerr << "鉂?Failed to get render client: 0x" << std::hex << hr << std::endl;
             device->Release();
             enumerator->Release();
             client_->Release();
             return false;
         }
         
-        std::cout << "✓ Render client obtained" << std::endl;
+        std::cout << "鉁?Render client obtained" << std::endl;
         device->Release();
         enumerator->Release();
         
@@ -192,11 +192,11 @@ public:
         
         HRESULT hr = client_->Start();
         if (FAILED(hr)) {
-            std::cerr << "❌ Failed to start audio: 0x" << std::hex << hr << std::endl;
+            std::cerr << "鉂?Failed to start audio: 0x" << std::hex << hr << std::endl;
             return;
         }
         
-        std::cout << "✓ Audio started" << std::endl;
+        std::cout << "鉁?Audio started" << std::endl;
         
         UINT32 buffer_size = 0;
         client_->GetBufferSize(&buffer_size);
@@ -236,16 +236,16 @@ public:
             std::this_thread::sleep_for(std::chrono::microseconds(100));
         }
         
-        std::cout << "✓ Playback complete (" << frames_played << " frames played)" << std::endl;
+        std::cout << "鉁?Playback complete (" << frames_played << " frames played)" << std::endl;
         client_->Stop();
     }
 };
 #endif
 
 int main() {
-    std::cout << "╔══════════════════════════════════════════════╗" << std::endl;
-    std::cout << "║    Audio System Diagnostic Tool             ║" << std::endl;
-    std::cout << "╚══════════════════════════════════════════════╝" << std::endl;
+    std::cout << "鈺斺晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晽" << std::endl;
+    std::cout << "鈺?   Audio System Diagnostic Tool             鈺? << std::endl;
+    std::cout << "鈺氣晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨暆" << std::endl;
     std::cout << std::endl;
     
 #ifdef _WIN32
@@ -253,7 +253,7 @@ int main() {
     
     std::cout << "Step 1: Initializing audio system..." << std::endl;
     if (!audio.initialize()) {
-        std::cerr << "\n❌ FAILED - Audio system could not be initialized" << std::endl;
+        std::cerr << "\n鉂?FAILED - Audio system could not be initialized" << std::endl;
         std::cerr << "Possible causes:" << std::endl;
         std::cerr << "  - No audio device connected" << std::endl;
         std::cerr << "  - Audio drivers not installed" << std::endl;
@@ -262,11 +262,11 @@ int main() {
         return 1;
     }
     
-    std::cout << "\n✓ Audio system initialized successfully!" << std::endl;
+    std::cout << "\n鉁?Audio system initialized successfully!" << std::endl;
     std::cout << std::endl;
-    std::cout << "╔══════════════════════════════════════════════╗" << std::endl;
-    std::cout << "║  CHECK YOUR VOLUME: Set to 50% now!         ║" << std::endl;
-    std::cout << "╚══════════════════════════════════════════════╝" << std::endl;
+    std::cout << "鈺斺晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晽" << std::endl;
+    std::cout << "鈺? CHECK YOUR VOLUME: Set to 50% now!         鈺? << std::endl;
+    std::cout << "鈺氣晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨暆" << std::endl;
     std::cout << std::endl;
     std::cout << "Press Enter when ready...";
     std::cin.get();
@@ -276,11 +276,11 @@ int main() {
     audio.play_tone(1000.0f, 3.0f, 0.8f);  // 1kHz, 3 seconds, 80% volume
     
     std::cout << std::endl;
-    std::cout << "╔══════════════════════════════════════════════╗" << std::endl;
-    std::cout << "║  DID YOU HEAR THE TONE?                      ║" << std::endl;
-    std::cout << "║  [YES] Audio system working                  ║" << std::endl;
-    std::cout << "║  [NO]  Check volume, speakers, drivers       ║" << std::endl;
-    std::cout << "╚══════════════════════════════════════════════╝" << std::endl;
+    std::cout << "鈺斺晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晽" << std::endl;
+    std::cout << "鈺? DID YOU HEAR THE TONE?                      鈺? << std::endl;
+    std::cout << "鈺? [YES] Audio system working                  鈺? << std::endl;
+    std::cout << "鈺? [NO]  Check volume, speakers, drivers       鈺? << std::endl;
+    std::cout << "鈺氣晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨暆" << std::endl;
     std::cout << std::endl;
     
     return 0;

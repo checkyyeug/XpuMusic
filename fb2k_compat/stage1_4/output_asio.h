@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../stage1_2/audio_output.h"
 #include "../stage1_3/dsp_effect.h"
@@ -14,7 +14,7 @@
 
 namespace fb2k {
 
-// ASIO驱动信息结构
+// ASIO椹卞姩淇℃伅缁撴瀯
 struct asio_driver_info {
     std::string name;
     std::string id;
@@ -31,17 +31,17 @@ struct asio_driver_info {
     int buffer_size_granularity;
 };
 
-// ASIO缓冲区信息
+// ASIO缂撳啿鍖轰俊鎭?
 struct asio_buffer_info {
     long buffer_index;
     long channel_index;
-    void* buffer[2];  // 双缓冲
+    void* buffer[2];  // 鍙岀紦鍐?
     long data_size;
     long sample_type;
     bool is_active;
 };
 
-// ASIO时间信息
+// ASIO鏃堕棿淇℃伅
 struct asio_time_info {
     double sample_position;
     double system_time;
@@ -50,28 +50,28 @@ struct asio_time_info {
     char future[64];
 };
 
-// ASIO回调函数类型
+// ASIO鍥炶皟鍑芥暟绫诲瀷
 typedef long (*asio_callback)(long buffer_index);
 typedef void (*asio_sample_rate_callback)(double sample_rate);
 typedef long (*asio_message_callback)(long selector, long value, void* message, double* opt);
 typedef void (*asio_buffer_switch_callback)(long buffer_index, long direct_process);
 
-// ASIO接口定义
+// ASIO鎺ュ彛瀹氫箟
 class asio_driver_interface {
 public:
     virtual ~asio_driver_interface() = default;
     
-    // 基本操作
+    // 鍩烘湰鎿嶄綔
     virtual long init(void* sys_handle) = 0;
     virtual long get_driver_name(char* name) = 0;
     virtual long get_driver_version() = 0;
     virtual long get_error_message(char* string) = 0;
     
-    // 启动和停止
+    // 鍚姩鍜屽仠姝?
     virtual long start() = 0;
     virtual long stop() = 0;
     
-    // 缓冲区管理
+    // 缂撳啿鍖虹鐞?
     virtual long get_channels(long* num_input_channels, long* num_output_channels) = 0;
     virtual long get_latencies(long* input_latency, long* output_latency) = 0;
     virtual long get_buffer_size(long* min_size, long* max_size, long* preferred_size, long* granularity) = 0;
@@ -81,7 +81,7 @@ public:
     virtual long get_clock_sources(long* clocks, long* num_sources) = 0;
     virtual long set_clock_source(long reference) = 0;
     
-    // 缓冲区操作
+    // 缂撳啿鍖烘搷浣?
     virtual long get_sample_position(long long* sample_pos, long long* time_stamp) = 0;
     virtual long get_channel_info(long channel, long is_input, long* sample_type, char* name, long* name_len, long* channel_group) = 0;
     virtual long create_buffers(asio_buffer_info* buffer_infos, long num_channels, long buffer_size, asio_callback callbacks) = 0;
@@ -91,7 +91,7 @@ public:
     virtual long output_ready() = 0;
 };
 
-// ASIO时间代码
+// ASIO鏃堕棿浠ｇ爜
 enum asio_time_code_flags {
     kSystemTimeValid = 1,
     kSamplePositionValid = 2,
@@ -101,7 +101,7 @@ enum asio_time_code_flags {
     kClockSourceChanged = 32
 };
 
-// ASIO样本类型
+// ASIO鏍锋湰绫诲瀷
 enum asio_sample_type {
     ASIOST_16LSB = 0,
     ASIOST_24LSB = 1,
@@ -117,7 +117,7 @@ enum asio_sample_type {
     ASIOST_LAST = 11
 };
 
-// ASIO错误代码
+// ASIO閿欒浠ｇ爜
 enum asio_error {
     ASE_OK = 0,
     ASE_SUCCESS = 0x3f4847a0,
@@ -130,47 +130,47 @@ enum asio_error {
     ASE_NoMemory = -994
 };
 
-// ASIO输出设备接口
+// ASIO杈撳嚭璁惧鎺ュ彛
 class output_asio : public output_device {
 public:
-    // ASIO特定接口
+    // ASIO鐗瑰畾鎺ュ彛
     virtual bool enum_drivers(std::vector<asio_driver_info>& drivers) = 0;
     virtual bool load_driver(const std::string& driver_id) = 0;
     virtual void unload_driver() = 0;
     virtual bool is_driver_loaded() const = 0;
     virtual std::string get_current_driver_name() const = 0;
     
-    // ASIO配置
+    // ASIO閰嶇疆
     virtual void set_buffer_size(long size) = 0;
     virtual long get_buffer_size() const = 0;
     virtual void set_sample_rate(double rate) = 0;
     virtual double get_sample_rate() const = 0;
     virtual std::vector<double> get_available_sample_rates() const = 0;
     
-    // 性能信息
+    // 鎬ц兘淇℃伅
     virtual long get_input_latency() const = 0;
     virtual long get_output_latency() const = 0;
     virtual double get_cpu_load() const = 0;
     
-    // 高级功能
+    // 楂樼骇鍔熻兘
     virtual bool supports_time_code() const = 0;
     virtual bool supports_input_monitoring() const = 0;
     virtual bool supports_variable_buffer_size() const = 0;
     virtual void show_control_panel() = 0;
     
-    // 缓冲区信息
+    // 缂撳啿鍖轰俊鎭?
     virtual long get_buffer_size_min() const = 0;
     virtual long get_buffer_size_max() const = 0;
     virtual long get_buffer_size_preferred() const = 0;
     virtual long get_buffer_size_granularity() const = 0;
     
-    // 时钟源
+    // 鏃堕挓婧?
     virtual std::vector<std::string> get_clock_sources() const = 0;
     virtual void set_clock_source(long index) = 0;
     virtual long get_current_clock_source() const = 0;
 };
 
-// ASIO驱动加载器
+// ASIO椹卞姩鍔犺浇鍣?
 class asio_driver_loader {
 public:
     static std::unique_ptr<asio_driver_interface> load_driver(const std::string& clsid);
@@ -179,7 +179,7 @@ public:
     static bool is_driver_available(const std::string& clsid);
 };
 
-// ASIO缓冲区管理器
+// ASIO缂撳啿鍖虹鐞嗗櫒
 class asio_buffer_manager {
 public:
     asio_buffer_manager();
@@ -209,7 +209,7 @@ private:
     long get_sample_size(asio_sample_type type) const;
 };
 
-// ASIO时间管理器
+// ASIO鏃堕棿绠＄悊鍣?
 class asio_time_manager {
 public:
     asio_time_manager();
@@ -232,27 +232,27 @@ private:
     mutable std::mutex time_mutex_;
 };
 
-// ASIO回调处理器
+// ASIO鍥炶皟澶勭悊鍣?
 class asio_callback_handler {
 public:
     asio_callback_handler();
     ~asio_callback_handler();
     
-    // 设置回调函数
+    // 璁剧疆鍥炶皟鍑芥暟
     void set_buffer_switch_callback(asio_buffer_switch_callback callback);
     void set_sample_rate_callback(asio_sample_rate_callback callback);
     void set_message_callback(asio_message_callback callback);
     
-    // 触发回调
+    // 瑙﹀彂鍥炶皟
     void on_buffer_switch(long buffer_index, long direct_process);
     void on_sample_rate_changed(double sample_rate);
     long on_message(long selector, long value, void* message, double* opt);
     
-    // 缓冲区处理
+    // 缂撳啿鍖哄鐞?
     void process_input_buffers(long buffer_index);
     void process_output_buffers(long buffer_index);
     
-    // 数据处理接口
+    // 鏁版嵁澶勭悊鎺ュ彛
     void set_audio_processor(std::function<void(float**, float**, long, long)> processor);
     void set_input_data(float** input_data, long num_channels, long buffer_size);
     void get_output_data(float** output_data, long num_channels, long buffer_size);
@@ -264,7 +264,7 @@ private:
     
     std::function<void(float**, float**, long, long)> audio_processor_;
     
-    // 输入输出缓冲区
+    // 杈撳叆杈撳嚭缂撳啿鍖?
     std::vector<std::vector<float>> input_buffers_;
     std::vector<std::vector<float>> output_buffers_;
     std::vector<std::vector<float>> process_buffers_;
@@ -275,7 +275,7 @@ private:
     std::mutex callback_mutex_;
 };
 
-// ASIO错误处理
+// ASIO閿欒澶勭悊
 class asio_error_handler {
 public:
     static std::string get_error_string(long error_code);
@@ -284,7 +284,7 @@ public:
     static void log_asio_error(const std::string& context, long error_code);
 };
 
-// ASIO配置结构
+// ASIO閰嶇疆缁撴瀯
 struct asio_config {
     bool enable_exclusive_mode = true;
     bool enable_input_monitoring = false;
@@ -306,13 +306,13 @@ struct asio_config {
     int thread_priority = THREAD_PRIORITY_TIME_CRITICAL;
 };
 
-// 主要的ASIO输出实现类
+// 涓昏鐨凙SIO杈撳嚭瀹炵幇绫?
 class output_asio_impl : public output_asio {
 public:
     output_asio_impl();
     ~output_asio_impl() override;
     
-    // output_device接口实现
+    // output_device鎺ュ彛瀹炵幇
     void open(t_uint32 sample_rate, t_uint32 channels, t_uint32 flags, abort_callback& p_abort) override;
     void close(abort_callback& p_abort) override;
     t_uint32 get_latency() override;
@@ -338,7 +338,7 @@ public:
     void get_latency_ex3(t_uint32& p_samples, t_uint32& p_samples_total, t_uint32& p_samples_in_buffer) override;
     void get_latency_ex4(t_uint32& p_samples, t_uint32& p_samples_total, t_uint32& p_samples_in_buffer, t_uint32& p_samples_in_device_buffer) override;
     
-    // output_asio接口实现
+    // output_asio鎺ュ彛瀹炵幇
     bool enum_drivers(std::vector<asio_driver_info>& drivers) override;
     bool load_driver(const std::string& driver_id) override;
     void unload_driver() override;
@@ -365,50 +365,50 @@ public:
     long get_current_clock_source() const override;
     
 private:
-    // ASIO组件
+    // ASIO缁勪欢
     std::unique_ptr<asio_driver_interface> driver_;
     std::unique_ptr<asio_buffer_manager> buffer_manager_;
     std::unique_ptr<asio_time_manager> time_manager_;
     std::unique_ptr<asio_callback_handler> callback_handler_;
     
-    // 配置
+    // 閰嶇疆
     asio_config config_;
     std::string current_driver_name_;
     std::string current_driver_id_;
     
-    // 状态
+    // 鐘舵€?
     std::atomic<bool> is_initialized_;
     std::atomic<bool> is_playing_;
     std::atomic<bool> is_paused_;
     std::atomic<float> volume_;
     
-    // 音频格式
+    // 闊抽鏍煎紡
     t_uint32 sample_rate_;
     t_uint32 channels_;
     t_uint32 bits_per_sample_;
     
-    // 缓冲区信息
+    // 缂撳啿鍖轰俊鎭?
     long buffer_size_;
     long input_latency_;
     long output_latency_;
     
-    // 线程管理
+    // 绾跨▼绠＄悊
     std::thread asio_thread_;
     std::atomic<bool> asio_thread_running_;
     std::mutex asio_mutex_;
     std::condition_variable asio_cv_;
     
-    // 音频数据
+    // 闊抽鏁版嵁
     std::vector<uint8_t> input_buffer_;
     std::vector<uint8_t> output_buffer_;
     std::atomic<t_uint64> samples_written_;
     std::atomic<t_uint64> samples_played_;
     
-    // 性能监控
+    // 鎬ц兘鐩戞帶
     std::chrono::steady_clock::time_point start_time_;
     std::atomic<double> cpu_load_;
     
-    // 私有方法
+    // 绉佹湁鏂规硶
     bool initialize_asio();
     bool create_asio_buffers();
     bool start_asio_streaming();
@@ -431,10 +431,10 @@ private:
     void handle_asio_error(const std::string& operation, long error_code);
 };
 
-// 创建ASIO输出设备
+// 鍒涘缓ASIO杈撳嚭璁惧
 std::unique_ptr<output_asio> create_asio_output();
 
-// ASIO工具函数
+// ASIO宸ュ叿鍑芥暟
 namespace asio_utils {
     std::vector<asio_driver_info> enumerate_asio_drivers();
     bool is_asio_available();

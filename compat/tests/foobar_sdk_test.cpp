@@ -1,4 +1,4 @@
-#include "test_framework.h"
+﻿#include "test_framework.h"
 #include "xpumusic_sdk/foobar2000_sdk.h"
 #include "xpumusic_sdk/input_decoder.h"
 

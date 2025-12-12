@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file foobar2k_compatible_player.cpp
  * @brief foobar2000 compatible player
  * @date 2025-12-11
@@ -15,6 +15,7 @@
 #include "../compat/sdk_implementations/common_includes.h"
 #include "../compat/xpumusic_sdk/foobar2000_sdk.h"
 
+using namespace xpumusic_sdk;
 using namespace foobar2000_sdk;
 
 class FB2KCompatiblePlayer {
@@ -40,11 +41,11 @@ public:
         fb2k_module_ = LoadLibrary(L"foobar2000.dll");
 
         if (fb2k_module_) {
-            std::cout << "✓ Loaded foobar2000.dll" << std::endl;
+            std::cout << "鉁?Loaded foobar2000.dll" << std::endl;
             // Initialize using actual foobar2000
             return init_from_dll();
         } else {
-            std::cout << "⚠️  foobar2000.dll not found, using emulation mode" << std::endl;
+            std::cout << "鈿狅笍  foobar2000.dll not found, using emulation mode" << std::endl;
             // Use our SDK implementation
             return init_emulated();
         }
@@ -68,7 +69,7 @@ public:
 
     bool init_emulated() {
         // Use our SDK implementation
-        std::cout << "✓ Using emulated foobar2000 services" << std::endl;
+        std::cout << "鉁?Using emulated foobar2000 services" << std::endl;
 
         // Create emulated services
         initialized_ = true;
@@ -89,32 +90,31 @@ public:
         std::cout << "Loading file: " << filename << std::endl;
 
         // Try to load using foobar2000 input plugins
-        service_ptr_t<input_manager> input_manager;
-        input_manager->instantiate();
+        auto input_mgr = standard_api_create_t<input_manager>();
+        if (input_mgr.is_empty()) {
+            std::cerr << "Failed to create input manager" << std::endl;
+            return false;
+        }
 
         // Create playback handle
         service_ptr_t<input_decoder> decoder;
-        if (input_manager->open(filename, decoder, abort_callback_dummy())) {
-            std::cout << "✓ File loaded successfully" << std::endl;
-
-            // Get file info
-            file_info_impl info;
-            decoder->get_info(0, info, abort_callback_dummy());
-
-            std::cout << "  Format: " << info.info_get("codec") << std::endl;
-            std::cout << "  Duration: " << info.get_length() << " seconds" << std::endl;
-
+        abort_callback_dummy abort_cb;
+        if (input_mgr->open(filename, decoder, abort_cb)) {
+            std::cout << "鉁?File loaded successfully" << std::endl;
+            // TODO: Implement file info extraction
+            std::cout << "  Format: Unknown" << std::endl;
+            std::cout << "  Duration: Unknown" << std::endl;
             return true;
         }
 
-        std::cerr << "✗ Failed to load file" << std::endl;
+        std::cerr << "鉁?Failed to load file" << std::endl;
         return false;
     }
 
     void play() {
         if (!initialized_) return;
 
-        std::cout << "\n▶ Starting playback..." << std::endl;
+        std::cout << "\n鈻?Starting playback..." << std::endl;
         // Implementation for playback
     }
 };

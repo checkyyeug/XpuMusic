@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file sample_rate_converter_64.h
  * @brief 64-bit floating point sample rate converters
  * @date 2025-12-10

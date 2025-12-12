@@ -1,7 +1,7 @@
-#pragma once
+﻿#pragma once
 
-// 阶段1.3：参数均衡器
-// 专业级参数均衡器，支持多段频率调节
+// 闃舵1.3锛氬弬鏁板潎琛″櫒
+// 涓撲笟绾у弬鏁板潎琛″櫒锛屾敮鎸佸娈甸鐜囪皟鑺?
 
 #include "dsp_manager.h"
 #include <vector>
@@ -10,25 +10,25 @@
 
 namespace fb2k {
 
-// 滤波器类型
+// 婊ゆ尝鍣ㄧ被鍨?
 enum class filter_type {
-    low_shelf,      // 低架滤波器
-    high_shelf,     // 高架滤波器
-    peak,           // 峰值滤波器
-    low_pass,       // 低通滤波器
-    high_pass,      // 高通滤波器
-    band_pass,      // 带通滤波器
-    notch           // 陷波滤波器
+    low_shelf,      // 浣庢灦婊ゆ尝鍣?
+    high_shelf,     // 楂樻灦婊ゆ尝鍣?
+    peak,           // 宄板€兼护娉㈠櫒
+    low_pass,       // 浣庨€氭护娉㈠櫒
+    high_pass,      // 楂橀€氭护娉㈠櫒
+    band_pass,      // 甯﹂€氭护娉㈠櫒
+    notch           // 闄锋尝婊ゆ尝鍣?
 };
 
-// 均衡器频段参数
+// 鍧囪　鍣ㄩ娈靛弬鏁?
 struct eq_band_params {
-    float frequency;        // 中心频率 (Hz)
-    float gain;            // 增益 (dB)
-    float bandwidth;       // 带宽 (Q值或octaves)
-    filter_type type;      // 滤波器类型
-    bool is_enabled;       // 是否启用
-    std::string name;      // 频段名称
+    float frequency;        // 涓績棰戠巼 (Hz)
+    float gain;            // 澧炵泭 (dB)
+    float bandwidth;       // 甯﹀ (Q鍊兼垨octaves)
+    filter_type type;      // 婊ゆ尝鍣ㄧ被鍨?
+    bool is_enabled;       // 鏄惁鍚敤
+    std::string name;      // 棰戞鍚嶇О
     
     eq_band_params() : 
         frequency(1000.0f), gain(0.0f), bandwidth(1.0f), 
@@ -39,38 +39,38 @@ struct eq_band_params {
         is_enabled(true), name("") {}
 };
 
-// 双二阶滤波器（Biquad Filter）
+// 鍙屼簩闃舵护娉㈠櫒锛圔iquad Filter锛?
 class biquad_filter {
 private:
-    // 滤波器系数
-    float a0_, a1_, a2_;  // 分母系数
-    float b0_, b1_, b2_;  // 分子系数
+    // 婊ゆ尝鍣ㄧ郴鏁?
+    float a0_, a1_, a2_;  // 鍒嗘瘝绯绘暟
+    float b0_, b1_, b2_;  // 鍒嗗瓙绯绘暟
     
-    // 状态变量
-    float x1_, x2_;       // 输入历史
-    float y1_, y2_;       // 输出历史
+    // 鐘舵€佸彉閲?
+    float x1_, x2_;       // 杈撳叆鍘嗗彶
+    float y1_, y2_;       // 杈撳嚭鍘嗗彶
     
 public:
     biquad_filter() : a0_(1.0f), a1_(0.0f), a2_(0.0f), 
                      b0_(1.0f), b1_(0.0f), b2_(0.0f),
                      x1_(0.0f), x2_(0.0f), y1_(0.0f), y2_(0.0f) {}
     
-    // 设置滤波器系数
+    // 璁剧疆婊ゆ尝鍣ㄧ郴鏁?
     void set_coefficients(float b0, float b1, float b2, float a0, float a1, float a2);
     
-    // 处理单个采样
+    // 澶勭悊鍗曚釜閲囨牱
     float process(float input);
     
-    // 处理音频块
+    // 澶勭悊闊抽鍧?
     void process_block(float* data, size_t samples);
     
-    // 重置状态
+    // 閲嶇疆鐘舵€?
     void reset();
     
-    // 获取频率响应
+    // 鑾峰彇棰戠巼鍝嶅簲
     std::complex<float> get_frequency_response(float frequency, float sample_rate) const;
     
-    // 设计滤波器
+    // 璁捐婊ゆ尝鍣?
     static void design_peaking(float frequency, float gain_db, float bandwidth, 
                               float sample_rate, float& b0, float& b1, float& b2,
                               float& a0, float& a1, float& a2);
@@ -92,7 +92,7 @@ public:
                                 float& a0, float& a1, float& a2);
 };
 
-// 参数均衡器频段
+// 鍙傛暟鍧囪　鍣ㄩ娈?
 class eq_band {
 private:
     eq_band_params params_;
@@ -103,25 +103,25 @@ public:
     eq_band() : needs_update_(true) {}
     explicit eq_band(const eq_band_params& params) : params_(params), needs_update_(true) {}
     
-    // 参数设置
+    // 鍙傛暟璁剧疆
     void set_params(const eq_band_params& params);
     const eq_band_params& get_params() const { return params_; }
     
-    // 实时参数调节
+    // 瀹炴椂鍙傛暟璋冭妭
     void set_frequency(float frequency);
     void set_gain(float gain_db);
     void set_bandwidth(float bandwidth);
     void set_enabled(bool enabled);
     
-    // 音频处理
+    // 闊抽澶勭悊
     void process(audio_chunk& chunk);
     void process_block(float* data, size_t samples);
     
-    // 状态管理
+    // 鐘舵€佺鐞?
     void reset();
     bool is_enabled() const { return params_.is_enabled; }
     
-    // 频率响应分析
+    // 棰戠巼鍝嶅簲鍒嗘瀽
     std::complex<float> get_frequency_response(float frequency, float sample_rate) const;
     float get_gain_at_frequency(float frequency, float sample_rate) const;
     
@@ -130,19 +130,19 @@ private:
     void validate_params();
 };
 
-// 参数均衡器主类
+// 鍙傛暟鍧囪　鍣ㄤ富绫?
 class dsp_equalizer_advanced : public dsp_effect_advanced {
 private:
     std::vector<std::unique_ptr<eq_band>> bands_;
     static constexpr size_t MAX_BANDS = 32;
     
-    // 预设频段频率（符合ISO标准）
+    // 棰勮棰戞棰戠巼锛堢鍚圛SO鏍囧噯锛?
     static constexpr float ISO_FREQUENCIES[10] = {
         31.25f, 62.5f, 125.0f, 250.0f, 500.0f,
         1000.0f, 2000.0f, 4000.0f, 8000.0f, 16000.0f
     };
     
-    // 状态
+    // 鐘舵€?
     bool needs_coefficient_update_;
     std::atomic<bool> is_updating_coefficients_;
     
@@ -151,13 +151,13 @@ public:
     explicit dsp_equalizer_advanced(const dsp_effect_params& params);
     ~dsp_equalizer_advanced() override;
     
-    // DSP接口实现
+    // DSP鎺ュ彛瀹炵幇
     bool instantiate(audio_chunk& chunk, uint32_t sample_rate, 
                     uint32_t channels) override;
     void run(audio_chunk& chunk, abort_callback& abort) override;
     void reset() override;
     
-    // 均衡器特定接口
+    // 鍧囪　鍣ㄧ壒瀹氭帴鍙?
     size_t add_band(const eq_band_params& params);
     bool remove_band(size_t index);
     void clear_bands();
@@ -166,7 +166,7 @@ public:
     eq_band* get_band(size_t index);
     const eq_band* get_band(size_t index) const;
     
-    // 预设管理
+    // 棰勮绠＄悊
     void load_iso_preset();
     void load_classical_preset();
     void load_rock_preset();
@@ -174,31 +174,31 @@ public:
     void load_pop_preset();
     void load_headphone_preset();
     
-    // 频率响应分析
+    // 棰戠巼鍝嶅簲鍒嗘瀽
     std::vector<std::complex<float>> get_frequency_response(
         const std::vector<float>& frequencies, float sample_rate) const;
     
     float get_response_at_frequency(float frequency, float sample_rate) const;
     
-    // 实时参数调节（线程安全）
+    // 瀹炴椂鍙傛暟璋冭妭锛堢嚎绋嬪畨鍏級
     bool set_band_frequency(size_t band, float frequency);
     bool set_band_gain(size_t band, float gain_db);
     bool set_band_bandwidth(size_t band, float bandwidth);
     bool set_band_enabled(size_t band, bool enabled);
     
-    // 批量操作
+    // 鎵归噺鎿嶄綔
     void set_all_bands_gain(float gain_db);
     void reset_all_bands();
     void copy_band_settings(size_t source_band, size_t target_band);
     
-    // 高级功能
+    // 楂樼骇鍔熻兘
     void auto_gain_compensate();
     void analyze_and_suggest_corrections(const audio_chunk& reference);
     std::vector<eq_band_params> suggest_corrections_for_room_response(
         const std::vector<float>& room_response);
     
 protected:
-    // dsp_effect_advanced 接口实现
+    // dsp_effect_advanced 鎺ュ彛瀹炵幇
     void process_chunk_internal(audio_chunk& chunk, abort_callback& abort) override;
     void update_cpu_usage(float usage) override;
     
@@ -207,24 +207,24 @@ private:
     void update_all_coefficients();
     void validate_band_index(size_t index);
     
-    // 工厂方法
+    // 宸ュ巶鏂规硶
     static std::unique_ptr<eq_band> create_band(const eq_band_params& params);
 };
 
-// 10段参数均衡器（符合ISO标准）
+// 10娈靛弬鏁板潎琛″櫒锛堢鍚圛SO鏍囧噯锛?
 class dsp_equalizer_10band : public dsp_equalizer_advanced {
 public:
     dsp_equalizer_10band();
     explicit dsp_equalizer_10band(const dsp_effect_params& params);
     
-    // 快速预设
+    // 蹇€熼璁?
     void load_flat_response();
     void load_v_shape();
     void load_smiley_curve();
     void load_loudness_contour();
 };
 
-// 图形均衡器（固定频段）
+// 鍥惧舰鍧囪　鍣紙鍥哄畾棰戞锛?
 class dsp_graphic_equalizer : public dsp_effect_advanced {
 private:
     std::vector<std::unique_ptr<eq_band>> iso_bands_;
@@ -234,13 +234,13 @@ public:
     dsp_graphic_equalizer();
     explicit dsp_graphic_equalizer(const dsp_effect_params& params);
     
-    // DSP接口实现
+    // DSP鎺ュ彛瀹炵幇
     bool instantiate(audio_chunk& chunk, uint32_t sample_rate, 
                     uint32_t channels) override;
     void run(audio_chunk& chunk, abort_callback& abort) override;
     void reset() override;
     
-    // 图形均衡器特定接口
+    // 鍥惧舰鍧囪　鍣ㄧ壒瀹氭帴鍙?
     void set_iso_band_gain(size_t band, float gain_db);
     float get_iso_band_gain(size_t band) const;
     void set_all_iso_bands(float gain_db);
@@ -248,7 +248,7 @@ public:
     const std::vector<float>& get_iso_frequencies() const;
 };
 
-// 房间响应均衡器
+// 鎴块棿鍝嶅簲鍧囪　鍣?
 class dsp_room_equalizer : public dsp_equalizer_advanced {
 private:
     std::vector<float> room_response_;
@@ -258,54 +258,54 @@ public:
     dsp_room_equalizer();
     explicit dsp_room_equalizer(const dsp_effect_params& params);
     
-    // 房间响应设置
+    // 鎴块棿鍝嶅簲璁剧疆
     void set_room_response(const std::vector<float>& response, 
                           const std::vector<float>& frequencies);
     void set_target_response(const std::vector<float>& response);
     
-    // 自动校正
+    // 鑷姩鏍℃
     void auto_calculate_corrections();
     std::vector<eq_band_params> calculate_optimal_corrections();
     
-    // 测量支持
+    // 娴嬮噺鏀寔
     bool can_measure_room_response() const;
     void start_room_measurement();
     void stop_room_measurement();
     std::vector<float> get_measurement_progress() const;
 };
 
-// DSP均衡器工具函数
+// DSP鍧囪　鍣ㄥ伐鍏峰嚱鏁?
 namespace eq_utils {
 
-// 频率转换工具
+// 棰戠巼杞崲宸ュ叿
 float frequency_to_midi(float frequency);
 float midi_to_frequency(float midi_note);
 float frequency_to_octave(float frequency, float reference_freq = 1000.0f);
 
-// Q值和带宽转换
+// Q鍊煎拰甯﹀杞崲
 float q_to_bandwidth(float q);
 float bandwidth_to_q(float bandwidth);
 float octave_to_q(float octaves);
 float q_to_octave(float q);
 
-// 增益转换
+// 澧炵泭杞崲
 db_to_linear(float gain_db);
 linear_to_db(float gain_linear);
 
-// 频率响应计算
+// 棰戠巼鍝嶅簲璁＄畻
 std::vector<std::complex<float>> calculate_combined_response(
     const std::vector<eq_band>& bands, 
     const std::vector<float>& frequencies, 
     float sample_rate);
 
-// 最优频段放置
+// 鏈€浼橀娈垫斁缃?
 std::vector<float> optimize_band_placement(
     const std::vector<float>& target_frequencies,
     size_t num_bands,
     float min_frequency,
     float max_frequency);
 
-// 房间响应分析
+// 鎴块棿鍝嶅簲鍒嗘瀽
 struct room_analysis_result {
     std::vector<float> measured_response;
     std::vector<float> recommended_corrections;
@@ -320,10 +320,10 @@ room_analysis_result analyze_room_response(
 
 } // namespace eq_utils
 
-// 标准DSP效果器工厂
+// 鏍囧噯DSP鏁堟灉鍣ㄥ伐鍘?
 class dsp_std_effect_factory {
 public:
-    // 标准效果器
+    // 鏍囧噯鏁堟灉鍣?
     static std::unique_ptr<dsp_equalizer_advanced> create_equalizer_10band();
     static std::unique_ptr<dsp_equalizer_advanced> create_equalizer_31band();
     
@@ -341,7 +341,7 @@ public:
     static std::unique_ptr<dsp_effect_advanced> create_crossfeed_natural();
     static std::unique_ptr<dsp_effect_advanced> create_crossfeed_jmeier();
     
-    // 预设DSP链
+    // 棰勮DSP閾?
     static std::vector<std::unique_ptr<dsp_effect_advanced>> 
         create_hifi_effect_chain();
     
@@ -351,7 +351,7 @@ public:
     static std::vector<std::unique_ptr<dsp_effect_advanced>> 
         create_room_correction_chain(const std::vector<float>& room_response);
     
-    // 根据foobar2000配置创建效果器
+    // 鏍规嵁foobar2000閰嶇疆鍒涘缓鏁堟灉鍣?
     static std::unique_ptr<dsp_effect_advanced> 
         create_from_fb2k_config(const std::string& config_name);
 };

@@ -1,7 +1,7 @@
-#pragma once
+﻿#pragma once
 
-// 阶段1：最小foobar2000主机接口
-// 目标：加载并运行foo_input_std组件
+// 闃舵1锛氭渶灏廸oobar2000涓绘満鎺ュ彛
+// 鐩爣锛氬姞杞藉苟杩愯foo_input_std缁勪欢
 
 #include <windows.h>
 #include <unknwn.h>
@@ -10,10 +10,10 @@
 #include <vector>
 #include <memory>
 
-// 最小GUID定义
+// 鏈€灏廏UID瀹氫箟
 struct DECLSPEC_UUID("00000000-0000-0000-C000-000000000046") IUnknown;
 
-// 前向声明
+// 鍓嶅悜澹版槑
 namespace fb2k {
     class service_base;
     class file_info;
@@ -22,7 +22,7 @@ namespace fb2k {
     class playback_control;
 }
 
-// 基础服务接口
+// 鍩虹鏈嶅姟鎺ュ彛
 MIDL_INTERFACE("FB2KServiceBase")
 class service_base : public IUnknown {
 public:
@@ -30,7 +30,7 @@ public:
     virtual int service_release() = 0;
 };
 
-// 智能指针模板
+// 鏅鸿兘鎸囬拡妯℃澘
 template<typename T>
 class service_ptr_t {
 private:
@@ -66,13 +66,13 @@ public:
     bool is_empty() const { return ptr_ == nullptr; }
 };
 
-// 文件统计信息
+// 鏂囦欢缁熻淇℃伅
 struct file_stats {
     uint64_t size = 0;
     uint64_t timestamp = 0;
 };
 
-// 音频信息
+// 闊抽淇℃伅
 struct audio_info {
     uint32_t sample_rate = 44100;
     uint32_t channels = 2;
@@ -80,7 +80,7 @@ struct audio_info {
     double length = 0.0;
 };
 
-// 文件信息接口
+// 鏂囦欢淇℃伅鎺ュ彛
 MIDL_INTERFACE("FB2KFileInfo")
 class file_info : public service_base {
 public:
@@ -96,30 +96,30 @@ public:
     virtual void set_file_stats(const file_stats& stats) = 0;
 };
 
-// 中止回调
+// 涓鍥炶皟
 MIDL_INTERFACE("FB2KAbortCallback")
 class abort_callback : public service_base {
 public:
     virtual bool is_aborting() const = 0;
 };
 
-// 输入解码器接口 - 这是核心！
+// 杈撳叆瑙ｇ爜鍣ㄦ帴鍙?- 杩欐槸鏍稿績锛?
 MIDL_INTERFACE("FB2KInputDecoder")
 class input_decoder : public service_base {
 public:
-    // 核心解码接口
+    // 鏍稿績瑙ｇ爜鎺ュ彛
     virtual bool open(const char* path, fb2k::file_info& info, fb2k::abort_callback& abort) = 0;
     virtual int decode(float* buffer, int samples, fb2k::abort_callback& abort) = 0;
     virtual void seek(double seconds, fb2k::abort_callback& abort) = 0;
     virtual bool can_seek() = 0;
     virtual void close() = 0;
     
-    // 能力查询
+    // 鑳藉姏鏌ヨ
     virtual bool is_our_path(const char* path) = 0;
     virtual const char* get_name() = 0;
 };
 
-// 简单的文件信息实现
+// 绠€鍗曠殑鏂囦欢淇℃伅瀹炵幇
 class file_info_impl : public file_info {
 private:
     std::unordered_map<std::string, std::vector<std::string>> metadata_;
@@ -142,10 +142,10 @@ public:
         return E_NOINTERFACE;
     }
     
-    ULONG STDMETHODCALLTYPE AddRef() override { return 1; }  // 简单实现
+    ULONG STDMETHODCALLTYPE AddRef() override { return 1; }  // 绠€鍗曞疄鐜?
     ULONG STDMETHODCALLTYPE Release() override { return 1; }
     
-    // file_info接口
+    // file_info鎺ュ彛
     void reset() override {
         metadata_.clear();
         audio_info_ = {};
@@ -181,12 +181,12 @@ public:
     const file_stats& get_file_stats() const override { return file_stats_; }
     void set_file_stats(const file_stats& stats) override { file_stats_ = stats; }
     
-    // service_base接口
+    // service_base鎺ュ彛
     int service_add_ref() override { return 1; }
     int service_release() override { return 1; }
 };
 
-// 哑中止回调
+// 鍝戜腑姝㈠洖璋?
 class abort_callback_dummy : public abort_callback {
 public:
     HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) override {
@@ -210,36 +210,36 @@ public:
 
 } // namespace fb2k
 
-// 主机类
+// 涓绘満绫?
 class mini_host {
 public:
     using decoder_ptr = fb2k::service_ptr_t<fb2k::input_decoder>;
     
-    // 初始化COM
+    // 鍒濆鍖朇OM
     bool initialize();
     
-    // 加载组件DLL
+    // 鍔犺浇缁勪欢DLL
     bool load_component(const std::wstring& dll_path);
     
-    // 创建解码器
+    // 鍒涘缓瑙ｇ爜鍣?
     decoder_ptr create_decoder_for_path(const std::string& path);
     
-    // 获取已加载的组件信息
+    // 鑾峰彇宸插姞杞界殑缁勪欢淇℃伅
     std::vector<std::string> get_loaded_components() const;
     
-    // 测试解码
+    // 娴嬭瘯瑙ｇ爜
     bool test_decode(const std::string& audio_file);
     
 private:
     std::vector<HMODULE> loaded_modules_;
     std::vector<std::string> component_names_;
     
-    // 获取输入解码器服务工厂
+    // 鑾峰彇杈撳叆瑙ｇ爜鍣ㄦ湇鍔″伐鍘?
     using get_service_func = HRESULT(*)(const GUID&, void**);
     get_service_func get_service_ = nullptr;
 };
 
-// 辅助函数
+// 杈呭姪鍑芥暟
 std::string wide_to_utf8(const std::wstring& wide);
 std::wstring utf8_to_wide(const std::string& utf8);
 void log_info(const char* format, ...);

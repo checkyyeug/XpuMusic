@@ -1,9 +1,9 @@
-/**
+﻿/**
  * @file metadb_handle_impl_simple.h
- * @brief 简化的 metadb_handle 实现
+ * @brief 绠€鍖栫殑 metadb_handle 瀹炵幇
  * @date 2025-12-11
  * 
- * 这是 metadb_handle 的最小化实现，只提供基本功能以通过编译。
+ * 杩欐槸 metadb_handle 鐨勬渶灏忓寲瀹炵幇锛屽彧鎻愪緵鍩烘湰鍔熻兘浠ラ€氳繃缂栬瘧銆?
  */
 
 #pragma once
@@ -20,27 +20,27 @@ namespace foobar2000_sdk {
 
 /**
  * @class metadb_handle_impl_simple
- * @brief metadb_handle 的简化实现
+ * @brief metadb_handle 鐨勭畝鍖栧疄鐜?
  * 
- * 只提供最基本的功能，确保项目能编译通过。
+ * 鍙彁渚涙渶鍩烘湰鐨勫姛鑳斤紝纭繚椤圭洰鑳界紪璇戦€氳繃銆?
  */
 class metadb_handle_impl_simple : public metadb_handle_interface {
 private:
-    // 文件位置
+    // 鏂囦欢浣嶇疆
     playable_location location_;
     
-    // 缓存的元数据
+    // 缂撳瓨鐨勫厓鏁版嵁
     std::unique_ptr<file_info_impl> info_;
     
-    // 文件统计信息
+    // 鏂囦欢缁熻淇℃伅
     xpumusic_sdk::file_stats file_stats_;
     
-    // 互斥锁，用于线程安全
+    // 浜掓枼閿侊紝鐢ㄤ簬绾跨▼瀹夊叏
     mutable std::mutex mutex_;
     
 public:
     /**
-     * @brief 构造函数
+     * @brief 鏋勯€犲嚱鏁?
      */
     metadb_handle_impl_simple() : metadb_handle_interface() {
         info_ = std::make_unique<file_info_impl>();
@@ -49,13 +49,13 @@ public:
     }
     
     /**
-     * @brief 析构函数
+     * @brief 鏋愭瀯鍑芥暟
      */
     ~metadb_handle_impl_simple() override = default;
     
     /**
-     * @brief 用 playable_location 初始化
-     * @param loc 文件位置
+     * @brief 鐢?playable_location 鍒濆鍖?
+     * @param loc 鏂囦欢浣嶇疆
      */
     void initialize(const playable_location& loc) {
         std::lock_guard<std::mutex> lock(mutex_);
@@ -63,8 +63,8 @@ public:
     }
     
     /**
-     * @brief 获取文件位置（const 版本）
-     * @return 位置的指针
+     * @brief 鑾峰彇鏂囦欢浣嶇疆锛坈onst 鐗堟湰锛?
+     * @return 浣嶇疆鐨勬寚閽?
      */
     const playable_location& get_location() const override { 
         std::lock_guard<std::mutex> lock(mutex_);
@@ -72,8 +72,8 @@ public:
     }
     
     /**
-     * @brief 获取元数据（const 版本）
-     * @return file_info 的引用
+     * @brief 鑾峰彇鍏冩暟鎹紙const 鐗堟湰锛?
+     * @return file_info 鐨勫紩鐢?
      */
     const file_info_interface& get_info() const override {
         std::lock_guard<std::mutex> lock(mutex_);
@@ -81,8 +81,8 @@ public:
     }
     
     /**
-     * @brief 获取元数据（非 const 版本）
-     * @return file_info 的引用
+     * @brief 鑾峰彇鍏冩暟鎹紙闈?const 鐗堟湰锛?
+     * @return file_info 鐨勫紩鐢?
      */
     file_info_interface& get_info() override {
         std::lock_guard<std::mutex> lock(mutex_);
@@ -90,22 +90,22 @@ public:
     }
     
     /**
-     * @brief 从实时文件获取元数据（简化版本）
-     * @param p_info 输出 file_info
-     * @param p_abort 中止回调
-     * @param p_can_expire 是否允许过期缓存
+     * @brief 浠庡疄鏃舵枃浠惰幏鍙栧厓鏁版嵁锛堢畝鍖栫増鏈級
+     * @param p_info 杈撳嚭 file_info
+     * @param p_abort 涓鍥炶皟
+     * @param p_can_expire 鏄惁鍏佽杩囨湡缂撳瓨
      */
     void get_info_async(file_info_interface& p_info, xpumusic_sdk::abort_callback& p_abort, 
                        bool p_can_expire = false) const override {
-        // 简化实现：直接复制当前信息
+        // 绠€鍖栧疄鐜帮細鐩存帴澶嶅埗褰撳墠淇℃伅
         std::lock_guard<std::mutex> lock(mutex_);
         p_info.copy_from(*info_);
     }
     
     /**
-     * @brief 更新元数据
-     * @param p_info 新的元数据
-     * @param p_abort 中止回调
+     * @brief 鏇存柊鍏冩暟鎹?
+     * @param p_info 鏂扮殑鍏冩暟鎹?
+     * @param p_abort 涓鍥炶皟
      */
     void update_info(const file_info_interface& p_info, xpumusic_sdk::abort_callback& p_abort) override {
         std::lock_guard<std::mutex> lock(mutex_);
@@ -113,17 +113,17 @@ public:
     }
     
     /**
-     * @brief 从文件刷新元数据（简化版本）
-     * @param p_abort 中止回调
+     * @brief 浠庢枃浠跺埛鏂板厓鏁版嵁锛堢畝鍖栫増鏈級
+     * @param p_abort 涓鍥炶皟
      */
     void refresh_info(xpumusic_sdk::abort_callback& p_abort) override {
-        // 简化实现：什么都不做
-        // 在实际实现中，这里会重新扫描文件
+        // 绠€鍖栧疄鐜帮細浠€涔堥兘涓嶅仛
+        // 鍦ㄥ疄闄呭疄鐜颁腑锛岃繖閲屼細閲嶆柊鎵弿鏂囦欢
     }
     
     /**
-     * @brief 获取文件统计信息
-     * @return 文件统计
+     * @brief 鑾峰彇鏂囦欢缁熻淇℃伅
+     * @return 鏂囦欢缁熻
      */
     const xpumusic_sdk::file_stats& get_file_stats() const override {
         std::lock_guard<std::mutex> lock(mutex_);
@@ -131,8 +131,8 @@ public:
     }
     
     /**
-     * @brief 获取路径
-     * @return 文件路径
+     * @brief 鑾峰彇璺緞
+     * @return 鏂囦欢璺緞
      */
     std::string get_path() const override {
         std::lock_guard<std::mutex> lock(mutex_);
@@ -140,8 +140,8 @@ public:
     }
     
     /**
-     * @brief 获取文件名
-     * @return 文件名
+     * @brief 鑾峰彇鏂囦欢鍚?
+     * @return 鏂囦欢鍚?
      */
     std::string get_filename() const override {
         std::lock_guard<std::mutex> lock(mutex_);
@@ -151,8 +151,8 @@ public:
     }
     
     /**
-     * @brief 获取目录
-     * @return 目录路径
+     * @brief 鑾峰彇鐩綍
+     * @return 鐩綍璺緞
      */
     std::string get_directory() const override {
         std::lock_guard<std::mutex> lock(mutex_);
@@ -162,8 +162,8 @@ public:
     }
     
     /**
-     * @brief 获取位置哈希
-     * @return 位置的哈希值
+     * @brief 鑾峰彇浣嶇疆鍝堝笇
+     * @return 浣嶇疆鐨勫搱甯屽€?
      */
     uint64_t get_location_hash() const override {
         std::lock_guard<std::mutex> lock(mutex_);
@@ -172,48 +172,48 @@ public:
     }
     
     /**
-     * @brief 检查是否与另一个 handle 相同
-     * @param other 另一个 handle
-     * @return true 如果相同
+     * @brief 妫€鏌ユ槸鍚︿笌鍙︿竴涓?handle 鐩稿悓
+     * @param other 鍙︿竴涓?handle
+     * @return true 濡傛灉鐩稿悓
      */
     bool is_same(const metadb_handle_interface& other) const override {
         return get_location_hash() == other.get_location_hash();
     }
     
     /**
-     * @brief 检查是否有效
-     * @return true 如果有效
+     * @brief 妫€鏌ユ槸鍚︽湁鏁?
+     * @return true 濡傛灉鏈夋晥
      */
     bool is_valid() const override {
         return !location_.get_path().empty();
     }
     
     /**
-     * @brief 重新加载（简化版本）
-     * @param p_abort 中止回调
+     * @brief 閲嶆柊鍔犺浇锛堢畝鍖栫増鏈級
+     * @param p_abort 涓鍥炶皟
      */
     void reload(xpumusic_sdk::abort_callback& p_abort) override {
         refresh_info(p_abort);
     }
     
     /**
-     * @brief 引用计数增加（简化版本）
-     * 在完整实现中，这会使用实际的引用计数
+     * @brief 寮曠敤璁℃暟澧炲姞锛堢畝鍖栫増鏈級
+     * 鍦ㄥ畬鏁村疄鐜颁腑锛岃繖浼氫娇鐢ㄥ疄闄呯殑寮曠敤璁℃暟
      */
     void ref_add_ref() override {
-        // 简化版本：什么都不做
+        // 绠€鍖栫増鏈細浠€涔堥兘涓嶅仛
     }
     
     /**
-     * @brief 引用计数释放（简化版本）
-     * 在完整实现中，这会减少引用计数并在需要时删除对象
+     * @brief 寮曠敤璁℃暟閲婃斁锛堢畝鍖栫増鏈級
+     * 鍦ㄥ畬鏁村疄鐜颁腑锛岃繖浼氬噺灏戝紩鐢ㄨ鏁板苟鍦ㄩ渶瑕佹椂鍒犻櫎瀵硅薄
      */
     void ref_release() override {
-        // 简化版本：什么都不做
+        // 绠€鍖栫増鏈細浠€涔堥兘涓嶅仛
     }
 };
 
-// 类型别名，保持兼容性
+// 绫诲瀷鍒悕锛屼繚鎸佸吋瀹规€?
 typedef metadb_handle_impl_simple metadb_handle_impl;
 
 } // namespace foobar2000_sdk

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file music_player_enhanced.cpp
  * @brief Enhanced music player with quality-adjustable sample rate conversion
  * @date 2025-12-10
@@ -227,7 +227,7 @@ public:
 
         // Perform sample rate conversion
         std::cout << "Resampling audio (" << file_format_.sample_rate
-                  << "Hz → " << output_format_.sample_rate << "Hz)... ";
+                  << "Hz 鈫?" << output_format_.sample_rate << "Hz)... ";
         auto start = std::chrono::high_resolution_clock::now();
 
         int converted_frames = resampler_->convert(

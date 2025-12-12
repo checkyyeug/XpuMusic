@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @file music_player_complete.cpp
- * @brief 完整的音乐播放器实现，包含播放控制、UI交互和正常退出
+ * @brief 瀹屾暣鐨勯煶涔愭挱鏀惧櫒瀹炵幇锛屽寘鍚挱鏀炬帶鍒躲€乁I浜や簰鍜屾甯搁€€鍑?
  */
 
 #include <iostream>
@@ -22,7 +22,7 @@
 #include <algorithm>
 #include <cmath>
 
-// WAV文件头
+// WAV鏂囦欢澶?
 struct WAVHeader {
     char riff[4];
     uint32_t size;
@@ -39,7 +39,7 @@ struct WAVHeader {
     uint32_t data_size;
 };
 
-// 播放状态枚举
+// 鎾斁鐘舵€佹灇涓?
 enum PlaybackState {
     STOPPED,
     PLAYING,
@@ -58,7 +58,7 @@ private:
     std::thread playback_thread_;
     std::thread input_thread_;
 
-    // 音频参数
+    // 闊抽鍙傛暟
     unsigned int sample_rate_;
     unsigned int channels_;
 
@@ -86,7 +86,7 @@ public:
         std::cout << std::endl;
         std::cout << "Initializing audio system..." << std::endl;
 
-        // 设置信号处理
+        // 璁剧疆淇″彿澶勭悊
         struct sigaction sa;
         sa.sa_handler = [](int sig) {
             if (sig == SIGINT) {
@@ -119,14 +119,14 @@ public:
             return false;
         }
 
-        // 显示文件信息
+        // 鏄剧ず鏂囦欢淇℃伅
         std::cout << "[INFO] File format:" << std::endl;
         std::cout << "  - Sample Rate: " << header.sample_rate << " Hz" << std::endl;
         std::cout << "  - Channels: " << header.channels << std::endl;
         std::cout << "  - Bits: " << header.bits << " bit" << std::endl;
         std::cout << "  - Duration: " << (header.data_size / (header.sample_rate * header.channels * header.bits / 8)) << " seconds" << std::endl;
 
-        // 读取音频数据
+        // 璇诲彇闊抽鏁版嵁
         audio_buffer_.resize(header.data_size / 2);
         file.read(reinterpret_cast<char*>(audio_buffer_.data()), header.data_size);
 
@@ -136,7 +136,7 @@ public:
 
         std::cout << "[OK] Loaded " << audio_buffer_.size() << " samples" << std::endl;
 
-        // 初始化ALSA
+        // 鍒濆鍖朅LSA
         if (!init_alsa()) {
             return false;
         }
@@ -155,13 +155,13 @@ public:
 
         int err;
 
-        // 打开PCM设备
+        // 鎵撳紑PCM璁惧
         if ((err = snd_pcm_open(&pcm_handle_, "default", SND_PCM_STREAM_PLAYBACK, 0)) < 0) {
             std::cerr << "[ERROR] Cannot open audio device: " << snd_strerror(err) << std::endl;
             return false;
         }
 
-        // 设置硬件参数
+        // 璁剧疆纭欢鍙傛暟
         snd_pcm_hw_params_t *hw_params;
         if ((err = snd_pcm_hw_params_malloc(&hw_params)) < 0) {
             std::cerr << "[ERROR] Cannot allocate hw params: " << snd_strerror(err) << std::endl;
@@ -199,7 +199,7 @@ public:
             return false;
         }
 
-        // 设置缓冲区大小
+        // 璁剧疆缂撳啿鍖哄ぇ灏?
         snd_pcm_uframes_t buffer_size = 1024;
         if ((err = snd_pcm_hw_params_set_buffer_size_near(pcm_handle_, hw_params, &buffer_size)) < 0) {
             std::cerr << "[ERROR] Cannot set buffer size: " << snd_strerror(err) << std::endl;
@@ -215,7 +215,7 @@ public:
 
         snd_pcm_hw_params_free(hw_params);
 
-        // 准备PCM
+        // 鍑嗗PCM
         if ((err = snd_pcm_prepare(pcm_handle_)) < 0) {
             std::cerr << "[ERROR] Cannot prepare PCM: " << snd_strerror(err) << std::endl;
             return false;
@@ -245,7 +245,7 @@ public:
         state_ = PLAYING;
         std::cout << "[INFO] Starting playback..." << std::endl;
 
-        // 启动播放线程
+        // 鍚姩鎾斁绾跨▼
         if (playback_thread_.joinable()) {
             playback_thread_.join();
         }
@@ -336,14 +336,14 @@ public:
         std::cout << "\nEnter 'help' for commands or 'quit' to exit" << std::endl;
         std::cout << "> " << std::flush;
 
-        // 启动输入线程
+        // 鍚姩杈撳叆绾跨▼
         input_thread_ = std::thread(&MusicPlayer::input_worker, this);
 
-        // 主线程等待退出
+        // 涓荤嚎绋嬬瓑寰呴€€鍑?
         while (!quit_flag_) {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-            // 检查播放是否完成
+            // 妫€鏌ユ挱鏀炬槸鍚﹀畬鎴?
             if (state_ == PLAYING && current_pos_ >= total_frames_) {
                 state_ = STOPPED;
                 current_pos_ = 0;
@@ -352,7 +352,7 @@ public:
             }
         }
 
-        // 清理
+        // 娓呯悊
         stop();
         if (input_thread_.joinable()) {
             input_thread_.join();
@@ -386,7 +386,7 @@ private:
                     current_pos_ += result;
                 }
             } else {
-                // 暂停状态
+                // 鏆傚仠鐘舵€?
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
             }
         }
@@ -395,13 +395,13 @@ private:
     void input_worker() {
         std::string command;
         while (!quit_flag_ && std::getline(std::cin, command)) {
-            // 转换为小写
+            // 杞崲涓哄皬鍐?
             std::transform(command.begin(), command.end(), command.begin(), ::tolower);
 
             if (command.substr(0, 4) == "load" && command.length() > 5) {
                 stop();
                 std::string filename = command.substr(5);
-                // 去除引号（如果有）
+                // 鍘婚櫎寮曞彿锛堝鏋滄湁锛?
                 if (filename.front() == '"' && filename.back() == '"') {
                     filename = filename.substr(1, filename.length() - 2);
                 }
@@ -427,7 +427,7 @@ private:
                 quit();
                 break;
             } else if (command.empty()) {
-                // 忽略空输入
+                // 蹇界暐绌鸿緭鍏?
             } else {
                 std::cout << "[ERROR] Unknown command. Type 'help' for available commands." << std::endl;
             }
@@ -462,14 +462,14 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // 如果提供了文件名参数，自动加载
+    // 濡傛灉鎻愪緵浜嗘枃浠跺悕鍙傛暟锛岃嚜鍔ㄥ姞杞?
     if (argc > 1) {
         if (player.load_file(argv[1])) {
             std::cout << "\nFile loaded. Use commands to control playback." << std::endl;
         }
     }
 
-    // 运行交互式界面
+    // 杩愯浜や簰寮忕晫闈?
     player.run_interactive();
 
     std::cout << "Goodbye!" << std::endl;

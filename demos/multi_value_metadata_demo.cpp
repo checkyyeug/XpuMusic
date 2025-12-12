@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file multi_value_metadata_demo.cpp
  * @brief Demo: Multi-value metadata functionality
  * @date 2025-12-09
@@ -179,9 +179,9 @@ void demo_audio_info() {
 }
 
 int main() {
-    std::cout << "\n╔══════════════════════════════════════════════════════════════╗\n";
-    std::cout << "║     XpuMusic Multi-Value Metadata SDK Demo                ║\n";
-    std::cout << "╚══════════════════════════════════════════════════════════════╝\n";
+    std::cout << "\n鈺斺晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晽\n";
+    std::cout << "鈺?    XpuMusic Multi-Value Metadata SDK Demo                鈺慭n";
+    std::cout << "鈺氣晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨暆\n";
     
     demo_basic_metadata();
     demo_multi_value_artists();
@@ -193,7 +193,7 @@ int main() {
     demo_audio_info();
     
     print_separator("Demo Complete");
-    std::cout << "\n✅ All multi-value metadata features working!\n\n";
+    std::cout << "\n鉁?All multi-value metadata features working!\n\n";
     
     return 0;
 }

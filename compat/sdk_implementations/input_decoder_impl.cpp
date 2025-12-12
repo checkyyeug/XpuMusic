@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file input_decoder_impl.cpp
  * @brief Input decoder implementation
  * @date 2025-12-10

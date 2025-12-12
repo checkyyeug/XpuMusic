@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file audio_output_wasapi.cpp
  * @brief WASAPI audio output implementation for Windows
  * @date 2025-12-10

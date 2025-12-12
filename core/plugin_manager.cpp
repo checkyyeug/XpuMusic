@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @file plugin_manager.cpp
- * @brief 插件管理器实现
+ * @brief 鎻掍欢绠＄悊鍣ㄥ疄鐜?
  * @date 2025-12-10
  */
 
@@ -22,15 +22,15 @@ PluginManager::~PluginManager() {
 }
 
 void PluginManager::initialize(const PluginConfig& config) {
-    // 清除现有目录
+    // 娓呴櫎鐜版湁鐩綍
     plugin_directories_.clear();
 
-    // 添加配置中的目录
+    // 娣诲姞閰嶇疆涓殑鐩綍
     for (const auto& dir : config.plugin_directories) {
         add_plugin_directory(dir);
     }
 
-    // 如果启用自动加载，立即加载所有插件
+    // 濡傛灉鍚敤鑷姩鍔犺浇锛岀珛鍗冲姞杞芥墍鏈夋彃浠?
     if (config.auto_load_plugins) {
         load_all_plugins();
     }
@@ -60,14 +60,14 @@ const std::vector<std::string>& PluginManager::get_plugin_directories() const {
 }
 
 bool PluginManager::load_native_plugin(const std::string& path) {
-    // 加载动态库
+    // 鍔犺浇鍔ㄦ€佸簱
     void* handle = load_library(path);
     if (!handle) {
         std::cerr << "Failed to load library: " << path << std::endl;
         return false;
     }
 
-    // 获取工厂创建函数
+    // 鑾峰彇宸ュ巶鍒涘缓鍑芥暟
     auto create_factory = reinterpret_cast<IPluginFactory* (*)()>(
         get_library_symbol(handle, "xpumusic_create_plugin_factory"));
 
@@ -78,7 +78,7 @@ bool PluginManager::load_native_plugin(const std::string& path) {
         return false;
     }
 
-    // 创建工厂
+    // 鍒涘缓宸ュ巶
     std::unique_ptr<IPluginFactory> factory(create_factory());
     if (!factory) {
         std::cerr << "Failed to create plugin factory: " << path << std::endl;
@@ -86,17 +86,17 @@ bool PluginManager::load_native_plugin(const std::string& path) {
         return false;
     }
 
-    // 注册插件
+    // 娉ㄥ唽鎻掍欢
     std::string plugin_key = register_plugin_factory(path, std::move(factory));
     if (plugin_key.empty()) {
         unload_library(handle);
         return false;
     }
 
-    // 保存库句柄
+    // 淇濆瓨搴撳彞鏌?
     library_handles_[plugin_key] = handle;
 
-    // 触发回调
+    // 瑙﹀彂鍥炶皟
     if (on_plugin_loaded_) {
         on_plugin_loaded_(plugin_key);
     }
@@ -106,24 +106,24 @@ bool PluginManager::load_native_plugin(const std::string& path) {
 }
 
 bool PluginManager::load_foobar_plugin(const std::string& path) {
-    // 使用foobar2000兼容适配器
+    // 浣跨敤foobar2000鍏煎閫傞厤鍣?
     auto wrapper = std::make_unique<compat::FoobarPluginWrapper>();
     if (!wrapper->load_plugin(path)) {
         std::cerr << "Failed to load foobar2000 plugin: " << path << std::endl;
         return false;
     }
 
-    // 获取适配后的解码器
+    // 鑾峰彇閫傞厤鍚庣殑瑙ｇ爜鍣?
     auto decoders = wrapper->get_decoders();
     for (auto& decoder : decoders) {
-        // 创建包装工厂
+        // 鍒涘缓鍖呰宸ュ巶
         auto factory = std::make_unique<compat::FoobarDecoderFactory>(
             std::move(decoder));
 
         PluginInfo info = factory->get_info();
         std::string plugin_key = "foobar:" + info.name + ":" + info.version;
 
-        // 注册到注册表
+        // 娉ㄥ唽鍒版敞鍐岃〃
         if (registry_->register_factory(plugin_key, std::move(factory))) {
             std::cout << "Loaded foobar2000 decoder: " << info.name << std::endl;
         }
@@ -170,22 +170,22 @@ void PluginManager::load_all_plugins() {
 }
 
 bool PluginManager::unload_plugin(const std::string& key) {
-    // 卸载插件实例
+    // 鍗歌浇鎻掍欢瀹炰緥
     instances_.erase(key);
 
-    // 从注册表注销
+    // 浠庢敞鍐岃〃娉ㄩ攢
     if (!registry_->unregister_factory(key)) {
         return false;
     }
 
-    // 卸载动态库
+    // 鍗歌浇鍔ㄦ€佸簱
     auto it = library_handles_.find(key);
     if (it != library_handles_.end()) {
         unload_library(it->second);
         library_handles_.erase(it);
     }
 
-    // 触发回调
+    // 瑙﹀彂鍥炶皟
     if (on_plugin_unloaded_) {
         on_plugin_unloaded_(key);
     }
@@ -195,19 +195,19 @@ bool PluginManager::unload_plugin(const std::string& key) {
 }
 
 void PluginManager::unload_all_plugins() {
-    // 清理所有实例
+    // 娓呯悊鎵€鏈夊疄渚?
     instances_.clear();
 
-    // 卸载所有动态库
+    // 鍗歌浇鎵€鏈夊姩鎬佸簱
     for (auto& [key, handle] : library_handles_) {
         unload_library(handle);
     }
     library_handles_.clear();
 
-    // 清理foobar插件
+    // 娓呯悊foobar鎻掍欢
     foobar_plugins_.clear();
 
-    // 清空注册表
+    // 娓呯┖娉ㄥ唽琛?
     registry_->clear();
 }
 
@@ -217,13 +217,13 @@ std::unique_ptr<IAudioDecoder> PluginManager::get_decoder(const std::string& fil
         return nullptr;
     }
 
-    // 获取支持该扩展名的解码器工厂
+    // 鑾峰彇鏀寔璇ユ墿灞曞悕鐨勮В鐮佸櫒宸ュ巶
     auto factories = registry_->get_decoder_factories_by_extension(extension);
     if (factories.empty()) {
         return nullptr;
     }
 
-    // 尝试每个工厂
+    // 灏濊瘯姣忎釜宸ュ巶
     for (auto* factory : factories) {
         auto plugin = factory->create();
         if (!plugin) continue;
@@ -231,9 +231,9 @@ std::unique_ptr<IAudioDecoder> PluginManager::get_decoder(const std::string& fil
         auto decoder = dynamic_cast<IAudioDecoder*>(plugin.get());
         if (!decoder) continue;
 
-        // 检查是否能解码该文件
+        // 妫€鏌ユ槸鍚﹁兘瑙ｇ爜璇ユ枃浠?
         if (decoder->can_decode(file_path)) {
-            plugin.release(); // 释放所有权
+            plugin.release(); // 閲婃斁鎵€鏈夋潈
             return std::unique_ptr<IAudioDecoder>(decoder);
         }
     }
@@ -262,7 +262,7 @@ std::unique_ptr<IDSPProcessor> PluginManager::get_dsp_processor(const std::strin
 std::unique_ptr<IAudioOutput> PluginManager::get_audio_output(const std::string& device_id) {
     auto factories = registry_->get_factories_by_type(PluginType::AudioOutput);
 
-    // 优先获取指定设备
+    // 浼樺厛鑾峰彇鎸囧畾璁惧
     for (auto* factory : factories) {
         auto plugin = factory->create();
         auto output = dynamic_cast<IAudioOutput*>(plugin.get());
@@ -389,7 +389,7 @@ std::string PluginManager::get_file_extension(const std::string& path) const {
 }
 
 bool PluginManager::is_foobar_plugin(const std::string& path) const {
-    // 简单判断：如果文件名包含"foo_"，很可能是foobar2000插件
+    // 绠€鍗曞垽鏂細濡傛灉鏂囦欢鍚嶅寘鍚?foo_"锛屽緢鍙兘鏄痜oobar2000鎻掍欢
     return path.find("foo_") != std::string::npos;
 }
 

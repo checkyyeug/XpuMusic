@@ -1,4 +1,4 @@
-#include "playback_engine.h"
+﻿#include "playback_engine.h"
 #include <iostream>
 #include <algorithm>
 #include <cstring>
@@ -194,7 +194,7 @@ Result PlaybackEngine::play() {
         return result;
     }
 
-    std::cout << "✓ Playback started successfully" << std::endl;
+    std::cout << "鉁?Playback started successfully" << std::endl;
     return Result::Success;
 }
 

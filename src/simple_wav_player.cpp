@@ -1,4 +1,4 @@
-#include "../platform/audio_output_factory.h"
+﻿#include "../platform/audio_output_factory.h"
 #include "../sdk/headers/mp_types.h"
 #include "../sdk/headers/mp_decoder.h"
 #include "../sdk/headers/mp_audio_output.h"
@@ -315,7 +315,7 @@ public:
             return false;
         }
 
-        std::cout << "✓ Playback started!" << std::endl;
+        std::cout << "鉁?Playback started!" << std::endl;
         return true;
     }
 

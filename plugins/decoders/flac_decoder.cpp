@@ -1,4 +1,4 @@
-#include "mp_plugin.h"
+﻿#include "mp_plugin.h"
 #include "mp_decoder.h"
 
 #ifndef NO_FLAC

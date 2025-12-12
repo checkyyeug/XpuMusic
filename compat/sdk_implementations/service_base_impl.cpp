@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file service_base_impl.cpp
  * @brief Service base implementation
  * @date 2025-12-10

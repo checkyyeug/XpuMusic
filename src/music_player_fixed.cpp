@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file music_player_fixed.cpp
  * @brief Fixed version with proper signal handling and cross-platform support
  * @date 2025-12-10

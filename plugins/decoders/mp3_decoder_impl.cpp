@@ -1,4 +1,4 @@
-#include "mp3_decoder_impl.h"
+﻿#include "mp3_decoder_impl.h"
 #include <cstring>
 #include <algorithm>
 #include <fstream>

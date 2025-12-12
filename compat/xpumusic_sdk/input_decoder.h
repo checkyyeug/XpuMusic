@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "foobar2000_sdk.h"
 

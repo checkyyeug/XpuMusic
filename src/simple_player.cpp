@@ -1,16 +1,16 @@
-#include <iostream>
+﻿#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
 #include <thread>
 #include <chrono>
 
-// 包含基础SDK头文件
+// 鍖呭惈鍩虹SDK澶存枃浠?
 #include "../compat/sdk_implementations/audio_output.h"
 #include "../compat/sdk_implementations/audio_decoder.h"
 #include "../compat/sdk_implementations/simple_dsp.h"
 
-// 基础音频处理
+// 鍩虹闊抽澶勭悊
 namespace mp {
     class SimplePlayer {
     private:
@@ -32,43 +32,43 @@ namespace mp {
             std::cout << "Initializing audio system..." << std::endl;
 
             try {
-                // 创建音频输出
+                // 鍒涘缓闊抽杈撳嚭
                 audio_output_ = create_audio_output();
                 if (!audio_output_) {
-                    std::cerr << "❌ Failed to create audio output" << std::endl;
+                    std::cerr << "鉂?Failed to create audio output" << std::endl;
                     return false;
                 }
-                std::cout << "✓ Audio output created" << std::endl;
+                std::cout << "鉁?Audio output created" << std::endl;
 
-                // 创建解码器
+                // 鍒涘缓瑙ｇ爜鍣?
                 decoder_ = create_audio_decoder();
                 if (!decoder_) {
-                    std::cerr << "❌ Failed to create audio decoder" << std::endl;
+                    std::cerr << "鉂?Failed to create audio decoder" << std::endl;
                     return false;
                 }
-                std::cout << "✓ Audio decoder created" << std::endl;
+                std::cout << "鉁?Audio decoder created" << std::endl;
 
-                // 创建DSP处理器
+                // 鍒涘缓DSP澶勭悊鍣?
                 dsp_ = create_simple_dsp();
                 if (!dsp_) {
-                    std::cerr << "❌ Failed to create DSP processor" << std::endl;
+                    std::cerr << "鉂?Failed to create DSP processor" << std::endl;
                     return false;
                 }
-                std::cout << "✓ DSP processor created" << std::endl;
+                std::cout << "鉁?DSP processor created" << std::endl;
 
                 is_initialized_ = true;
-                std::cout << "✅ Audio system initialized successfully!" << std::endl;
+                std::cout << "鉁?Audio system initialized successfully!" << std::endl;
                 return true;
 
             } catch (const std::exception& e) {
-                std::cerr << "❌ Initialization error: " << e.what() << std::endl;
+                std::cerr << "鉂?Initialization error: " << e.what() << std::endl;
                 return false;
             }
         }
 
         bool play_file(const std::string& file_path) {
             if (!is_initialized_) {
-                std::cerr << "❌ Player not initialized" << std::endl;
+                std::cerr << "鉂?Player not initialized" << std::endl;
                 return false;
             }
 
@@ -76,42 +76,42 @@ namespace mp {
                 stop();
             }
 
-            std::cout << "\n🎵 Loading file: " << file_path << std::endl;
+            std::cout << "\n馃幍 Loading file: " << file_path << std::endl;
 
             try {
-                // 打开音频文件
+                // 鎵撳紑闊抽鏂囦欢
                 if (!decoder_->open_file(file_path)) {
-                    std::cerr << "❌ Failed to open file: " << file_path << std::endl;
+                    std::cerr << "鉂?Failed to open file: " << file_path << std::endl;
                     return false;
                 }
-                std::cout << "✓ File opened successfully" << std::endl;
+                std::cout << "鉁?File opened successfully" << std::endl;
 
-                // 获取音频信息
+                // 鑾峰彇闊抽淇℃伅
                 auto info = decoder_->get_file_info();
-                std::cout << "📊 Audio Info:" << std::endl;
+                std::cout << "馃搳 Audio Info:" << std::endl;
                 std::cout << "  Sample Rate: " << info.sample_rate << " Hz" << std::endl;
                 std::cout << "  Channels: " << info.channels << std::endl;
                 std::cout << "  Duration: " << info.duration_seconds << " seconds" << std::endl;
                 std::cout << "  Format: " << info.format << std::endl;
 
-                // 配置音频输出
+                // 閰嶇疆闊抽杈撳嚭
                 if (!audio_output_->open(info.sample_rate, info.channels, 16, 512)) {
-                    std::cerr << "❌ Failed to open audio output" << std::endl;
+                    std::cerr << "鉂?Failed to open audio output" << std::endl;
                     return false;
                 }
-                std::cout << "✓ Audio output configured" << std::endl;
+                std::cout << "鉁?Audio output configured" << std::endl;
 
-                // 开始播放
+                // 寮€濮嬫挱鏀?
                 is_playing_ = true;
-                std::cout << "▶️  Playing..." << std::endl;
+                std::cout << "鈻讹笍  Playing..." << std::endl;
 
-                // 简单的播放循环
+                // 绠€鍗曠殑鎾斁寰幆
                 play_audio_loop();
 
                 return true;
 
             } catch (const std::exception& e) {
-                std::cerr << "❌ Playback error: " << e.what() << std::endl;
+                std::cerr << "鉂?Playback error: " << e.what() << std::endl;
                 return false;
             }
         }
@@ -119,7 +119,7 @@ namespace mp {
         void stop() {
             if (is_playing_) {
                 is_playing_ = false;
-                std::cout << "⏹️  Stopping playback..." << std::endl;
+                std::cout << "鈴癸笍  Stopping playback..." << std::endl;
                 
                 if (audio_output_) {
                     audio_output_->close();
@@ -128,14 +128,14 @@ namespace mp {
                     decoder_->close();
                 }
                 
-                std::cout << "✅ Playback stopped" << std::endl;
+                std::cout << "鉁?Playback stopped" << std::endl;
             }
         }
 
         void set_volume(float volume) {
             if (dsp_) {
                 dsp_->set_volume(volume);
-                std::cout << "🔊 Volume set to: " << (volume * 100) << "%" << std::endl;
+                std::cout << "馃攰 Volume set to: " << (volume * 100) << "%" << std::endl;
             }
         }
 
@@ -171,61 +171,61 @@ namespace mp {
     private:
         void play_audio_loop() {
             const int buffer_size = 1024;
-            std::vector<float> audio_buffer(buffer_size * 2); // 立体声
+            std::vector<float> audio_buffer(buffer_size * 2); // 绔嬩綋澹?
             
             while (is_playing_) {
-                // 从解码器读取音频数据
+                // 浠庤В鐮佸櫒璇诲彇闊抽鏁版嵁
                 int frames_read = decoder_->read_samples(audio_buffer.data(), buffer_size);
                 
                 if (frames_read <= 0) {
-                    // 文件结束
-                    std::cout << "\n🏁 End of file reached" << std::endl;
+                    // 鏂囦欢缁撴潫
+                    std::cout << "\n馃弫 End of file reached" << std::endl;
                     break;
                 }
                 
-                // 应用DSP处理
+                // 搴旂敤DSP澶勭悊
                 if (dsp_) {
                     dsp_->process_buffer(audio_buffer.data(), frames_read, 2);
                 }
                 
-                // 写入音频输出
+                // 鍐欏叆闊抽杈撳嚭
                 int frames_written = audio_output_->write(audio_buffer.data(), frames_read * 2, 16);
                 
                 if (frames_written <= 0) {
-                    std::cerr << "❌ Audio output error" << std::endl;
+                    std::cerr << "鉂?Audio output error" << std::endl;
                     break;
                 }
                 
-                // 小延迟避免CPU占用过高
+                // 灏忓欢杩熼伩鍏岰PU鍗犵敤杩囬珮
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
             }
             
             if (is_playing_) {
-                std::cout << "\n✅ Playback completed" << std::endl;
+                std::cout << "\n鉁?Playback completed" << std::endl;
                 stop();
             }
         }
     };
 }
 
-// 主函数
+// 涓诲嚱鏁?
 int main(int argc, char* argv[]) {
-    std::cout << "🎵 XpuMusic Simple Player v1.0" << std::endl;
+    std::cout << "馃幍 XpuMusic Simple Player v1.0" << std::endl;
     std::cout << "================================" << std::endl;
     std::cout << "A simple audio player with foobar2000 compatibility" << std::endl;
     std::cout << "================================" << std::endl;
 
     mp::SimplePlayer player;
     
-    // 初始化播放器
+    // 鍒濆鍖栨挱鏀惧櫒
     if (!player.initialize()) {
-        std::cerr << "❌ Failed to initialize player" << std::endl;
+        std::cerr << "鉂?Failed to initialize player" << std::endl;
         return 1;
     }
 
     player.show_help();
 
-    // 命令行模式
+    // 鍛戒护琛屾ā寮?
     if (argc > 1) {
         std::string command = argv[1];
         
@@ -233,7 +233,7 @@ int main(int argc, char* argv[]) {
             std::string file_path = argv[2];
             player.play_file(file_path);
             
-            // 等待播放完成
+            // 绛夊緟鎾斁瀹屾垚
             while (player.is_playing()) {
                 std::this_thread::sleep_for(std::chrono::seconds(1));
             }
@@ -248,8 +248,8 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    // 交互式模式
-    std::cout << "\n💡 Enter commands (type 'help' for available commands):" << std::endl;
+    // 浜や簰寮忔ā寮?
+    std::cout << "\n馃挕 Enter commands (type 'help' for available commands):" << std::endl;
     
     std::string command;
     while (true) {
@@ -274,7 +274,7 @@ int main(int argc, char* argv[]) {
             std::string file_path;
             std::getline(iss, file_path);
             
-            // 去除前导空格
+            // 鍘婚櫎鍓嶅绌烘牸
             file_path.erase(0, file_path.find_first_not_of(" \t"));
             
             if (!file_path.empty()) {
@@ -283,7 +283,7 @@ int main(int argc, char* argv[]) {
                 });
                 play_thread.detach();
             } else {
-                std::cout << "❌ Please specify a file path" << std::endl;
+                std::cout << "鉂?Please specify a file path" << std::endl;
             }
         } else if (cmd == "volume") {
             float volume;
@@ -292,17 +292,17 @@ int main(int argc, char* argv[]) {
             if (volume >= 0.0f && volume <= 1.0f) {
                 player.set_volume(volume);
             } else {
-                std::cout << "❌ Volume must be between 0.0 and 1.0" << std::endl;
+                std::cout << "鉂?Volume must be between 0.0 and 1.0" << std::endl;
             }
         } else {
-            std::cout << "❌ Unknown command: " << cmd << std::endl;
+            std::cout << "鉂?Unknown command: " << cmd << std::endl;
             std::cout << "Type 'help' for available commands" << std::endl;
         }
     }
 
-    std::cout << "\n👋 Shutting down player..." << std::endl;
+    std::cout << "\n馃憢 Shutting down player..." << std::endl;
     player.stop();
-    std::cout << "✅ Player shutdown complete" << std::endl;
+    std::cout << "鉁?Player shutdown complete" << std::endl;
     
     return 0;
 }

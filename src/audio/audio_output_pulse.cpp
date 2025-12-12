@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file audio_output_pulse.cpp
  * @brief PulseAudio audio output implementation for Linux
  * @date 2025-12-10

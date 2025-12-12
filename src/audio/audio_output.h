@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file audio_output.h
  * @brief Unified audio output interface
  * @date 2025-12-10

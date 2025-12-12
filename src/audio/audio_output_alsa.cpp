@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file audio_output_alsa.cpp
  * @brief ALSA audio output implementation for Linux
  * @date 2025-12-10

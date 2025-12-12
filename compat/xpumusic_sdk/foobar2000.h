@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file foobar2000.h
  * @brief XpuMusic SDK compatibility definitions
  * @date 2025-12-10

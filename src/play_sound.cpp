@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file play_sound.cpp
  * @brief Minimal audio playback test - bypass everything
  */
@@ -91,7 +91,7 @@ SimpleResult test_wasapi_direct() {
         return Result_Failure;
     }
     
-    std::cout << "✓ Audio device obtained" << std::endl;
+    std::cout << "鉁?Audio device obtained" << std::endl;
     
     // Get audio client
     IAudioClient* pAudioClient = NULL;
@@ -117,7 +117,7 @@ SimpleResult test_wasapi_direct() {
         return Result_Failure;
     }
     
-    std::cout << "✓ Audio format: " << pwfx->nSamplesPerSec << " Hz, " 
+    std::cout << "鉁?Audio format: " << pwfx->nSamplesPerSec << " Hz, " 
               << pwfx->nChannels << " channels" << std::endl;
     
     // Initialize audio client
@@ -150,7 +150,7 @@ SimpleResult test_wasapi_direct() {
         return Result_Failure;
     }
     
-    std::cout << "✓ Buffer size: " << bufferFrameCount << " frames" << std::endl;
+    std::cout << "鉁?Buffer size: " << bufferFrameCount << " frames" << std::endl;
     
     // Get render client
     IAudioRenderClient* pRenderClient = NULL;
@@ -179,7 +179,7 @@ SimpleResult test_wasapi_direct() {
         return Result_Failure;
     }
     
-    std::cout << "✓ Audio started - Playing 2 second tone..." << std::endl;
+    std::cout << "鉁?Audio started - Playing 2 second tone..." << std::endl;
     
     // Generate and play audio
     AudioContext ctx;
@@ -226,7 +226,7 @@ SimpleResult test_wasapi_direct() {
     pEnumerator->Release();
     CoUninitialize();
     
-    std::cout << "✓ Audio playback complete!" << std::endl;
+    std::cout << "鉁?Audio playback complete!" << std::endl;
     return Result_Success;
 }
 #endif
@@ -243,10 +243,10 @@ int main(int argc, char** argv) {
     SimpleResult result = test_wasapi_direct();
     
     if (result == Result_Success) {
-        std::cout << "\n✅ SUCCESS! Audio played through WASAPI!" << std::endl;
+        std::cout << "\n鉁?SUCCESS! Audio played through WASAPI!" << std::endl;
         std::cout << "The audio stack is working - problem is in CoreEngine init." << std::endl;
     } else {
-        std::cout << "\n❌ Failed to play audio via WASAPI." << std::endl;
+        std::cout << "\n鉂?Failed to play audio via WASAPI." << std::endl;
     }
 #else
     std::cout << "Non-Windows platform - Audio test skipped." << std::endl;

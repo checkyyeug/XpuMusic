@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../sdk/headers/mp_audio_output.h"
 #include <string>

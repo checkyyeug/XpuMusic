@@ -1,7 +1,7 @@
-#pragma once
+﻿#pragma once
 
-// 阶段1.1：真实组件桥接器
-// 桥接真实fb2k组件和主机环境
+// 闃舵1.1锛氱湡瀹炵粍浠舵ˉ鎺ュ櫒
+// 妗ユ帴鐪熷疄fb2k缁勪欢鍜屼富鏈虹幆澧?
 
 #include "real_minihost.h"
 #include <map>
@@ -9,7 +9,7 @@
 
 namespace fb2k {
 
-// 服务桥接基类
+// 鏈嶅姟妗ユ帴鍩虹被
 template<typename Interface>
 class ServiceBridge : public Interface {
 protected:
@@ -22,7 +22,7 @@ public:
     
     virtual ~ServiceBridge() {
         if(m_ownInterface && m_realInterface) {
-            // 释放真实接口
+            // 閲婃斁鐪熷疄鎺ュ彛
             if(auto* unknown = static_cast<IUnknown*>(m_realInterface)) {
                 unknown->Release();
             }
@@ -31,25 +31,25 @@ public:
     
     void* GetRealInterface() const { return m_realInterface; }
     
-    // 辅助函数：获取真实接口的方法指针
+    // 杈呭姪鍑芥暟锛氳幏鍙栫湡瀹炴帴鍙ｇ殑鏂规硶鎸囬拡
     template<typename FuncPtr>
     FuncPtr GetMethod(int index) {
         if(!m_realInterface) return nullptr;
         
-        // 假设是标准的COM接口布局
+        // 鍋囪鏄爣鍑嗙殑COM鎺ュ彛甯冨眬
         void** vtable = *(void***)m_realInterface;
         return reinterpret_cast<FuncPtr>(vtable[index]);
     }
 };
 
-// 真实的文件信息桥接器
+// 鐪熷疄鐨勬枃浠朵俊鎭ˉ鎺ュ櫒
 class RealFileInfoBridge : public ServiceBridge<FileInfo> {
 public:
     RealFileInfoBridge(void* realFileInfo) : ServiceBridge(realFileInfo, false) {}
     
-    // FileInfo接口实现 - 桥接到真实实现
+    // FileInfo鎺ュ彛瀹炵幇 - 妗ユ帴鍒扮湡瀹炲疄鐜?
     void reset() override {
-        auto func = GetMethod<void(*)(void*)>(3); // 假设reset是第3个方法
+        auto func = GetMethod<void(*)(void*)>(3); // 鍋囪reset鏄3涓柟娉?
         if(func) func(m_realInterface);
     }
     
@@ -101,23 +101,23 @@ public:
     }
 };
 
-// 真实的中止回调桥接器
+// 鐪熷疄鐨勪腑姝㈠洖璋冩ˉ鎺ュ櫒
 class RealAbortCallbackBridge : public ServiceBridge<AbortCallback> {
 public:
     RealAbortCallbackBridge(void* realAbortCallback) : ServiceBridge(realAbortCallback, false) {}
     
     bool is_aborting() const override {
-        auto func = GetMethod<bool(*)(void*)>(3); // 假设is_aborting是第3个方法
+        auto func = GetMethod<bool(*)(void*)>(3); // 鍋囪is_aborting鏄3涓柟娉?
         return func ? func(m_realInterface) : false;
     }
 };
 
-// 真实的输入解码器桥接器
+// 鐪熷疄鐨勮緭鍏ヨВ鐮佸櫒妗ユ帴鍣?
 class RealInputDecoderBridge : public ServiceBridge<InputDecoder> {
 public:
     RealInputDecoderBridge(void* realDecoder) : ServiceBridge(realDecoder, false) {}
     
-    // InputDecoder接口实现
+    // InputDecoder鎺ュ彛瀹炵幇
     bool open(const char* path, FileInfo& info, AbortCallback& abort) override {
         auto func = GetMethod<bool(*)(void*, const char*, void*, void*)>(3);
         return func ? func(m_realInterface, path, &info, &abort) : false;
@@ -154,7 +154,7 @@ public:
     }
 };
 
-// 组件适配器基类
+// 缁勪欢閫傞厤鍣ㄥ熀绫?
 class ComponentAdapter {
 protected:
     HMODULE m_module;
@@ -178,7 +178,7 @@ public:
     virtual service_ptr_t<ServiceBase> CreateService(REFGUID guid) = 0;
 };
 
-// 输入解码器适配器
+// 杈撳叆瑙ｇ爜鍣ㄩ€傞厤鍣?
 class InputDecoderAdapter : public ComponentAdapter {
 private:
     typedef HRESULT (*GetServiceFunc)(REFGUID, void**);
@@ -188,7 +188,7 @@ public:
     InputDecoderAdapter(HMODULE module, const std::string& name) 
         : ComponentAdapter(module, name) {
         
-        // 获取服务入口点
+        // 鑾峰彇鏈嶅姟鍏ュ彛鐐?
         m_getService = (GetServiceFunc)GetProcAddress(module, "fb2k_get_service");
         if(!m_getService) {
             m_getService = (GetServiceFunc)GetProcAddress(module, "get_service");
@@ -205,7 +205,7 @@ public:
             return false;
         }
         
-        // 这里可以添加组件特定的初始化代码
+        // 杩欓噷鍙互娣诲姞缁勪欢鐗瑰畾鐨勫垵濮嬪寲浠ｇ爜
         return true;
     }
     
@@ -221,7 +221,7 @@ public:
             return service_ptr_t<ServiceBase>();
         }
         
-        // 根据GUID创建相应的桥接器
+        // 鏍规嵁GUID鍒涘缓鐩稿簲鐨勬ˉ鎺ュ櫒
         if(IsEqualGUID(guid, IID_InputDecoder)) {
             return service_ptr_t<ServiceBase>(new RealInputDecoderBridge(service_ptr));
         } else if(IsEqualGUID(guid, IID_FileInfo)) {
@@ -230,12 +230,12 @@ public:
             return service_ptr_t<ServiceBase>(new RealAbortCallbackBridge(service_ptr));
         }
         
-        // 如果不知道如何处理，返回原始接口
+        // 濡傛灉涓嶇煡閬撳浣曞鐞嗭紝杩斿洖鍘熷鎺ュ彛
         return service_ptr_t<ServiceBase>(static_cast<ServiceBase*>(service_ptr));
     }
 };
 
-// 服务定位器（增强版）
+// 鏈嶅姟瀹氫綅鍣紙澧炲己鐗堬級
 class EnhancedServiceLocator {
 private:
     std::map<GUID, std::unique_ptr<ComponentAdapter>, GUID_hash> m_adapters;
@@ -253,13 +253,13 @@ public:
     }
     
     service_ptr_t<ServiceBase> GetService(REFGUID guid) {
-        // 首先尝试组件适配器
+        // 棣栧厛灏濊瘯缁勪欢閫傞厤鍣?
         auto it = m_adapters.find(guid);
         if(it != m_adapters.end()) {
             return it->second->CreateService(guid);
         }
         
-        // 然后尝试工厂
+        // 鐒跺悗灏濊瘯宸ュ巶
         auto factory_it = m_factories.find(guid);
         if(factory_it != m_factories.end()) {
             return factory_it->second();
@@ -280,7 +280,7 @@ public:
     }
 };
 
-// 组件发现器
+// 缁勪欢鍙戠幇鍣?
 class ComponentDiscoverer {
 public:
     struct ComponentInfo {
@@ -306,7 +306,7 @@ public:
                     info.name = WideToUTF8(entry.path().filename().wstring());
                     info.type = IdentifyComponentType(info.name);
                     
-                    // 验证组件
+                    // 楠岃瘉缁勪欢
                     auto validation_result = ValidateComponent(entry.path().wstring());
                     info.is_valid = validation_result.first;
                     info.error_message = validation_result.second;
@@ -315,7 +315,7 @@ public:
                 }
             }
         } catch(const std::exception& e) {
-            // 记录错误但不中断
+            // 璁板綍閿欒浣嗕笉涓柇
         }
         
         return components;
@@ -353,10 +353,10 @@ private:
         HMODULE module = LoadLibraryW(path.c_str());
         if(!module) {
             DWORD error = GetLastError();
-            return {false, "无法加载DLL: " + std::to_string(error)};
+            return {false, "鏃犳硶鍔犺浇DLL: " + std::to_string(error)};
         }
         
-        // 检查关键导出函数
+        // 妫€鏌ュ叧閿鍑哄嚱鏁?
         bool has_service_export = false;
         
         const char* service_exports[] = {
@@ -376,14 +376,14 @@ private:
         FreeLibrary(module);
         
         if(!has_service_export) {
-            return {false, "未找到服务导出函数"};
+            return {false, "鏈壘鍒版湇鍔″鍑哄嚱鏁?};
         }
         
         return {true, ""};
     }
 };
 
-// 增强版主机
+// 澧炲己鐗堜富鏈?
 class EnhancedMiniHost : public RealMiniHost {
 private:
     EnhancedServiceLocator m_serviceLocator;
@@ -391,34 +391,34 @@ private:
     
 public:
     bool LoadComponentEnhanced(const std::wstring& dll_path) {
-        FB2KLogger::Info("增强加载组件: %s", WideToUTF8(dll_path).c_str());
+        FB2KLogger::Info("澧炲己鍔犺浇缁勪欢: %s", WideToUTF8(dll_path).c_str());
         
-        // 基础加载
+        // 鍩虹鍔犺浇
         if(!LoadComponent(dll_path)) {
             return false;
         }
         
-        // 获取刚加载的模块
+        // 鑾峰彇鍒氬姞杞界殑妯″潡
         HMODULE module = m_modules.back();
         std::string name = WideToUTF8(fs::path(dll_path).filename().wstring());
         
-        // 创建适当的适配器
+        // 鍒涘缓閫傚綋鐨勯€傞厤鍣?
         std::unique_ptr<ComponentAdapter> adapter;
         
         if(name.find("input") != std::string::npos || name.find("decoder") != std::string::npos) {
             adapter = std::make_unique<InputDecoderAdapter>(module, name);
         }
-        // 可以添加更多适配器类型...
+        // 鍙互娣诲姞鏇村閫傞厤鍣ㄧ被鍨?..
         
         if(adapter && adapter->Initialize()) {
-            // 注册适配器处理的服务
+            // 娉ㄥ唽閫傞厤鍣ㄥ鐞嗙殑鏈嶅姟
             m_serviceLocator.RegisterComponent(CLSID_InputDecoderService, std::move(adapter));
             
-            FB2KLogger::Info("组件增强适配完成: %s", name.c_str());
+            FB2KLogger::Info("缁勪欢澧炲己閫傞厤瀹屾垚: %s", name.c_str());
             return true;
         }
         
-        FB2KLogger::Warning("组件增强适配失败: %s", name.c_str());
+        FB2KLogger::Warning("缁勪欢澧炲己閫傞厤澶辫触: %s", name.c_str());
         return false;
     }
     
@@ -426,13 +426,13 @@ public:
         return m_serviceLocator.GetService(guid);
     }
     
-    // 自动发现和加载组件
+    // 鑷姩鍙戠幇鍜屽姞杞界粍浠?
     bool AutoDiscoverAndLoadComponents(const std::wstring& directory) {
-        FB2KLogger::Info("自动发现组件: %s", WideToUTF8(directory).c_str());
+        FB2KLogger::Info("鑷姩鍙戠幇缁勪欢: %s", WideToUTF8(directory).c_str());
         
         auto components = ComponentDiscoverer::DiscoverComponents(directory);
         
-        FB2KLogger::Info("发现 %zu 个潜在组件", components.size());
+        FB2KLogger::Info("鍙戠幇 %zu 涓綔鍦ㄧ粍浠?, components.size());
         
         int loaded = 0;
         int failed = 0;
@@ -445,12 +445,12 @@ public:
                     failed++;
                 }
             } else {
-                FB2KLogger::Warning("跳过无效组件: %s - %s", comp.name.c_str(), comp.error_message.c_str());
+                FB2KLogger::Warning("璺宠繃鏃犳晥缁勪欢: %s - %s", comp.name.c_str(), comp.error_message.c_str());
                 failed++;
             }
         }
         
-        FB2KLogger::Info("自动加载完成: %d 成功, %d 失败", loaded, failed);
+        FB2KLogger::Info("鑷姩鍔犺浇瀹屾垚: %d 鎴愬姛, %d 澶辫触", loaded, failed);
         return loaded > 0;
     }
 };

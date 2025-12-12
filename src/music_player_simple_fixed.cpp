@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file music_player_simple_fixed.cpp
  * @brief Fixed simple music player with proper signal handling
  * @date 2025-12-10
@@ -101,10 +101,10 @@ int main(int argc, char* argv[]) {
     // Set up signal handler
     std::signal(SIGINT, signal_handler);
 
-    std::cout << "╔══════════════════════════════════════════════╗\n";
-    std::cout << "║    Professional Music Player v0.1.0          ║\n";
-    std::cout << "║    Cross-Platform Audio Player               ║\n";
-    std::cout << "╚══════════════════════════════════════════════╝\n\n";
+    std::cout << "鈺斺晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晽\n";
+    std::cout << "鈺?   Professional Music Player v0.1.0          鈺慭n";
+    std::cout << "鈺?   Cross-Platform Audio Player               鈺慭n";
+    std::cout << "鈺氣晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨暆\n\n";
 
     std::cout << "Initializing Music Player Core Engine...\n";
 

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file flac_decoder_stub.cpp
  * @brief FLAC decoder stub (placeholder until FLAC is installed)
  * @date 2025-12-11

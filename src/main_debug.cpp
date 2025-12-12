@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file main_debug.cpp
  * @brief Safe test version - step by step initialization
  */
@@ -33,7 +33,7 @@ int main() {
         std::cout << "Step 2: Calling initialize()...\n";
         auto result = engine.initialize();
         if (result == mp::Result::Success) {
-            std::cout << "✓ Initialization successful!\n";
+            std::cout << "鉁?Initialization successful!\n";
             
             // Just wait a bit then exit cleanly
             std::cout << "Running for 3 seconds...\n";
@@ -43,12 +43,12 @@ int main() {
             
             std::cout << "Exiting cleanly...\n";
         } else {
-            std::cout << "✗ Initialization failed: " << static_cast<int>(result) << "\n";
+            std::cout << "鉁?Initialization failed: " << static_cast<int>(result) << "\n";
         }
     } catch (const std::exception& e) {
-        std::cout << "✗ Exception during initialization: " << e.what() << "\n";
+        std::cout << "鉁?Exception during initialization: " << e.what() << "\n";
     } catch (...) {
-        std::cout << "✗ Unknown exception during initialization\n";
+        std::cout << "鉁?Unknown exception during initialization\n";
     }
     
     std::cout << "Done.\n";

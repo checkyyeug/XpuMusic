@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file adaptive_resampler.h
  * @brief Adaptive sample rate converter with automatic quality selection
  * @date 2025-12-10

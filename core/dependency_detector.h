@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file dependency_detector.h
  * @brief Cross-platform dependency detection
  * @date 2025-12-10

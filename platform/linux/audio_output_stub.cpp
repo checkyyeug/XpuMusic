@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file audio_output_stub.cpp
  * @brief ALSA audio output stub implementation
  * @date 2025-12-10

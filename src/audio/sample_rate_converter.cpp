@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file sample_rate_converter.cpp
  * @brief Sample rate conversion implementations
  * @date 2025-12-10

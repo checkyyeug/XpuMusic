@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @file wav_decoder.cpp
- * @brief XpuMusic WAV解码器插件
+ * @brief XpuMusic WAV瑙ｇ爜鍣ㄦ彃浠?
  * @date 2025-12-10
  */
 
@@ -20,7 +20,7 @@ using xpumusic::AudioBuffer;
 using xpumusic::MetadataItem;
 using xpumusic::PluginType;
 
-// WAV文件头结构
+// WAV鏂囦欢澶寸粨鏋?
 #pragma pack(push, 1)
 struct WAVHeader {
     char riff[4];
@@ -87,7 +87,7 @@ public:
     }
 
     bool can_decode(const std::string& file_path) override {
-        // 检查扩展名
+        // 妫€鏌ユ墿灞曞悕
         size_t pos = file_path.find_last_of('.');
         if (pos == std::string::npos) return false;
 
@@ -113,7 +113,7 @@ public:
             return false;
         }
 
-        // 读取WAV头
+        // 璇诲彇WAV澶?
         file_.read(reinterpret_cast<char*>(&header_), sizeof(header_));
         if (file_.gcount() != sizeof(header_)) {
             last_error_ = "Invalid WAV file: cannot read header";
@@ -122,7 +122,7 @@ public:
             return false;
         }
 
-        // 验证WAV格式
+        // 楠岃瘉WAV鏍煎紡
         if (strncmp(header_.riff, "RIFF", 4) != 0 ||
             strncmp(header_.wave, "WAVE", 4) != 0) {
             last_error_ = "Invalid WAV file: wrong signature";
@@ -131,7 +131,7 @@ public:
             return false;
         }
 
-        // 检查格式是否为PCM
+        // 妫€鏌ユ牸寮忔槸鍚︿负PCM
         if (le16toh(header_.format) != 1) {
             last_error_ = "Only PCM WAV format is supported";
             file_.close();
@@ -139,7 +139,7 @@ public:
             return false;
         }
 
-        // 设置音频格式
+        // 璁剧疆闊抽鏍煎紡
         format_.sample_rate = le32toh(header_.sample_rate);
         format_.channels = le16toh(header_.channels);
         format_.bits_per_sample = le16toh(header_.bits);
@@ -156,7 +156,7 @@ public:
             return false;
         }
 
-        // 查找data块
+        // 鏌ユ壘data鍧?
         if (!find_data_chunk()) {
             last_error_ = "Data chunk not found";
             file_.close();
@@ -176,7 +176,7 @@ public:
             return -1;
         }
 
-        // 计算可读取的帧数
+        // 璁＄畻鍙鍙栫殑甯ф暟
         int64_t remaining_frames = (data_size_ / (format_.bits_per_sample / 8) / format_.channels) - current_position_;
         int frames_to_read = std::min(static_cast<int64_t>(max_frames), remaining_frames);
 
@@ -184,7 +184,7 @@ public:
             return 0; // EOF
         }
 
-        // 读取原始数据
+        // 璇诲彇鍘熷鏁版嵁
         int bytes_to_read = frames_to_read * format_.channels * (format_.bits_per_sample / 8);
         std::vector<char> raw_data(bytes_to_read);
         file_.read(raw_data.data(), bytes_to_read);
@@ -196,7 +196,7 @@ public:
 
         int frames_read = bytes_read / (format_.channels * (format_.bits_per_sample / 8));
 
-        // 转换为浮点数
+        // 杞崲涓烘诞鐐规暟
         convert_to_float(raw_data.data(), frames_read, buffer.data);
 
         current_position_ += frames_read;
@@ -284,7 +284,7 @@ public:
 
 private:
     bool find_data_chunk() {
-        // 从当前位置开始查找data块
+        // 浠庡綋鍓嶄綅缃紑濮嬫煡鎵綿ata鍧?
         file_.seekg(sizeof(WAVHeader), std::ios::beg);
 
         char chunk_id[5] = {0};
@@ -298,7 +298,7 @@ private:
                 return true;
             }
 
-            // 跳过其他块
+            // 璺宠繃鍏朵粬鍧?
             file_.read(reinterpret_cast<char*>(&chunk_size), 4);
             chunk_size = le32toh(chunk_size);
             file_.seekg(chunk_size, std::ios::cur);
@@ -315,12 +315,12 @@ private:
             int32_t sample = 0;
 
             switch (bytes_per_sample) {
-                case 1: // 8位
+                case 1: // 8浣?
                     sample = static_cast<int8_t>(src[i]) - 128;
-                    sample = sample << 24; // 转换为32位
+                    sample = sample << 24; // 杞崲涓?2浣?
                     break;
 
-                case 2: // 16位
+                case 2: // 16浣?
                     sample = static_cast<int16_t>(
                         (static_cast<uint8_t>(src[i*2+1]) << 8) |
                         static_cast<uint8_t>(src[i*2])
@@ -328,13 +328,13 @@ private:
                     sample = sample << 16;
                     break;
 
-                case 3: // 24位
+                case 3: // 24浣?
                     sample = (static_cast<int8_t>(src[i*3+2]) << 24) |
                             (static_cast<uint8_t>(src[i*3+1]) << 16) |
                             (static_cast<uint8_t>(src[i*3]) << 8);
                     break;
 
-                case 4: // 32位
+                case 4: // 32浣?
                     sample = (static_cast<int8_t>(src[i*4+3]) << 24) |
                             (static_cast<uint8_t>(src[i*4+2]) << 16) |
                             (static_cast<uint8_t>(src[i*4+1]) << 8) |
@@ -342,13 +342,13 @@ private:
                     break;
             }
 
-            // 转换为浮点数 [-1.0, 1.0]
+            // 杞崲涓烘诞鐐规暟 [-1.0, 1.0]
             dst[i] = static_cast<float>(sample) / 2147483648.0f;
         }
     }
 };
 
-// 插件工厂
+// 鎻掍欢宸ュ巶
 class WAVDecoderFactory : public ITypedPluginFactory<IAudioDecoder> {
 public:
     std::unique_ptr<IAudioDecoder> create_typed() override {
@@ -367,5 +367,5 @@ public:
     }
 };
 
-// 导出插件
+// 瀵煎嚭鎻掍欢
 XPUMUSIC_EXPORT_AUDIO_PLUGIN(WAVDecoderPlugin)

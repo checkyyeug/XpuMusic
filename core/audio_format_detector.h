@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <string>
 #include <vector>
@@ -8,70 +8,70 @@
 namespace xpumusic::core {
 
 /**
- * @brief 音频文件格式检测结果
+ * @brief 闊抽鏂囦欢鏍煎紡妫€娴嬬粨鏋?
  */
 struct AudioFormatInfo {
-    std::string format;           // 格式名称（如 "MP3", "FLAC", "OGG"）
-    std::string extension;         // 文件扩展名
-    std::string mime_type;         // MIME类型
-    bool lossless;                 // 是否无损
-    std::string codec;             // 编解码器名称
-    std::string container;         // 容器格式
-    bool supported;                // 是否支持解码
-    std::vector<std::string> possible_decoders; // 可能的解码器列表
+    std::string format;           // 鏍煎紡鍚嶇О锛堝 "MP3", "FLAC", "OGG"锛?
+    std::string extension;         // 鏂囦欢鎵╁睍鍚?
+    std::string mime_type;         // MIME绫诲瀷
+    bool lossless;                 // 鏄惁鏃犳崯
+    std::string codec;             // 缂栬В鐮佸櫒鍚嶇О
+    std::string container;         // 瀹瑰櫒鏍煎紡
+    bool supported;                // 鏄惁鏀寔瑙ｇ爜
+    std::vector<std::string> possible_decoders; // 鍙兘鐨勮В鐮佸櫒鍒楄〃
 };
 
 /**
- * @brief 音频格式检测器
+ * @brief 闊抽鏍煎紡妫€娴嬪櫒
  *
- * 支持通过文件扩展名、文件头魔数、文件内容等多种方式检测音频格式
+ * 鏀寔閫氳繃鏂囦欢鎵╁睍鍚嶃€佹枃浠跺ご榄旀暟銆佹枃浠跺唴瀹圭瓑澶氱鏂瑰紡妫€娴嬮煶棰戞牸寮?
  */
 class AudioFormatDetector {
 public:
     /**
-     * @brief 获取全局检测器实例
+     * @brief 鑾峰彇鍏ㄥ眬妫€娴嬪櫒瀹炰緥
      */
     static AudioFormatDetector& get_instance();
 
     /**
-     * @brief 检测音频文件格式
-     * @param file_path 文件路径
-     * @return 格式信息
+     * @brief 妫€娴嬮煶棰戞枃浠舵牸寮?
+     * @param file_path 鏂囦欢璺緞
+     * @return 鏍煎紡淇℃伅
      */
     AudioFormatInfo detect_format(const std::string& file_path);
 
     /**
-     * @brief 通过文件扩展名检测格式
-     * @param file_path 文件路径
-     * @return 格式信息，如果无法识别则返回未知格式
+     * @brief 閫氳繃鏂囦欢鎵╁睍鍚嶆娴嬫牸寮?
+     * @param file_path 鏂囦欢璺緞
+     * @return 鏍煎紡淇℃伅锛屽鏋滄棤娉曡瘑鍒垯杩斿洖鏈煡鏍煎紡
      */
     AudioFormatInfo detect_by_extension(const std::string& file_path);
 
     /**
-     * @brief 通过文件头魔数检测格式
-     * @param file_path 文件路径
-     * @return 格式信息，如果无法识别则返回未知格式
+     * @brief 閫氳繃鏂囦欢澶撮瓟鏁版娴嬫牸寮?
+     * @param file_path 鏂囦欢璺緞
+     * @return 鏍煎紡淇℃伅锛屽鏋滄棤娉曡瘑鍒垯杩斿洖鏈煡鏍煎紡
      */
     AudioFormatInfo detect_by_magic_number(const std::string& file_path);
 
     /**
-     * @brief 通过文件内容检测格式（更深入的检测）
-     * @param file_path 文件路径
-     * @return 格式信息，如果无法识别则返回未知格式
+     * @brief 閫氳繃鏂囦欢鍐呭妫€娴嬫牸寮忥紙鏇存繁鍏ョ殑妫€娴嬶級
+     * @param file_path 鏂囦欢璺緞
+     * @return 鏍煎紡淇℃伅锛屽鏋滄棤娉曡瘑鍒垯杩斿洖鏈煡鏍煎紡
      */
     AudioFormatInfo detect_by_content(const std::string& file_path);
 
     /**
-     * @brief 获取所有支持的格式
-     * @return 支持的格式列表
+     * @brief 鑾峰彇鎵€鏈夋敮鎸佺殑鏍煎紡
+     * @return 鏀寔鐨勬牸寮忓垪琛?
      */
     std::vector<std::string> get_supported_formats() const;
 
     /**
-     * @brief 注册自定义格式检测器
-     * @param extension 文件扩展名
-     * @param format_info 格式信息
-     * @param detector 检测函数（可选，用于更复杂的检测）
+     * @brief 娉ㄥ唽鑷畾涔夋牸寮忔娴嬪櫒
+     * @param extension 鏂囦欢鎵╁睍鍚?
+     * @param format_info 鏍煎紡淇℃伅
+     * @param detector 妫€娴嬪嚱鏁帮紙鍙€夛紝鐢ㄤ簬鏇村鏉傜殑妫€娴嬶級
      */
     void register_format_detector(const std::string& extension,
                                   const AudioFormatInfo& format_info,

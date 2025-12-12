@@ -1,4 +1,4 @@
-#include "../core/event_bus.h"
+﻿#include "../core/event_bus.h"
 #include <gtest/gtest.h>
 #include <thread>
 #include <chrono>

@@ -1,4 +1,4 @@
-#include "vst_bridge.h"
+﻿#include "vst_bridge.h"
 #include <windows.h>
 #include <cmath>
 #include <algorithm>
@@ -9,7 +9,7 @@
 
 namespace fb2k {
 
-// vst_plugin_wrapper实现
+// vst_plugin_wrapper瀹炵幇
 vst_plugin_wrapper::vst_plugin_wrapper()
     : vst_effect_(nullptr)
     , vst_dll_(nullptr)
@@ -22,7 +22,7 @@ vst_plugin_wrapper::vst_plugin_wrapper()
     , total_samples_processed_(0)
     , total_processing_time_(0.0) {
     
-    // 初始化DSP效果器参数
+    // 鍒濆鍖朌SP鏁堟灉鍣ㄥ弬鏁?
     auto params = create_default_dsp_params();
     params.type = dsp_effect_type::vst_plugin;
     params.name = "VST Plugin";
@@ -44,49 +44,49 @@ bool vst_plugin_wrapper::load_plugin(const std::string& dll_path) {
         unload_plugin();
     }
     
-    // 加载VST DLL
+    // 鍔犺浇VST DLL
     vst_dll_ = LoadLibraryA(dll_path.c_str());
     if (!vst_dll_) {
-        std::cerr << "[VST Bridge] 加载VST DLL失败: " << dll_path << std::endl;
+        std::cerr << "[VST Bridge] 鍔犺浇VST DLL澶辫触: " << dll_path << std::endl;
         return false;
     }
     
-    // 获取VST主函数
+    // 鑾峰彇VST涓诲嚱鏁?
     VstPluginMainFunc main_func = (VstPluginMainFunc)GetProcAddress(vst_dll_, "VSTPluginMain");
     if (!main_func) {
-        // 尝试旧的入口点名称
+        // 灏濊瘯鏃х殑鍏ュ彛鐐瑰悕绉?
         main_func = (VstPluginMainFunc)GetProcAddress(vst_dll_, "main");
     }
     
     if (!main_func) {
-        std::cerr << "[VST Bridge] 找不到VST入口点: " << dll_path << std::endl;
+        std::cerr << "[VST Bridge] 鎵句笉鍒癡ST鍏ュ彛鐐? " << dll_path << std::endl;
         FreeLibrary(vst_dll_);
         vst_dll_ = nullptr;
         return false;
     }
     
-    // 创建VST效果实例
+    // 鍒涘缓VST鏁堟灉瀹炰緥
     vst_effect_ = main_func(host_callback);
     if (!vst_effect_ || vst_effect_->magic != 'VstP') {
-        std::cerr << "[VST Bridge] 创建VST效果失败: " << dll_path << std::endl;
+        std::cerr << "[VST Bridge] 鍒涘缓VST鏁堟灉澶辫触: " << dll_path << std::endl;
         FreeLibrary(vst_dll_);
         vst_dll_ = nullptr;
         return false;
     }
     
-    // 注册插件到宿主
+    // 娉ㄥ唽鎻掍欢鍒板涓?
     vst_host::get_instance().register_plugin(vst_effect_, this);
     
     vst_plugin_path_ = dll_path;
     plugin_loaded_ = true;
     
-    // 初始化插件
+    // 鍒濆鍖栨彃浠?
     if (!initialize_vst_plugin()) {
         unload_plugin();
         return false;
     }
     
-    std::cout << "[VST Bridge] VST插件加载成功: " << dll_path << std::endl;
+    std::cout << "[VST Bridge] VST鎻掍欢鍔犺浇鎴愬姛: " << dll_path << std::endl;
     return true;
 }
 
@@ -97,22 +97,22 @@ void vst_plugin_wrapper::unload_plugin() {
         return;
     }
     
-    // 关闭编辑器
+    // 鍏抽棴缂栬緫鍣?
     if (editor_open_) {
         close_editor();
     }
     
-    // 关闭插件
+    // 鍏抽棴鎻掍欢
     if (vst_effect_) {
         call_dispatcher(kVstEffectClose, 0, 0, nullptr, 0.0f);
         
-        // 从宿主注销
+        // 浠庡涓绘敞閿€
         vst_host::get_instance().unregister_plugin(vst_effect_);
         
         vst_effect_ = nullptr;
     }
     
-    // 卸载DLL
+    // 鍗歌浇DLL
     if (vst_dll_) {
         FreeLibrary(vst_dll_);
         vst_dll_ = nullptr;
@@ -124,7 +124,7 @@ void vst_plugin_wrapper::unload_plugin() {
     parameter_info_.clear();
     programs_.clear();
     
-    std::cout << "[VST Bridge] VST插件已卸载" << std::endl;
+    std::cout << "[VST Bridge] VST鎻掍欢宸插嵏杞? << std::endl;
 }
 
 std::string vst_plugin_wrapper::get_plugin_name() const {
@@ -201,7 +201,7 @@ void vst_plugin_wrapper::set_parameter_value(int index, float value) {
         return;
     }
     
-    // 限制参数范围
+    // 闄愬埗鍙傛暟鑼冨洿
     value = std::max(0.0f, std::min(1.0f, value));
     
     call_set_parameter(index, value);
@@ -236,7 +236,7 @@ bool vst_plugin_wrapper::process_audio(const float** inputs, float** outputs, in
         return false;
     }
     
-    // 设置音频缓冲区
+    // 璁剧疆闊抽缂撳啿鍖?
     VstAudioBuffer in_buffer;
     in_buffer.channels = const_cast<float**>(inputs);
     in_buffer.numChannels = vst_effect_->numInputs;
@@ -247,7 +247,7 @@ bool vst_plugin_wrapper::process_audio(const float** inputs, float** outputs, in
     out_buffer.numChannels = vst_effect_->numOutputs;
     out_buffer.size = num_samples;
     
-    // 处理音频
+    // 澶勭悊闊抽
     auto start_time = std::chrono::high_resolution_clock::now();
     
     typedef void (*VstProcessFunc)(AEffect* effect, float** inputs, float** outputs, VstInt32 sampleFrames);
@@ -259,7 +259,7 @@ bool vst_plugin_wrapper::process_audio(const float** inputs, float** outputs, in
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
     
     total_samples_processed_ += num_samples;
-    total_processing_time_ += duration.count() / 1000.0; // 转换为毫秒
+    total_processing_time_ += duration.count() / 1000.0; // 杞崲涓烘绉?
     
     return true;
 }
@@ -303,13 +303,13 @@ bool vst_plugin_wrapper::open_editor(void* parent_window) {
     
     editor_window_ = parent_window;
     
-    // 获取编辑器大小
+    // 鑾峰彇缂栬緫鍣ㄥぇ灏?
     struct EditorRect {
         short top, left, bottom, right;
     } rect;
     
     if (call_dispatcher(kVstEffectEditGetRect, 0, 0, &rect, 0.0f) == 1) {
-        // 打开编辑器
+        // 鎵撳紑缂栬緫鍣?
         if (call_dispatcher(kVstEffectEditOpen, 0, 0, parent_window, 0.0f) == 1) {
             editor_open_ = true;
             return true;
@@ -329,38 +329,38 @@ void vst_plugin_wrapper::close_editor() {
     }
 }
 
-// dsp_effect_advanced 实现
+// dsp_effect_advanced 瀹炵幇
 bool vst_plugin_wrapper::instantiate(audio_chunk& chunk, uint32_t sample_rate, uint32_t channels) {
     if (!plugin_loaded_) return false;
     
     std::lock_guard<std::mutex> lock(vst_mutex_);
     
-    // 设置采样率
+    // 璁剧疆閲囨牱鐜?
     if (current_sample_rate_ != sample_rate) {
         current_sample_rate_ = sample_rate;
         call_dispatcher(kVstEffectSetSampleRate, 0, 0, nullptr, static_cast<float>(sample_rate));
     }
     
-    // 设置块大小
+    // 璁剧疆鍧楀ぇ灏?
     int block_size = chunk.get_sample_count();
     if (current_block_size_ != block_size) {
         current_block_size_ = block_size;
         call_dispatcher(kVstEffectSetBlockSize, 0, block_size, nullptr, 0.0f);
     }
     
-    // 检查I/O配置
+    // 妫€鏌/O閰嶇疆
     int plugin_inputs = get_num_inputs();
     int plugin_outputs = get_num_outputs();
     
     if (channels != plugin_inputs && plugin_inputs != 0) {
-        // 尝试配置插件的声道布局
+        // 灏濊瘯閰嶇疆鎻掍欢鐨勫０閬撳竷灞€
         call_dispatcher(kVstEffectSetSpeakerArrangement, 0, channels, nullptr, 0.0f);
     }
     
-    // 启用插件
+    // 鍚敤鎻掍欢
     call_dispatcher(kVstEffectMainsChanged, 0, 1, nullptr, 0.0f);
     
-    // 恢复参数值
+    // 鎭㈠鍙傛暟鍊?
     if (!parameter_values_.empty()) {
         for (size_t i = 0; i < parameter_values_.size() && i < vst_effect_->numParams; ++i) {
             call_set_parameter(static_cast<VstInt32>(i), parameter_values_[i]);
@@ -381,13 +381,13 @@ void vst_plugin_wrapper::run(audio_chunk& chunk, abort_callback& abort) {
     int num_channels = chunk.get_channels();
     float* data = chunk.get_data();
     
-    // 准备输入输出缓冲区
+    // 鍑嗗杈撳叆杈撳嚭缂撳啿鍖?
     std::vector<float*> inputs(vst_effect_->numInputs);
     std::vector<float*> outputs(vst_effect_->numOutputs);
     std::vector<std::vector<float>> input_buffers;
     std::vector<std::vector<float>> output_buffers;
     
-    // 分配缓冲区
+    // 鍒嗛厤缂撳啿鍖?
     for (int i = 0; i < vst_effect_->numInputs; ++i) {
         input_buffers.emplace_back(num_samples, 0.0f);
         inputs[i] = input_buffers[i].data();
@@ -398,7 +398,7 @@ void vst_plugin_wrapper::run(audio_chunk& chunk, abort_callback& abort) {
         outputs[i] = output_buffers[i].data();
     }
     
-    // 填充输入缓冲区
+    // 濉厖杈撳叆缂撳啿鍖?
     if (vst_effect_->numInputs > 0 && num_channels > 0) {
         for (int i = 0; i < std::min(vst_effect_->numInputs, num_channels); ++i) {
             for (int j = 0; j < num_samples; ++j) {
@@ -407,10 +407,10 @@ void vst_plugin_wrapper::run(audio_chunk& chunk, abort_callback& abort) {
         }
     }
     
-    // 处理音频
+    // 澶勭悊闊抽
     process_audio(const_cast<const float**>(inputs.data()), outputs.data(), num_samples);
     
-    // 将输出复制回原缓冲区
+    // 灏嗚緭鍑哄鍒跺洖鍘熺紦鍐插尯
     if (vst_effect_->numOutputs > 0) {
         for (int i = 0; i < std::min(vst_effect_->numOutputs, num_channels); ++i) {
             for (int j = 0; j < num_samples; ++j) {
@@ -424,7 +424,7 @@ void vst_plugin_wrapper::reset() {
     std::lock_guard<std::mutex> lock(vst_mutex_);
     
     if (vst_effect_) {
-        // 重置插件状态
+        // 閲嶇疆鎻掍欢鐘舵€?
         call_dispatcher(kVstEffectMainsChanged, 0, 0, nullptr, 0.0f);
         call_dispatcher(kVstEffectMainsChanged, 0, 1, nullptr, 0.0f);
     }
@@ -434,7 +434,7 @@ void vst_plugin_wrapper::reset() {
 }
 
 void vst_plugin_wrapper::set_realtime_parameter(const std::string& param_name, float value) {
-    // 查找参数索引
+    // 鏌ユ壘鍙傛暟绱㈠紩
     for (size_t i = 0; i < parameter_info_.size(); ++i) {
         if (parameter_info_[i].name == param_name) {
             set_parameter_value(static_cast<int>(i), value);
@@ -444,7 +444,7 @@ void vst_plugin_wrapper::set_realtime_parameter(const std::string& param_name, f
 }
 
 float vst_plugin_wrapper::get_realtime_parameter(const std::string& param_name) const {
-    // 查找参数索引
+    // 鏌ユ壘鍙傛暟绱㈠紩
     for (size_t i = 0; i < parameter_info_.size(); ++i) {
         if (parameter_info_[i].name == param_name) {
             return get_parameter_value(static_cast<int>(i));
@@ -471,7 +471,7 @@ std::vector<parameter_info> vst_plugin_wrapper::get_realtime_parameters() const 
     return params;
 }
 
-// VST操作辅助函数
+// VST鎿嶄綔杈呭姪鍑芥暟
 VstInt32 vst_plugin_wrapper::call_dispatcher(VstInt32 opcode, VstInt32 index, VstInt32 value, void* ptr, VstFloat opt) {
     if (!vst_effect_ || !vst_effect_->dispatcher) {
         return 0;
@@ -505,9 +505,9 @@ VstFloat vst_plugin_wrapper::call_get_parameter(VstInt32 index) {
     return get_param_func(vst_effect_, index);
 }
 
-// VST主机回调
+// VST涓绘満鍥炶皟
 VstInt32 VSTCALLBACK vst_plugin_wrapper::host_callback(AEffect* effect, VstInt32 opcode, VstInt32 index, VstInt32 value, void* ptr, VstFloat opt) {
-    // 获取对应的插件包装器
+    // 鑾峰彇瀵瑰簲鐨勬彃浠跺寘瑁呭櫒
     vst_plugin_wrapper* wrapper = vst_host::get_instance().get_plugin_from_effect(effect);
     if (wrapper) {
         return wrapper->handle_host_callback(opcode, index, value, ptr, opt);
@@ -531,17 +531,17 @@ VstInt32 vst_plugin_wrapper::handle_host_callback(VstInt32 opcode, VstInt32 inde
             return reinterpret_cast<VstInt32>(vst_host::get_instance().get_time_info());
             
         case kVstAudioMasterProcessEvents:
-            // 处理VST事件
+            // 澶勭悊VST浜嬩欢
             if (ptr) {
                 VstEvents* events = static_cast<VstEvents*>(ptr);
-                // 这里应该处理MIDI等事件
+                // 杩欓噷搴旇澶勭悊MIDI绛変簨浠?
             }
             return 1;
             
         case kVstAudioMasterAutomate:
-            // 参数自动化
+            // 鍙傛暟鑷姩鍖?
             if (index >= 0 && index < vst_effect_->numParams) {
-                // 这里应该处理参数自动化
+                // 杩欓噷搴旇澶勭悊鍙傛暟鑷姩鍖?
             }
             return 1;
             
@@ -550,22 +550,22 @@ VstInt32 vst_plugin_wrapper::handle_host_callback(VstInt32 opcode, VstInt32 inde
     }
 }
 
-// 初始化VST插件
+// 鍒濆鍖朧ST鎻掍欢
 bool vst_plugin_wrapper::initialize_vst_plugin() {
     if (!vst_effect_) return false;
     
-    // 打开插件
+    // 鎵撳紑鎻掍欢
     if (call_dispatcher(kVstEffectOpen, 0, 0, nullptr, 0.0f) != 1) {
-        std::cerr << "[VST Bridge] 打开VST插件失败" << std::endl;
+        std::cerr << "[VST Bridge] 鎵撳紑VST鎻掍欢澶辫触" << std::endl;
         return false;
     }
     
-    // 提取插件信息
+    // 鎻愬彇鎻掍欢淇℃伅
     extract_plugin_info();
     extract_parameter_info();
     extract_program_info();
     
-    // 设置默认音频格式
+    // 璁剧疆榛樿闊抽鏍煎紡
     call_dispatcher(kVstEffectSetSampleRate, 0, 0, nullptr, 44100.0f);
     call_dispatcher(kVstEffectSetBlockSize, 0, 512, nullptr, 0.0f);
     
@@ -575,11 +575,11 @@ bool vst_plugin_wrapper::initialize_vst_plugin() {
 void vst_plugin_wrapper::extract_plugin_info() {
     if (!vst_effect_) return;
     
-    // 获取插件名称
+    // 鑾峰彇鎻掍欢鍚嶇О
     char name[64] = {0};
     call_dispatcher(kVstEffectGetEffectName, 0, 0, name, 0.0f);
     
-    // 更新DSP参数
+    // 鏇存柊DSP鍙傛暟
     auto params = get_params();
     params.name = std::string(name);
     params.description = "VST Plugin: " + std::string(name);
@@ -598,23 +598,23 @@ void vst_plugin_wrapper::extract_parameter_info() {
     for (int i = 0; i < num_params; ++i) {
         vst_parameter_info info;
         
-        // 获取参数名称
+        // 鑾峰彇鍙傛暟鍚嶇О
         char name[64] = {0};
         call_dispatcher(kVstEffectGetParamName, i, 0, name, 0.0f);
         info.name = std::string(name);
         
-        // 获取参数标签
+        // 鑾峰彇鍙傛暟鏍囩
         char label[64] = {0};
         call_dispatcher(kVstEffectGetParamLabel, i, 0, label, 0.0f);
         info.label = std::string(label);
         
-        // 获取参数显示值
+        // 鑾峰彇鍙傛暟鏄剧ず鍊?
         char display[64] = {0};
         call_dispatcher(kVstEffectGetParamDisplay, i, 0, display, 0.0f);
         
-        // 获取当前参数值
+        // 鑾峰彇褰撳墠鍙傛暟鍊?
         float current_value = call_get_parameter(i);
-        info.default_value = 0.5f; // 默认中间值
+        info.default_value = 0.5f; // 榛樿涓棿鍊?
         info.min_value = 0.0f;
         info.max_value = 1.0f;
         info.step_size = 0.01f;
@@ -636,14 +636,14 @@ void vst_plugin_wrapper::extract_program_info() {
     for (int i = 0; i < num_programs; ++i) {
         vst_program_info program;
         
-        // 获取程序名称
+        // 鑾峰彇绋嬪簭鍚嶇О
         char name[64] = {0};
         call_dispatcher(kVstEffectGetProgramNameIndexed, i, 0, name, 0.0f);
         program.name = std::string(name);
         
-        // 保存当前程序参数值
+        // 淇濆瓨褰撳墠绋嬪簭鍙傛暟鍊?
         if (i == 0) {
-            // 保存当前参数状态作为第一个预设
+            // 淇濆瓨褰撳墠鍙傛暟鐘舵€佷綔涓虹涓€涓璁?
             program.parameter_values.resize(parameter_values_.size());
             for (size_t j = 0; j < parameter_values_.size(); ++j) {
                 program.parameter_values[j] = parameter_values_[j];
@@ -656,7 +656,7 @@ void vst_plugin_wrapper::extract_program_info() {
     current_program_ = 0;
 }
 
-// vst_host实现
+// vst_host瀹炵幇
 vst_host::vst_host()
     : host_name_("foobar2000 VST Host")
     , host_version_("1.0.0")
@@ -666,7 +666,7 @@ vst_host::vst_host()
     , host_process_precision_(kProcessPrecision32)
     , initialized_(false) {
     
-    // 初始化时间信息
+    // 鍒濆鍖栨椂闂翠俊鎭?
     std::memset(&time_info_, 0, sizeof(time_info_));
     time_info_.sampleRate = host_sample_rate_;
     time_info_.flags = kVstTransportPlaying;
@@ -679,9 +679,9 @@ vst_host::~vst_host() {
 bool vst_host::initialize() {
     if (initialized_) return true;
     
-    std::cout << "[VST Host] 初始化VST宿主" << std::endl;
+    std::cout << "[VST Host] 鍒濆鍖朧ST瀹夸富" << std::endl;
     
-    // 设置默认VST目录
+    // 璁剧疆榛樿VST鐩綍
     std::vector<std::string> default_dirs = vst_utils::get_default_vst_directories();
     for (const auto& dir : default_dirs) {
         if (std::filesystem::exists(dir)) {
@@ -696,9 +696,9 @@ bool vst_host::initialize() {
 void vst_host::shutdown() {
     if (!initialized_) return;
     
-    std::cout << "[VST Host] 关闭VST宿主" << std::endl;
+    std::cout << "[VST Host] 鍏抽棴VST瀹夸富" << std::endl;
     
-    // 卸载所有插件
+    // 鍗歌浇鎵€鏈夋彃浠?
     std::lock_guard<std::mutex> lock(host_mutex_);
     for (auto& [effect, plugin] : registered_plugins_) {
         if (plugin) {
@@ -752,7 +752,7 @@ std::vector<std::string> vst_host::scan_plugin_directory(const std::string& dire
             }
         }
     } catch (const std::exception& e) {
-        std::cerr << "[VST Host] 扫描插件目录失败: " << e.what() << std::endl;
+        std::cerr << "[VST Host] 鎵弿鎻掍欢鐩綍澶辫触: " << e.what() << std::endl;
     }
     
     return plugins;
@@ -781,7 +781,7 @@ void vst_host::update_time_info(double sample_pos, double sample_rate, double te
 }
 
 bool vst_host::is_vst_plugin(const std::string& file_path) {
-    // 检查DLL是否导出VST入口点
+    // 妫€鏌LL鏄惁瀵煎嚭VST鍏ュ彛鐐?
     HMODULE dll = LoadLibraryA(file_path.c_str());
     if (!dll) return false;
     
@@ -792,7 +792,7 @@ bool vst_host::is_vst_plugin(const std::string& file_path) {
     return is_vst;
 }
 
-// vst_bridge_manager实现
+// vst_bridge_manager瀹炵幇
 vst_bridge_manager& vst_bridge_manager::get_instance() {
     static vst_bridge_manager instance;
     return instance;
@@ -803,7 +803,7 @@ vst_bridge_manager::vst_bridge_manager()
     , vst_buffer_size_(512)
     , vst_sample_rate_(44100.0) {
     
-    // 设置默认VST目录
+    // 璁剧疆榛樿VST鐩綍
     vst_directories_ = vst_utils::get_default_vst_directories();
 }
 
@@ -814,21 +814,21 @@ vst_bridge_manager::~vst_bridge_manager() {
 bool vst_bridge_manager::initialize() {
     if (initialized_) return true;
     
-    std::cout << "[VST Bridge] 初始化VST桥接管理器" << std::endl;
+    std::cout << "[VST Bridge] 鍒濆鍖朧ST妗ユ帴绠＄悊鍣? << std::endl;
     
-    // 创建VST宿主
+    // 鍒涘缓VST瀹夸富
     vst_host_ = std::make_unique<vst_host>();
     if (!vst_host_->initialize()) {
-        std::cerr << "[VST Bridge] VST宿主初始化失败" << std::endl;
+        std::cerr << "[VST Bridge] VST瀹夸富鍒濆鍖栧け璐? << std::endl;
         return false;
     }
     
-    // 配置宿主
+    // 閰嶇疆瀹夸富
     vst_host_->set_sample_rate(vst_sample_rate_);
     vst_host_->set_block_size(vst_buffer_size_);
     
     initialized_ = true;
-    std::cout << "[VST Bridge] VST桥接管理器初始化成功" << std::endl;
+    std::cout << "[VST Bridge] VST妗ユ帴绠＄悊鍣ㄥ垵濮嬪寲鎴愬姛" << std::endl;
     
     return true;
 }
@@ -836,9 +836,9 @@ bool vst_bridge_manager::initialize() {
 void vst_bridge_manager::shutdown() {
     if (!initialized_) return;
     
-    std::cout << "[VST Bridge] 关闭VST桥接管理器" << std::endl;
+    std::cout << "[VST Bridge] 鍏抽棴VST妗ユ帴绠＄悊鍣? << std::endl;
     
-    // 卸载所有插件
+    // 鍗歌浇鎵€鏈夋彃浠?
     {
         std::lock_guard<std::mutex> lock(bridge_mutex_);
         for (auto& [path, plugin] : loaded_plugins_) {
@@ -849,7 +849,7 @@ void vst_bridge_manager::shutdown() {
         loaded_plugins_.clear();
     }
     
-    // 关闭VST宿主
+    // 鍏抽棴VST瀹夸富
     if (vst_host_) {
         vst_host_->shutdown();
         vst_host_.reset();
@@ -863,22 +863,22 @@ vst_plugin_wrapper* vst_bridge_manager::load_vst_plugin(const std::string& vst_p
     
     std::lock_guard<std::mutex> lock(bridge_mutex_);
     
-    // 检查是否已加载
+    // 妫€鏌ユ槸鍚﹀凡鍔犺浇
     auto it = loaded_plugins_.find(vst_path);
     if (it != loaded_plugins_.end()) {
         return it->second;
     }
     
-    // 验证路径
+    // 楠岃瘉璺緞
     if (!validate_vst_path(vst_path)) {
         return nullptr;
     }
     
-    // 加载插件
+    // 鍔犺浇鎻掍欢
     auto* plugin = vst_host_->load_plugin(vst_path);
     if (plugin) {
         loaded_plugins_[vst_path] = plugin;
-        std::cout << "[VST Bridge] VST插件加载成功: " << vst_path << std::endl;
+        std::cout << "[VST Bridge] VST鎻掍欢鍔犺浇鎴愬姛: " << vst_path << std::endl;
     }
     
     return plugin;
@@ -889,12 +889,12 @@ void vst_bridge_manager::unload_vst_plugin(vst_plugin_wrapper* plugin) {
     
     std::lock_guard<std::mutex> lock(bridge_mutex_);
     
-    // 查找并卸载插件
+    // 鏌ユ壘骞跺嵏杞芥彃浠?
     for (auto it = loaded_plugins_.begin(); it != loaded_plugins_.end(); ++it) {
         if (it->second == plugin) {
             vst_host_->unload_plugin(plugin);
             loaded_plugins_.erase(it);
-            std::cout << "[VST Bridge] VST插件卸载成功" << std::endl;
+            std::cout << "[VST Bridge] VST鎻掍欢鍗歌浇鎴愬姛" << std::endl;
             break;
         }
     }
@@ -925,11 +925,11 @@ std::unique_ptr<dsp_effect_advanced> vst_bridge_manager::create_vst_effect(const
         return nullptr;
     }
     
-    // 创建DSP效果器包装器
+    // 鍒涘缓DSP鏁堟灉鍣ㄥ寘瑁呭櫒
     auto effect = std::make_unique<dsp_effect_advanced>(plugin->get_params());
     
-    // 这里应该设置VST插件实例到效果器中
-    // 简化实现：直接返回VST包装器
+    // 杩欓噷搴旇璁剧疆VST鎻掍欢瀹炰緥鍒版晥鏋滃櫒涓?
+    // 绠€鍖栧疄鐜帮細鐩存帴杩斿洖VST鍖呰鍣?
     return std::unique_ptr<dsp_effect_advanced>(plugin);
 }
 
@@ -997,7 +997,7 @@ bool vst_bridge_manager::validate_vst_path(const std::string& path) const {
     return extension == ".dll";
 }
 
-// VST工具函数实现
+// VST宸ュ叿鍑芥暟瀹炵幇
 namespace vst_utils {
 
 std::string get_vst_directory() {
@@ -1012,18 +1012,18 @@ std::string get_vst_directory() {
 std::vector<std::string> get_default_vst_directories() {
     std::vector<std::string> directories;
     
-    // 系统VST目录
+    // 绯荤粺VST鐩綍
     directories.push_back("C:\\Program Files\\VSTPlugins");
     directories.push_back("C:\\Program Files\\Common Files\\VST2");
     directories.push_back("C:\\Program Files\\Common Files\\Steinberg\\VST2");
     
-    // 用户VST目录
+    // 鐢ㄦ埛VST鐩綍
     char user_profile[MAX_PATH];
     if (GetEnvironmentVariableA("USERPROFILE", user_profile, MAX_PATH) > 0) {
         directories.push_back(std::string(user_profile) + "\\VSTPlugins");
     }
     
-    // 从注册表获取VST目录
+    // 浠庢敞鍐岃〃鑾峰彇VST鐩綍
     HKEY hkey;
     if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SOFTWARE\\VST", 0, KEY_READ, &hkey) == ERROR_SUCCESS) {
         char value[MAX_PATH];
@@ -1041,7 +1041,7 @@ std::vector<std::string> get_default_vst_directories() {
 }
 
 bool is_vst_plugin(const std::string& file_path) {
-    // 检查文件扩展名
+    // 妫€鏌ユ枃浠舵墿灞曞悕
     std::string extension = std::filesystem::path(file_path).extension().string();
     std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
     
@@ -1049,7 +1049,7 @@ bool is_vst_plugin(const std::string& file_path) {
         return false;
     }
     
-    // 检查是否导出VST入口点
+    // 妫€鏌ユ槸鍚﹀鍑篤ST鍏ュ彛鐐?
     HMODULE dll = LoadLibraryA(file_path.c_str());
     if (!dll) return false;
     
@@ -1065,7 +1065,7 @@ std::string get_plugin_name_from_path(const std::string& path) {
 }
 
 VstInt32 float_to_vst_param(float value) {
-    return static_cast<VstInt32>(value * 16777216.0f); // 24位精度
+    return static_cast<VstInt32>(value * 16777216.0f); // 24浣嶇簿搴?
 }
 
 float vst_param_to_float(VstInt32 value) {
@@ -1081,7 +1081,7 @@ bool validate_vst_plugin(const std::string& path) {
         return false;
     }
     
-    // 尝试加载插件进行验证
+    // 灏濊瘯鍔犺浇鎻掍欢杩涜楠岃瘉
     HMODULE dll = LoadLibraryA(path.c_str());
     if (!dll) return false;
     

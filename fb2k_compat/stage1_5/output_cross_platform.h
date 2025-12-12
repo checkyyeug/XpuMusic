@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../stage1_2/audio_output.h"
 #include "../stage1_4/output_asio.h"
@@ -15,7 +15,7 @@
 
 namespace fb2k {
 
-// 平台类型枚举
+// 骞冲彴绫诲瀷鏋氫妇
 enum class platform_type {
     unknown = 0,
     windows,
@@ -25,7 +25,7 @@ enum class platform_type {
     android
 };
 
-// 音频后端类型
+// 闊抽鍚庣绫诲瀷
 enum class audio_backend {
     unknown = 0,
     wasapi,      // Windows Audio Session API
@@ -37,10 +37,10 @@ enum class audio_backend {
     opensl,      // Android OpenSL ES
     aaudio,      // Android AAudio (API 26+)
     audiounit,   // iOS Audio Unit
-    custom       // 自定义后端
+    custom       // 鑷畾涔夊悗绔?
 };
 
-// 跨平台设备信息
+// 璺ㄥ钩鍙拌澶囦俊鎭?
 struct cross_platform_device_info {
     std::string id;
     std::string name;
@@ -59,7 +59,7 @@ struct cross_platform_device_info {
     std::map<std::string, std::string> properties;
 };
 
-// 跨平台音频配置
+// 璺ㄥ钩鍙伴煶棰戦厤缃?
 struct cross_platform_config {
     audio_backend preferred_backend = audio_backend::unknown;
     platform_type target_platform = platform_type::unknown;
@@ -77,30 +77,30 @@ struct cross_platform_config {
     double max_acceptable_latency_ms = 50.0;
 };
 
-// 平台抽象接口
+// 骞冲彴鎶借薄鎺ュ彛
 class platform_audio_backend {
 public:
     virtual ~platform_audio_backend() = default;
     
-    // 基本信息
+    // 鍩烘湰淇℃伅
     virtual audio_backend get_backend_type() const = 0;
     virtual platform_type get_platform_type() const = 0;
     virtual std::string get_backend_name() const = 0;
     virtual std::string get_backend_version() const = 0;
     
-    // 设备管理
+    // 璁惧绠＄悊
     virtual std::vector<cross_platform_device_info> enumerate_devices() = 0;
     virtual bool select_device(const std::string& device_id) = 0;
     virtual cross_platform_device_info get_current_device_info() const = 0;
     virtual bool is_device_available(const std::string& device_id) const = 0;
     
-    // 格式支持
+    // 鏍煎紡鏀寔
     virtual std::vector<double> get_supported_sample_rates() const = 0;
     virtual std::vector<int> get_supported_channels() const = 0;
     virtual std::vector<int> get_supported_buffer_sizes() const = 0;
     virtual bool is_format_supported(double sample_rate, int channels, int bits_per_sample) const = 0;
     
-    // 音频I/O
+    // 闊抽I/O
     virtual bool open(double sample_rate, int channels, int format, int buffer_size) = 0;
     virtual void close() = 0;
     virtual bool is_open() const = 0;
@@ -110,7 +110,7 @@ public:
     virtual bool is_paused() const = 0;
     virtual void pause(bool pause) = 0;
     
-    // 数据传输
+    // 鏁版嵁浼犺緭
     virtual int write(const void* buffer, int frames) = 0;
     virtual int read(void* buffer, int frames) = 0;
     virtual int get_available_write_frames() const = 0;
@@ -118,7 +118,7 @@ public:
     virtual double get_latency() const = 0;
     virtual double get_cpu_load() const = 0;
     
-    // 配置和控制
+    // 閰嶇疆鍜屾帶鍒?
     virtual void set_volume(float volume) = 0;
     virtual float get_volume() const = 0;
     virtual void set_mute(bool mute) = 0;
@@ -126,7 +126,7 @@ public:
     virtual void set_buffer_size(int size) = 0;
     virtual int get_buffer_size() const = 0;
     
-    // 高级功能
+    // 楂樼骇鍔熻兘
     virtual bool supports_exclusive_mode() const { return false; }
     virtual bool supports_hardware_mixing() const { return false; }
     virtual bool supports_low_latency_mode() const { return false; }
@@ -135,18 +135,18 @@ public:
     virtual bool enter_exclusive_mode() { return false; }
     virtual void exit_exclusive_mode() {}
     
-    // 错误处理
+    // 閿欒澶勭悊
     virtual std::string get_last_error() const = 0;
     virtual void clear_error() = 0;
     virtual bool is_recoverable_error() const = 0;
     virtual bool recover_from_error() { return false; }
     
-    // 性能监控
+    // 鎬ц兘鐩戞帶
     virtual std::map<std::string, double> get_performance_metrics() const {
         return {};
     }
     
-    // 设备事件
+    // 璁惧浜嬩欢
     virtual void set_device_event_callback(std::function<void(const std::string& event, const std::string& device_id)> callback) {
         device_event_callback_ = callback;
     }
@@ -161,7 +161,7 @@ protected:
     }
 };
 
-// Windows WASAPI后端
+// Windows WASAPI鍚庣
 class wasapi_backend : public platform_audio_backend {
 public:
     wasapi_backend();
@@ -228,7 +228,7 @@ private:
     void update_device_info();
 };
 
-// macOS Core Audio后端
+// macOS Core Audio鍚庣
 class coreaudio_backend : public platform_audio_backend {
 public:
     coreaudio_backend();
@@ -284,12 +284,12 @@ public:
     bool recover_from_error() override;
     
 private:
-    // macOS Core Audio实现
+    // macOS Core Audio瀹炵幇
     struct CoreAudioImpl;
     std::unique_ptr<CoreAudioImpl> impl_;
 };
 
-// Linux ALSA后端
+// Linux ALSA鍚庣
 class alsa_backend : public platform_audio_backend {
 public:
     alsa_backend();
@@ -345,12 +345,12 @@ public:
     bool recover_from_error() override;
     
 private:
-    // ALSA实现
+    // ALSA瀹炵幇
     struct ALSAImpl;
     std::unique_ptr<ALSAImpl> impl_;
 };
 
-// Linux PulseAudio后端
+// Linux PulseAudio鍚庣
 class pulseaudio_backend : public platform_audio_backend {
 public:
     pulseaudio_backend();
@@ -403,12 +403,12 @@ public:
     bool recover_from_error() override;
     
 private:
-    // PulseAudio实现
+    // PulseAudio瀹炵幇
     struct PulseAudioImpl;
     std::unique_ptr<PulseAudioImpl> impl_;
 };
 
-// JACK音频连接工具后端
+// JACK闊抽杩炴帴宸ュ叿鍚庣
 class jack_backend : public platform_audio_backend {
 public:
     jack_backend();
@@ -462,18 +462,18 @@ public:
     bool recover_from_error() override;
     
 private:
-    // JACK实现
+    // JACK瀹炵幇
     struct JACKImpl;
     std::unique_ptr<JACKImpl> impl_;
 };
 
-// 跨平台音频输出设备
+// 璺ㄥ钩鍙伴煶棰戣緭鍑鸿澶?
 class output_cross_platform : public output_device {
 public:
     output_cross_platform();
     ~output_cross_platform() override;
     
-    // output_device接口实现
+    // output_device鎺ュ彛瀹炵幇
     void open(t_uint32 sample_rate, t_uint32 channels, t_uint32 flags, abort_callback& p_abort) override;
     void close(abort_callback& p_abort) override;
     t_uint32 get_latency() override;
@@ -499,7 +499,7 @@ public:
     void get_latency_ex3(t_uint32& p_samples, t_uint32& p_samples_total, t_uint32& p_samples_in_buffer) override;
     void get_latency_ex4(t_uint32& p_samples, t_uint32& p_samples_total, t_uint32& p_samples_in_buffer, t_uint32& p_samples_in_device_buffer) override;
     
-    // 跨平台特定接口
+    // 璺ㄥ钩鍙扮壒瀹氭帴鍙?
     void set_backend(audio_backend backend);
     audio_backend get_current_backend() const;
     void set_platform(platform_type platform);
@@ -515,65 +515,65 @@ public:
     void set_config(const cross_platform_config& config);
     cross_platform_config get_config() const;
     
-    // 后端管理
+    // 鍚庣绠＄悊
     bool register_backend(std::unique_ptr<platform_audio_backend> backend);
     bool unregister_backend(audio_backend backend);
     platform_audio_backend* get_backend(audio_backend backend) const;
     std::vector<audio_backend> get_available_backends() const;
     
-    // 性能监控
+    // 鎬ц兘鐩戞帶
     std::map<std::string, double> get_performance_metrics() const;
     void reset_performance_metrics();
     
-    // 设备事件
+    // 璁惧浜嬩欢
     void set_device_change_callback(std::function<void(const std::string& event, const std::string& device_id)> callback) {
         device_change_callback_ = callback;
     }
     
 private:
-    // 后端管理
+    // 鍚庣绠＄悊
     std::map<audio_backend, std::unique_ptr<platform_audio_backend>> backends_;
     platform_audio_backend* current_backend_;
     audio_backend current_backend_type_;
     platform_type current_platform_;
     
-    // 配置
+    // 閰嶇疆
     cross_platform_config config_;
     
-    // 状态
+    // 鐘舵€?
     std::atomic<bool> is_initialized_;
     std::atomic<bool> is_playing_;
     std::atomic<bool> is_paused_;
     std::atomic<float> volume_;
     std::atomic<float> cpu_load_;
     
-    // 音频格式
+    // 闊抽鏍煎紡
     t_uint32 sample_rate_;
     t_uint32 channels_;
     t_uint32 bits_per_sample_;
     t_uint32 buffer_size_;
     
-    // 线程和缓冲
+    // 绾跨▼鍜岀紦鍐?
     std::thread audio_thread_;
     std::atomic<bool> audio_thread_running_;
     std::mutex audio_mutex_;
     std::condition_variable audio_cv_;
     
-    // 环形缓冲区
+    // 鐜舰缂撳啿鍖?
     std::vector<float> audio_buffer_;
     std::atomic<size_t> write_position_;
     std::atomic<size_t> read_position_;
     std::atomic<size_t> available_frames_;
     
-    // 回调和事件
+    // 鍥炶皟鍜屼簨浠?
     std::function<void(const std::string& event, const std::string& device_id)> device_change_callback_;
     
-    // 性能统计
+    // 鎬ц兘缁熻
     std::map<std::string, double> performance_metrics_;
     mutable std::mutex metrics_mutex_;
     std::chrono::steady_clock::time_point start_time_;
     
-    // 私有方法
+    // 绉佹湁鏂规硶
     bool initialize_backend();
     void shutdown_backend();
     void audio_thread_func();
@@ -586,7 +586,7 @@ private:
     void notify_device_change(const std::string& event, const std::string& device_id);
 };
 
-// 后端工厂
+// 鍚庣宸ュ巶
 class audio_backend_factory {
 public:
     static std::unique_ptr<platform_audio_backend> create_backend(audio_backend type);
@@ -600,39 +600,39 @@ private:
     static void initialize_platform_backends();
 };
 
-// 设备管理器
+// 璁惧绠＄悊鍣?
 class cross_platform_device_manager {
 public:
     static cross_platform_device_manager& get_instance();
     
-    // 设备枚举
+    // 璁惧鏋氫妇
     std::vector<cross_platform_device_info> enumerate_all_devices();
     std::vector<cross_platform_device_info> enumerate_devices_by_backend(audio_backend backend);
     std::vector<cross_platform_device_info> enumerate_devices_by_platform(platform_type platform);
     
-    // 设备选择
+    // 璁惧閫夋嫨
     bool select_device(const std::string& device_id);
     bool select_best_device(audio_backend backend);
     bool select_default_device(audio_backend backend);
     
-    // 设备信息
+    // 璁惧淇℃伅
     cross_platform_device_info get_device_info(const std::string& device_id) const;
     cross_platform_device_info get_current_device() const;
     bool is_device_available(const std::string& device_id) const;
     
-    // 设备监控
+    // 璁惧鐩戞帶
     void start_device_monitoring();
     void stop_device_monitoring();
     bool is_monitoring() const { return monitoring_; }
     
-    // 最佳设备推荐
+    // 鏈€浣宠澶囨帹鑽?
     cross_platform_device_info recommend_best_device(
         audio_backend preferred_backend = audio_backend::unknown,
         double target_latency_ms = 10.0,
         bool prefer_exclusive_mode = false
     ) const;
     
-    // 设备评分
+    // 璁惧璇勫垎
     double score_device(const cross_platform_device_info& device, 
                        audio_backend preferred_backend = audio_backend::unknown,
                        double target_latency_ms = 10.0,
@@ -653,16 +653,16 @@ private:
     void update_device_list();
     void detect_device_changes();
     
-    // 设备缓存
+    // 璁惧缂撳瓨
     std::map<std::string, cross_platform_device_info> device_cache_;
     mutable std::mutex device_mutex_;
 };
 
-// 跨平台音频输出工厂
+// 璺ㄥ钩鍙伴煶棰戣緭鍑哄伐鍘?
 std::unique_ptr<output_cross_platform> create_cross_platform_output();
 std::unique_ptr<output_cross_platform> create_cross_platform_output_for_platform(platform_type platform);
 
-// 平台检测工具
+// 骞冲彴妫€娴嬪伐鍏?
 namespace platform_utils {
     platform_type get_current_platform();
     std::string platform_type_to_string(platform_type platform);
@@ -670,7 +670,7 @@ namespace platform_utils {
     bool is_platform_supported(platform_type platform);
     std::vector<platform_type> get_supported_platforms();
     
-    // 平台特定功能检测
+    // 骞冲彴鐗瑰畾鍔熻兘妫€娴?
     bool is_wasapi_available();
     bool is_asio_available();
     bool is_coreaudio_available();

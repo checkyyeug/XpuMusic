@@ -1,4 +1,4 @@
-#include "playlist_manager.h"
+﻿#include "playlist_manager.h"
 #include <fstream>
 #include <sstream>
 #include <filesystem>

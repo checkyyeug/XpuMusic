@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file test_universal_converter.cpp
  * @brief Test program for universal sample rate converter
  * @date 2025-12-10
@@ -34,7 +34,7 @@ void generate_test_tone(float* buffer, int frames, int sample_rate,
 
 // Test conversion between specific rates
 bool test_conversion_pair(int input_rate, int output_rate, int channels = 2) {
-    std::cout << "  Testing " << input_rate << "Hz → " << output_rate << "Hz ... ";
+    std::cout << "  Testing " << input_rate << "Hz 鈫?" << output_rate << "Hz ... ";
 
     // Create converter
     UniversalSampleRateConverter converter;
@@ -57,14 +57,14 @@ bool test_conversion_pair(int input_rate, int output_rate, int channels = 2) {
 
     // Verify output
     if (actual_output_frames == 0) {
-        std::cout << "❌ FAILED (no output)" << std::endl;
+        std::cout << "鉂?FAILED (no output)" << std::endl;
         return false;
     }
 
     // Check frame count accuracy (allow 1 frame tolerance)
     int frame_diff = std::abs(actual_output_frames - expected_output_frames);
     if (frame_diff > 1) {
-        std::cout << "❌ FAILED (frame count: expected " << expected_output_frames
+        std::cout << "鉂?FAILED (frame count: expected " << expected_output_frames
                   << ", got " << actual_output_frames << ")" << std::endl;
         return false;
     }
@@ -76,11 +76,11 @@ bool test_conversion_pair(int input_rate, int output_rate, int channels = 2) {
     }
 
     if (max_amplitude < 0.1f) {
-        std::cout << "❌ FAILED (silence output)" << std::endl;
+        std::cout << "鉂?FAILED (silence output)" << std::endl;
         return false;
     }
 
-    std::cout << "✅ OK (" << actual_output_frames << " frames)" << std::endl;
+    std::cout << "鉁?OK (" << actual_output_frames << " frames)" << std::endl;
     return true;
 }
 
@@ -123,22 +123,22 @@ void test_user_requested_rates() {
 
     // Test some interesting pairs
     std::vector<std::pair<int, int>> special_pairs = {
-        {44100, 48000},  // CD → DVD
-        {48000, 44100},  // DVD → CD
-        {88200, 96000},  // DVD ×2 → Professional ×2
-        {96000, 88200},  // Professional ×2 → DVD ×2
-        {176400, 192000}, // Professional ×4 → HD ×2
-        {192000, 176400}, // HD ×2 → Professional ×4
-        {352800, 384000}, // Professional ×8 → HD ×4
-        {384000, 352800}, // HD ×4 → Professional ×8
-        {705600, 768000}, // Professional ×16 → UHD ×2
-        {768000, 705600}, // UHD ×2 → Professional ×16
+        {44100, 48000},  // CD 鈫?DVD
+        {48000, 44100},  // DVD 鈫?CD
+        {88200, 96000},  // DVD 脳2 鈫?Professional 脳2
+        {96000, 88200},  // Professional 脳2 鈫?DVD 脳2
+        {176400, 192000}, // Professional 脳4 鈫?HD 脳2
+        {192000, 176400}, // HD 脳2 鈫?Professional 脳4
+        {352800, 384000}, // Professional 脳8 鈫?HD 脳4
+        {384000, 352800}, // HD 脳4 鈫?Professional 脳8
+        {705600, 768000}, // Professional 脳16 鈫?UHD 脳2
+        {768000, 705600}, // UHD 脳2 鈫?Professional 脳16
     };
 
     std::cout << "\n--- Special Interest Conversions ---\n";
     for (auto& pair : special_pairs) {
         total_tests++;
-        std::cout << AudioSampleRate::get_rate_description(pair.first) << " → "
+        std::cout << AudioSampleRate::get_rate_description(pair.first) << " 鈫?"
                   << AudioSampleRate::get_rate_description(pair.second) << ":\n";
         if (test_conversion_pair(pair.first, pair.second)) {
             passed_tests++;
@@ -166,13 +166,13 @@ void demonstrate_auto_optimization() {
         88200, 96000, 176400, 192000, 352800, 384000
     };
 
-    std::cout << "\nInput Rate → Selected Output Rate:\n";
+    std::cout << "\nInput Rate 鈫?Selected Output Rate:\n";
     std::cout << std::setw(8) << "Input" << std::setw(15) << "Output" << "Category\n";
     std::cout << std::string(35, '-') << "\n";
 
     for (int input_rate : test_rates) {
         int output_rate = converter.select_optimal_output_rate(input_rate);
-        std::cout << std::setw(7) << input_rate << "Hz → "
+        std::cout << std::setw(7) << input_rate << "Hz 鈫?"
                   << std::setw(9) << output_rate << "Hz "
                   << AudioSampleRate::get_rate_category(output_rate) << "\n";
     }
@@ -215,10 +215,10 @@ void generate_test_files() {
         std::string filename = "test_" + std::to_string(rate) + "hz.wav";
         if (wav_writer.write(filename.c_str(), audio.data(), frames,
                            rate, channels, 32)) {
-            std::cout << "✅ Created: " << filename << " ("
+            std::cout << "鉁?Created: " << filename << " ("
                       << AudioSampleRate::get_rate_description(rate) << ")\n";
         } else {
-            std::cout << "❌ Failed to create: " << filename << "\n";
+            std::cout << "鉂?Failed to create: " << filename << "\n";
         }
     }
 }
@@ -244,16 +244,16 @@ void benchmark_conversions() {
 
     // Test user-requested conversions
     const std::vector<std::pair<int, int>> test_pairs = {
-        {44100, 48000},   // CD → DVD
-        {48000, 44100},   // DVD → CD
-        {44100, 96000},   // CD → Professional
-        {96000, 44100},   // Professional → CD
-        {176400, 192000}, // Professional ×4 → HD ×2
-        {192000, 176400}, // HD ×2 → Professional ×4
-        {352800, 384000}, // Professional ×8 → HD ×4
-        {384000, 352800}, // HD ×4 → Professional ×8
-        {705600, 768000}, // Professional ×16 → UHD ×2
-        {768000, 705600}, // UHD ×2 → Professional ×16
+        {44100, 48000},   // CD 鈫?DVD
+        {48000, 44100},   // DVD 鈫?CD
+        {44100, 96000},   // CD 鈫?Professional
+        {96000, 44100},   // Professional 鈫?CD
+        {176400, 192000}, // Professional 脳4 鈫?HD 脳2
+        {192000, 176400}, // HD 脳2 鈫?Professional 脳4
+        {352800, 384000}, // Professional 脳8 鈫?HD 脳4
+        {384000, 352800}, // HD 脳4 鈫?Professional 脳8
+        {705600, 768000}, // Professional 脳16 鈫?UHD 脳2
+        {768000, 705600}, // UHD 脳2 鈫?Professional 脳16
     };
 
     std::cout << "\nBenchmarking " << test_duration_seconds
@@ -306,9 +306,9 @@ void benchmark_conversions() {
               << std::setprecision(2) << avg_realtime_factor << "x\n";
 
     if (avg_realtime_factor > 1.0) {
-        std::cout << "✅ Converter is faster than real-time (can process audio faster than it plays)\n";
+        std::cout << "鉁?Converter is faster than real-time (can process audio faster than it plays)\n";
     } else {
-        std::cout << "⚠️  Converter is slower than real-time\n";
+        std::cout << "鈿狅笍  Converter is slower than real-time\n";
     }
 }
 
@@ -325,7 +325,7 @@ int main() {
     benchmark_conversions();
 
     std::cout << "\n=== Test Complete ===\n";
-    std::cout << "✅ Universal sample rate converter supports all requested rates!\n";
+    std::cout << "鉁?Universal sample rate converter supports all requested rates!\n";
 
     return 0;
 }

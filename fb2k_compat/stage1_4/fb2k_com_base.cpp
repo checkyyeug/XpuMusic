@@ -1,4 +1,4 @@
-#include "fb2k_com_base.h"
+﻿#include "fb2k_com_base.h"
 #include <windows.h>
 #include <combaseapi.h>
 #include <string>
@@ -11,23 +11,23 @@
 
 namespace fb2k {
 
-// 全局服务提供者实例
+// 鍏ㄥ眬鏈嶅姟鎻愪緵鑰呭疄渚?
 std::unique_ptr<fb2k_service_provider_impl> fb2k_service_provider_impl::instance_;
 std::mutex fb2k_service_provider_impl::instance_mutex_;
 
-// fb2k_service_provider_impl实现
+// fb2k_service_provider_impl瀹炵幇
 fb2k_service_provider_impl::fb2k_service_provider_impl() {
-    std::cout << "[FB2K COM] 服务提供者创建" << std::endl;
+    std::cout << "[FB2K COM] 鏈嶅姟鎻愪緵鑰呭垱寤? << std::endl;
 }
 
 fb2k_service_provider_impl::~fb2k_service_provider_impl() {
-    std::cout << "[FB2K COM] 服务提供者销毁" << std::endl;
+    std::cout << "[FB2K COM] 鏈嶅姟鎻愪緵鑰呴攢姣? << std::endl;
     
-    // 清理所有服务
+    // 娓呯悊鎵€鏈夋湇鍔?
     std::lock_guard<std::mutex> lock(services_mutex_);
     for (auto& [guid, entry] : services_) {
         if (entry.service) {
-            // 调用服务的Shutdown方法
+            // 璋冪敤鏈嶅姟鐨凷hutdown鏂规硶
             IFB2KService* service = nullptr;
             if (SUCCEEDED(entry.service->QueryInterface(IID_IFB2KService, (void**)&service))) {
                 service->Shutdown();
@@ -44,10 +44,10 @@ HRESULT fb2k_service_provider_impl::RegisterService(REFGUID guidService, IUnknow
     
     std::lock_guard<std::mutex> lock(services_mutex_);
     
-    // 检查是否已存在
+    // 妫€鏌ユ槸鍚﹀凡瀛樺湪
     auto it = services_.find(guidService);
     if (it != services_.end()) {
-        std::cout << "[FB2K COM] 服务已存在，替换: " << guid_to_string(guidService) << std::endl;
+        std::cout << "[FB2K COM] 鏈嶅姟宸插瓨鍦紝鏇挎崲: " << guid_to_string(guidService) << std::endl;
         if (it->second.service) {
             it->second.service->Release();
         }
@@ -56,7 +56,7 @@ HRESULT fb2k_service_provider_impl::RegisterService(REFGUID guidService, IUnknow
         return S_OK;
     }
     
-    // 添加新服务
+    // 娣诲姞鏂版湇鍔?
     service_entry entry;
     entry.guid = guidService;
     entry.service = pService;
@@ -66,7 +66,7 @@ HRESULT fb2k_service_provider_impl::RegisterService(REFGUID guidService, IUnknow
     pService->AddRef();
     services_[guidService] = entry;
     
-    std::cout << "[FB2K COM] 服务注册成功: " << guid_to_string(guidService) << std::endl;
+    std::cout << "[FB2K COM] 鏈嶅姟娉ㄥ唽鎴愬姛: " << guid_to_string(guidService) << std::endl;
     return S_OK;
 }
 
@@ -78,9 +78,9 @@ HRESULT fb2k_service_provider_impl::UnregisterService(REFGUID guidService) {
         return E_FAIL;
     }
     
-    // 清理服务
+    // 娓呯悊鏈嶅姟
     if (it->second.service) {
-        // 调用服务的Shutdown方法
+        // 璋冪敤鏈嶅姟鐨凷hutdown鏂规硶
         IFB2KService* service = nullptr;
         if (SUCCEEDED(it->second.service->QueryInterface(IID_IFB2KService, (void**)&service))) {
             service->Shutdown();
@@ -91,7 +91,7 @@ HRESULT fb2k_service_provider_impl::UnregisterService(REFGUID guidService) {
     
     services_.erase(it);
     
-    std::cout << "[FB2K COM] 服务注销: " << guid_to_string(guidService) << std::endl;
+    std::cout << "[FB2K COM] 鏈嶅姟娉ㄩ攢: " << guid_to_string(guidService) << std::endl;
     return S_OK;
 }
 
@@ -144,7 +144,7 @@ HRESULT fb2k_service_provider_impl::StartAllServices() {
     for (auto& [guid, entry] : services_) {
         HRESULT hr = start_service(entry);
         if (FAILED(hr)) {
-            std::cerr << "[FB2K COM] 启动服务失败: " << guid_to_string(guid) << std::endl;
+            std::cerr << "[FB2K COM] 鍚姩鏈嶅姟澶辫触: " << guid_to_string(guid) << std::endl;
             overall_result = hr;
         }
     }
@@ -159,7 +159,7 @@ HRESULT fb2k_service_provider_impl::StopAllServices() {
     for (auto& [guid, entry] : services_) {
         HRESULT hr = stop_service(entry);
         if (FAILED(hr)) {
-            std::cerr << "[FB2K COM] 停止服务失败: " << guid_to_string(guid) << std::endl;
+            std::cerr << "[FB2K COM] 鍋滄鏈嶅姟澶辫触: " << guid_to_string(guid) << std::endl;
             overall_result = hr;
         }
     }
@@ -174,7 +174,7 @@ HRESULT fb2k_service_provider_impl::InitializeAllServices() {
     for (auto& [guid, entry] : services_) {
         HRESULT hr = initialize_service(entry);
         if (FAILED(hr)) {
-            std::cerr << "[FB2K COM] 初始化服务失败: " << guid_to_string(guid) << std::endl;
+            std::cerr << "[FB2K COM] 鍒濆鍖栨湇鍔″け璐? " << guid_to_string(guid) << std::endl;
             overall_result = hr;
         }
     }
@@ -189,7 +189,7 @@ HRESULT fb2k_service_provider_impl::ShutdownAllServices() {
     for (auto& [guid, entry] : services_) {
         HRESULT hr = shutdown_service(entry);
         if (FAILED(hr)) {
-            std::cerr << "[FB2K COM] 关闭服务失败: " << guid_to_string(guid) << std::endl;
+            std::cerr << "[FB2K COM] 鍏抽棴鏈嶅姟澶辫触: " << guid_to_string(guid) << std::endl;
             overall_result = hr;
         }
     }
@@ -197,7 +197,7 @@ HRESULT fb2k_service_provider_impl::ShutdownAllServices() {
     return overall_result;
 }
 
-// 全局实例管理
+// 鍏ㄥ眬瀹炰緥绠＄悊
 fb2k_service_provider_impl* fb2k_service_provider_impl::get_instance() {
     std::lock_guard<std::mutex> lock(instance_mutex_);
     return instance_.get();
@@ -215,7 +215,7 @@ void fb2k_service_provider_impl::destroy_instance() {
     instance_.reset();
 }
 
-// 私有辅助方法
+// 绉佹湁杈呭姪鏂规硶
 bool fb2k_service_provider_impl::find_service(REFGUID guid, service_entry** entry) {
     auto it = services_.find(guid);
     if (it != services_.end()) {
@@ -272,7 +272,7 @@ HRESULT fb2k_service_provider_impl::stop_service(service_entry& entry) {
     return S_OK;
 }
 
-// GUID转换辅助函数
+// GUID杞崲杈呭姪鍑芥暟
 std::string guid_to_string(const GUID& guid) {
     std::stringstream ss;
     ss << "{" << std::hex << std::uppercase << std::setfill('0');
@@ -287,7 +287,7 @@ std::string guid_to_string(const GUID& guid) {
     return ss.str();
 }
 
-// 核心服务实现
+// 鏍稿績鏈嶅姟瀹炵幇
 class fb2k_core_impl : public fb2k_service_impl<IFB2KCore> {
 public:
     fb2k_core_impl();
@@ -296,7 +296,7 @@ protected:
     HRESULT do_initialize() override;
     HRESULT do_shutdown() override;
     
-    // IFB2KCore实现
+    // IFB2KCore瀹炵幇
     HRESULT STDMETHODCALLTYPE GetVersion(DWORD* major, DWORD* minor, DWORD* build, DWORD* revision) override;
     HRESULT STDMETHODCALLTYPE GetBuildDate(const char** date) override;
     HRESULT STDMETHODCALLTYPE GetAppName(const char** name) override;
@@ -321,7 +321,7 @@ private:
     std::atomic<bool> low_priority_;
     DWORD main_thread_id_;
     
-    // 性能计数器
+    // 鎬ц兘璁℃暟鍣?
     double cpu_usage_;
     double memory_usage_;
     double audio_latency_;
@@ -333,7 +333,7 @@ private:
     double get_current_memory_usage();
 };
 
-// 播放控制实现
+// 鎾斁鎺у埗瀹炵幇
 class fb2k_playback_control_impl : public fb2k_service_impl<IFB2KPlaybackControl> {
 public:
     fb2k_playback_control_impl();
@@ -342,7 +342,7 @@ protected:
     HRESULT do_initialize() override;
     HRESULT do_shutdown() override;
     
-    // IFB2KPlaybackControl实现
+    // IFB2KPlaybackControl瀹炵幇
     HRESULT STDMETHODCALLTYPE GetPlaybackState(DWORD* state) override;
     HRESULT STDMETHODCALLTYPE IsPlaying() override;
     HRESULT STDMETHODCALLTYPE IsPaused() override;
@@ -387,7 +387,7 @@ private:
     std::vector<std::string> play_queue_;
     std::mutex queue_mutex_;
     
-    // 播放统计
+    // 鎾斁缁熻
     DWORD total_play_count_;
     DWORD total_play_time_;
     std::string last_played_item_;
@@ -397,7 +397,7 @@ private:
     bool validate_playback_position(double position);
 };
 
-// 元数据库实现
+// 鍏冩暟鎹簱瀹炵幇
 class fb2k_metadb_impl : public fb2k_service_impl<IFB2KMetadb> {
 public:
     fb2k_metadb_impl();
@@ -407,7 +407,7 @@ protected:
     HRESULT do_initialize() override;
     HRESULT do_shutdown() override;
     
-    // IFB2KMetadb实现
+    // IFB2KMetadb瀹炵幇
     HRESULT STDMETHODCALLTYPE OpenDatabase(const char* path) override;
     HRESULT STDMETHODCALLTYPE CloseDatabase() override;
     HRESULT STDMETHODCALLTYPE IsDatabaseOpen() override;
@@ -454,7 +454,7 @@ private:
     std::string get_meta_file_path() const;
 };
 
-// 配置管理实现
+// 閰嶇疆绠＄悊瀹炵幇
 class fb2k_config_manager_impl : public fb2k_service_impl<IFB2KConfigManager> {
 public:
     fb2k_config_manager_impl();
@@ -464,7 +464,7 @@ protected:
     HRESULT do_initialize() override;
     HRESULT do_shutdown() override;
     
-    // IFB2KConfigManager实现
+    // IFB2KConfigManager瀹炵幇
     HRESULT STDMETHODCALLTYPE GetConfigValue(const char* section, const char* key, DWORD* value) override;
     HRESULT STDMETHODCALLTYPE SetConfigValue(const char* section, const char* key, DWORD value) override;
     HRESULT STDMETHODCALLTYPE GetConfigString(const char* section, const char* key, char** value) override;
@@ -518,7 +518,7 @@ private:
     HRESULT set_config_value_t(const char* section, const char* key, T value, config_value::type type);
 };
 
-// 核心服务注册宏
+// 鏍稿績鏈嶅姟娉ㄥ唽瀹?
 #define FB2K_REGISTER_CORE_SERVICE(ServiceClass, ServiceGUID) \
     namespace { \
         struct ServiceClass##_auto_register { \
@@ -534,18 +534,18 @@ private:
         } ServiceClass##_auto_register_instance; \
     }
 
-// 初始化核心服务
+// 鍒濆鍖栨牳蹇冩湇鍔?
 void initialize_fb2k_core_services() {
-    std::cout << "[FB2K COM] 初始化核心服务..." << std::endl;
+    std::cout << "[FB2K COM] 鍒濆鍖栨牳蹇冩湇鍔?.." << std::endl;
     
     fb2k_service_provider_impl::create_instance();
     auto* provider = fb2k_service_provider_impl::get_instance();
     if (!provider) {
-        std::cerr << "[FB2K COM] 服务提供者创建失败" << std::endl;
+        std::cerr << "[FB2K COM] 鏈嶅姟鎻愪緵鑰呭垱寤哄け璐? << std::endl;
         return;
     }
     
-    // 注册核心服务
+    // 娉ㄥ唽鏍稿績鏈嶅姟
     auto* core_service = new fb2k_core_impl();
     provider->RegisterService(IID_IFB2KCore, core_service);
     core_service->Release();
@@ -562,15 +562,15 @@ void initialize_fb2k_core_services() {
     provider->RegisterService(IID_IFB2KConfigManager, config_service);
     config_service->Release();
     
-    // 初始化所有服务
+    // 鍒濆鍖栨墍鏈夋湇鍔?
     provider->InitializeAllServices();
     
-    std::cout << "[FB2K COM] 核心服务初始化完成" << std::endl;
+    std::cout << "[FB2K COM] 鏍稿績鏈嶅姟鍒濆鍖栧畬鎴? << std::endl;
 }
 
-// 清理核心服务
+// 娓呯悊鏍稿績鏈嶅姟
 void shutdown_fb2k_core_services() {
-    std::cout << "[FB2K COM] 关闭核心服务..." << std::endl;
+    std::cout << "[FB2K COM] 鍏抽棴鏍稿績鏈嶅姟..." << std::endl;
     
     auto* provider = fb2k_service_provider_impl::get_instance();
     if (provider) {
@@ -578,10 +578,10 @@ void shutdown_fb2k_core_services() {
         fb2k_service_provider_impl::destroy_instance();
     }
     
-    std::cout << "[FB2K COM] 核心服务已关闭" << std::endl;
+    std::cout << "[FB2K COM] 鏍稿績鏈嶅姟宸插叧闂? << std::endl;
 }
 
-// fb2k_core_impl实现
+// fb2k_core_impl瀹炵幇
 fb2k_core_impl::fb2k_core_impl() 
     : version_major_(1), version_minor_(6), version_build_(0), version_revision_(0)
     , shutting_down_(false), low_priority_(false), main_thread_id_(GetCurrentThreadId())
@@ -590,13 +590,13 @@ fb2k_core_impl::fb2k_core_impl()
 }
 
 HRESULT fb2k_core_impl::do_initialize() {
-    std::cout << "[FB2K Core] 初始化核心服务" << std::endl;
+    std::cout << "[FB2K Core] 鍒濆鍖栨牳蹇冩湇鍔? << std::endl;
     initialize_paths();
     return S_OK;
 }
 
 HRESULT fb2k_core_impl::do_shutdown() {
-    std::cout << "[FB2K Core] 关闭核心服务" << std::endl;
+    std::cout << "[FB2K Core] 鍏抽棴鏍稿績鏈嶅姟" << std::endl;
     shutting_down_ = true;
     return S_OK;
 }
@@ -615,7 +615,7 @@ HRESULT fb2k_core_impl::GetBuildDate(const char** date) {
         auto now = std::time(nullptr);
         auto* timeinfo = std::localtime(&now);
         build_date_ = std::string(std::asctime(timeinfo));
-        // 移除末尾的换行符
+        // 绉婚櫎鏈熬鐨勬崲琛岀
         if (!build_date_.empty() && build_date_.back() == '\n') {
             build_date_.pop_back();
         }
@@ -678,7 +678,7 @@ void fb2k_core_impl::initialize_paths() {
     char buffer[MAX_PATH];
     if (GetModuleFileNameA(nullptr, buffer, MAX_PATH) > 0) {
         app_path_ = buffer;
-        // 提取目录路径
+        // 鎻愬彇鐩綍璺緞
         size_t last_slash = app_path_.find_last_of("\\/");
         if (last_slash != std::string::npos) {
             app_path_ = app_path_.substr(0, last_slash);
@@ -689,11 +689,11 @@ void fb2k_core_impl::initialize_paths() {
 void fb2k_core_impl::update_performance_counters() {
     cpu_usage_ = get_current_cpu_usage();
     memory_usage_ = get_current_memory_usage();
-    // audio_latency_ 应该由音频子系统更新
+    // audio_latency_ 搴旇鐢遍煶棰戝瓙绯荤粺鏇存柊
 }
 
 double fb2k_core_impl::get_current_cpu_usage() {
-    // 简化的CPU使用率计算
+    // 绠€鍖栫殑CPU浣跨敤鐜囪绠?
     static FILETIME prev_idle, prev_kernel, prev_user;
     FILETIME idle, kernel, user;
     
@@ -720,7 +720,7 @@ double fb2k_core_impl::get_current_cpu_usage() {
 }
 
 double fb2k_core_impl::get_current_memory_usage() {
-    // 获取当前进程内存使用
+    // 鑾峰彇褰撳墠杩涚▼鍐呭瓨浣跨敤
     PROCESS_MEMORY_COUNTERS pmc;
     if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc))) {
         return (double)pmc.WorkingSetSize / (1024.0 * 1024.0); // MB
@@ -728,7 +728,7 @@ double fb2k_core_impl::get_current_memory_usage() {
     return 0.0;
 }
 
-// fb2k_playback_control_impl实现
+// fb2k_playback_control_impl瀹炵幇
 fb2k_playback_control_impl::fb2k_playback_control_impl()
     : current_state_(state_stopped), volume_(1.0f), mute_(false)
     , playback_position_(0.0), playback_length_(0.0)
@@ -736,12 +736,12 @@ fb2k_playback_control_impl::fb2k_playback_control_impl()
 }
 
 HRESULT fb2k_playback_control_impl::do_initialize() {
-    std::cout << "[FB2K Playback] 初始化播放控制服务" << std::endl;
+    std::cout << "[FB2K Playback] 鍒濆鍖栨挱鏀炬帶鍒舵湇鍔? << std::endl;
     return S_OK;
 }
 
 HRESULT fb2k_playback_control_impl::do_shutdown() {
-    std::cout << "[FB2K Playback] 关闭播放控制服务" << std::endl;
+    std::cout << "[FB2K Playback] 鍏抽棴鎾斁鎺у埗鏈嶅姟" << std::endl;
     Stop();
     return S_OK;
 }
@@ -776,10 +776,10 @@ HRESULT fb2k_playback_control_impl::Play() {
     if (current_state_ == state_playing) return S_OK;
     
     current_state_ = state_playing;
-    std::cout << "[FB2K Playback] 开始播放" << std::endl;
+    std::cout << "[FB2K Playback] 寮€濮嬫挱鏀? << std::endl;
     
-    // 这里应该启动实际的音频播放
-    // 目前只是状态更新
+    // 杩欓噷搴旇鍚姩瀹為檯鐨勯煶棰戞挱鏀?
+    // 鐩墠鍙槸鐘舵€佹洿鏂?
     
     return S_OK;
 }
@@ -788,7 +788,7 @@ HRESULT fb2k_playback_control_impl::Pause() {
     if (current_state_ != state_playing) return E_FAIL;
     
     current_state_ = state_paused;
-    std::cout << "[FB2K Playback] 暂停播放" << std::endl;
+    std::cout << "[FB2K Playback] 鏆傚仠鎾斁" << std::endl;
     
     return S_OK;
 }
@@ -798,7 +798,7 @@ HRESULT fb2k_playback_control_impl::Stop() {
     
     current_state_ = state_stopped;
     playback_position_ = 0.0;
-    std::cout << "[FB2K Playback] 停止播放" << std::endl;
+    std::cout << "[FB2K Playback] 鍋滄鎾斁" << std::endl;
     
     return S_OK;
 }
@@ -812,20 +812,20 @@ HRESULT fb2k_playback_control_impl::PlayOrPause() {
 }
 
 HRESULT fb2k_playback_control_impl::Previous() {
-    std::cout << "[FB2K Playback] 上一曲" << std::endl;
-    // 实现播放队列前移
+    std::cout << "[FB2K Playback] 涓婁竴鏇? << std::endl;
+    // 瀹炵幇鎾斁闃熷垪鍓嶇Щ
     return S_OK;
 }
 
 HRESULT fb2k_playback_control_impl::Next() {
-    std::cout << "[FB2K Playback] 下一曲" << std::endl;
-    // 实现播放队列后移
+    std::cout << "[FB2K Playback] 涓嬩竴鏇? << std::endl;
+    // 瀹炵幇鎾斁闃熷垪鍚庣Щ
     return S_OK;
 }
 
 HRESULT fb2k_playback_control_impl::Random() {
-    std::cout << "[FB2K Playback] 随机播放" << std::endl;
-    // 实现随机播放
+    std::cout << "[FB2K Playback] 闅忔満鎾斁" << std::endl;
+    // 瀹炵幇闅忔満鎾斁
     return S_OK;
 }
 
@@ -869,7 +869,7 @@ HRESULT fb2k_playback_control_impl::GetVolume(float* volume) {
 
 HRESULT fb2k_playback_control_impl::SetVolume(float volume) {
     volume_ = std::max(0.0f, std::min(1.0f, volume));
-    std::cout << "[FB2K Playback] 音量设置为: " << volume_.load() << std::endl;
+    std::cout << "[FB2K Playback] 闊抽噺璁剧疆涓? " << volume_.load() << std::endl;
     return S_OK;
 }
 
@@ -881,7 +881,7 @@ HRESULT fb2k_playback_control_impl::GetMute(bool* mute) {
 
 HRESULT fb2k_playback_control_impl::SetMute(bool mute) {
     mute_ = mute;
-    std::cout << "[FB2K Playback] 静音设置为: " << (mute ? "开启" : "关闭") << std::endl;
+    std::cout << "[FB2K Playback] 闈欓煶璁剧疆涓? " << (mute ? "寮€鍚? : "鍏抽棴") << std::endl;
     return S_OK;
 }
 
@@ -890,7 +890,7 @@ HRESULT fb2k_playback_control_impl::GetQueueContents(const char*** items, DWORD*
     
     std::lock_guard<std::mutex> lock(queue_mutex_);
     
-    // 这里应该返回实际的队列内容
+    // 杩欓噷搴旇杩斿洖瀹為檯鐨勯槦鍒楀唴瀹?
     *items = nullptr;
     *count = 0;
     
@@ -903,7 +903,7 @@ HRESULT fb2k_playback_control_impl::AddToQueue(const char* item_path) {
     std::lock_guard<std::mutex> lock(queue_mutex_);
     play_queue_.push_back(item_path);
     
-    std::cout << "[FB2K Playback] 添加到队列: " << item_path << std::endl;
+    std::cout << "[FB2K Playback] 娣诲姞鍒伴槦鍒? " << item_path << std::endl;
     return S_OK;
 }
 
@@ -945,7 +945,7 @@ bool fb2k_playback_control_impl::validate_playback_position(double position) {
     return position >= 0.0 && position <= playback_length_.load();
 }
 
-// 核心服务注册
+// 鏍稿績鏈嶅姟娉ㄥ唽
 static struct fb2k_core_service_registrar {
     fb2k_core_service_registrar() {
         initialize_fb2k_core_services();

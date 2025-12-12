@@ -1,4 +1,4 @@
-#include "xpumusic_plugin_sdk.h"
+﻿#include "xpumusic_plugin_sdk.h"
 
 // This file contains the base plugin implementations
 // Provide default implementations for IPlugin methods

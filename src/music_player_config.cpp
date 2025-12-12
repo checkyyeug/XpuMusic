@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @file music_player_config.cpp
- * @brief 音乐播放器主程序 - 使用配置系统
+ * @brief 闊充箰鎾斁鍣ㄤ富绋嬪簭 - 浣跨敤閰嶇疆绯荤粺
  * @date 2025-12-10
  */
 
@@ -20,12 +20,12 @@
 using namespace xpumusic;
 using namespace std;
 
-// 全局变量
+// 鍏ㄥ眬鍙橀噺
 std::atomic<bool> g_running(true);
 std::unique_ptr<ConfigManager> g_config;
 std::unique_ptr<IAudioOutput> g_audio_output;
 
-// 信号处理
+// 淇″彿澶勭悊
 void signal_handler(int signal) {
     cout << "\nReceived signal " << signal << ", shutting down..." << endl;
     g_running = false;
@@ -36,7 +36,7 @@ void signal_handler(int signal) {
     }
 }
 
-// 打印帮助信息
+// 鎵撳嵃甯姪淇℃伅
 void print_help(const char* program_name) {
     cout << "Usage: " << program_name << " [options] [audio_file]" << endl;
     cout << "Options:" << endl;
@@ -49,7 +49,7 @@ void print_help(const char* program_name) {
     cout << "  --volume <0-1>      Set volume (default: from config)" << endl;
 }
 
-// 打印配置信息
+// 鎵撳嵃閰嶇疆淇℃伅
 void print_config() {
     const auto& config = g_config->get_config();
 
@@ -83,12 +83,12 @@ void print_config() {
     cout << "===================" << endl;
 }
 
-// 列出可用设备
+// 鍒楀嚭鍙敤璁惧
 void list_devices() {
     cout << "Available audio devices:" << endl;
 
-    // 这里需要调用音频后端的设备枚举功能
-    // 暂时显示默认设备
+    // 杩欓噷闇€瑕佽皟鐢ㄩ煶棰戝悗绔殑璁惧鏋氫妇鍔熻兘
+    // 鏆傛椂鏄剧ず榛樿璁惧
     cout << "  default - Default audio device" << endl;
 
 #ifdef MP_PLATFORM_LINUX
@@ -98,11 +98,11 @@ void list_devices() {
 }
 
 int main(int argc, char* argv[]) {
-    // 设置信号处理
+    // 璁剧疆淇″彿澶勭悊
     signal(SIGINT, signal_handler);
     signal(SIGTERM, signal_handler);
 
-    // 解析命令行参数
+    // 瑙ｆ瀽鍛戒护琛屽弬鏁?
     string config_file;
     string audio_file;
     string device_name;
@@ -171,7 +171,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    // 初始化配置管理器
+    // 鍒濆鍖栭厤缃鐞嗗櫒
     g_config = make_unique<ConfigManager>();
 
     if (!g_config->initialize(config_file)) {
@@ -179,12 +179,12 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // 打印配置信息（如果启用控制台输出）
+    // 鎵撳嵃閰嶇疆淇℃伅锛堝鏋滃惎鐢ㄦ帶鍒跺彴杈撳嚭锛?
     if (g_config->get_config().player.show_console_output) {
         print_config();
     }
 
-    // 应用命令行参数覆盖
+    // 搴旂敤鍛戒护琛屽弬鏁拌鐩?
     if (!device_name.empty()) {
         g_config->audio().output_device = device_name;
     }
@@ -198,14 +198,14 @@ int main(int argc, char* argv[]) {
         g_config->audio().volume = volume;
     }
 
-    // 创建音频输出
+    // 鍒涘缓闊抽杈撳嚭
     g_audio_output = create_audio_output();
     if (!g_audio_output) {
         cerr << "Error: Failed to create audio output" << endl;
         return 1;
     }
 
-    // 初始化音频输出
+    // 鍒濆鍖栭煶棰戣緭鍑?
     AudioFormat format;
     format.sample_rate = g_config->get_config().audio.sample_rate;
     format.channels = g_config->get_config().audio.channels;
@@ -224,16 +224,16 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // 应用音量和静音设置
+    // 搴旂敤闊抽噺鍜岄潤闊宠缃?
     g_audio_output->set_volume(g_config->get_config().audio.volume);
     g_audio_output->set_mute(g_config->get_config().audio.mute);
 
-    // 如果没有指定音频文件，播放测试音
+    // 濡傛灉娌℃湁鎸囧畾闊抽鏂囦欢锛屾挱鏀炬祴璇曢煶
     if (audio_file.empty()) {
         cout << "Playing 440 Hz test tone..." << endl;
 
-        // 生成440Hz正弦波
-        const int duration = 3; // 3秒
+        // 鐢熸垚440Hz姝ｅ鸡娉?
+        const int duration = 3; // 3绉?
         const int frames = format.sample_rate * duration;
         const int freq = 440;
         const double amplitude = 0.3 * g_config->get_config().audio.volume;
@@ -249,7 +249,7 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        // 播放音频
+        // 鎾斁闊抽
         g_audio_output->start();
 
         int frames_written = 0;
@@ -261,7 +261,7 @@ int main(int argc, char* argv[]) {
             }
             frames_written += chunk;
 
-            // 显示进度
+            // 鏄剧ず杩涘害
             if (g_config->get_config().player.show_progress_bar) {
                 int progress = (frames_written * 100) / frames;
                 cout << "\rProgress: [";
@@ -278,12 +278,12 @@ int main(int argc, char* argv[]) {
             cout << endl;
         }
     } else {
-        // TODO: 实现音频文件播放
-        // 这里需要集成音频解码器
+        // TODO: 瀹炵幇闊抽鏂囦欢鎾斁
+        // 杩欓噷闇€瑕侀泦鎴愰煶棰戣В鐮佸櫒
         cout << "Audio file playback not yet implemented" << endl;
     }
 
-    // 清理
+    // 娓呯悊
     g_audio_output->stop();
     g_audio_output->cleanup();
     g_audio_output.reset();

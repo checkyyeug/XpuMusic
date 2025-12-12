@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @file plugin_manager_v2.cpp
- * @brief 基于新架构的插件管理器实现
+ * @brief 鍩轰簬鏂版灦鏋勭殑鎻掍欢绠＄悊鍣ㄥ疄鐜?
  * @date 2025-12-10
  */
 
@@ -16,7 +16,7 @@ PluginManager::PluginManager() : host_api_version_(xpumusic::XPUMUSIC_PLUGIN_API
 }
 
 bool PluginManager::load_native_plugin(const std::string& path) {
-    // 平台相关的动态库加载
+    // 骞冲彴鐩稿叧鐨勫姩鎬佸簱鍔犺浇
 #ifdef _WIN32
     HMODULE handle = LoadLibraryA(path.c_str());
     if (!handle) {
@@ -24,7 +24,7 @@ bool PluginManager::load_native_plugin(const std::string& path) {
         return false;
     }
 
-    // 获取工厂创建函数
+    // 鑾峰彇宸ュ巶鍒涘缓鍑芥暟
     auto create_factory = reinterpret_cast<IPluginFactory* (*)()>(
         GetProcAddress(handle, "xpumusic_create_plugin_factory"));
     if (!create_factory) {
@@ -48,24 +48,24 @@ bool PluginManager::load_native_plugin(const std::string& path) {
     }
 #endif
 
-    // 创建工厂
+    // 鍒涘缓宸ュ巶
     std::unique_ptr<IPluginFactory> factory(create_factory());
     if (!factory) {
         std::cerr << "Failed to create plugin factory: " << path << std::endl;
         return false;
     }
 
-    // 检查兼容性
+    // 妫€鏌ュ吋瀹规€?
     if (!factory->is_compatible(host_api_version_)) {
         std::cerr << "Plugin API version mismatch: " << path << std::endl;
         return false;
     }
 
-    // 获取插件信息
+    // 鑾峰彇鎻掍欢淇℃伅
     PluginInfo info = factory->get_info();
     std::cout << "Loading plugin: " << info.name << " v" << info.version << std::endl;
 
-    // 存储插件
+    // 瀛樺偍鎻掍欢
     std::string plugin_key = info.name + ":" + info.version;
     native_plugins_[plugin_key] = std::move(factory);
 
@@ -73,17 +73,17 @@ bool PluginManager::load_native_plugin(const std::string& path) {
 }
 
 bool PluginManager::load_foobar_plugin(const std::string& path) {
-    // 使用foobar2000兼容适配器
+    // 浣跨敤foobar2000鍏煎閫傞厤鍣?
     auto wrapper = std::make_unique<compat::FoobarPluginWrapper>();
     if (!wrapper->load_plugin(path)) {
         std::cerr << "Failed to load foobar2000 plugin: " << path << std::endl;
         return false;
     }
 
-    // 获取适配后的解码器
+    // 鑾峰彇閫傞厤鍚庣殑瑙ｇ爜鍣?
     auto decoders = wrapper->get_decoders();
     for (auto& decoder : decoders) {
-        // 创建一个包装工厂
+        // 鍒涘缓涓€涓寘瑁呭伐鍘?
         auto factory = std::make_unique<compat::FoobarDecoderFactory>(
             std::move(decoder));
 
@@ -114,17 +114,17 @@ void PluginManager::load_plugins_from_directory(const std::string& directory) {
 #ifdef _WIN32
             if (ext == ".dll") {
                 if (path.find("foo_") != std::string::npos) {
-                    // 可能是foobar2000插件
+                    // 鍙兘鏄痜oobar2000鎻掍欢
                     load_foobar_plugin(path);
                 } else {
-                    // 原生插件
+                    // 鍘熺敓鎻掍欢
                     load_native_plugin(path);
                 }
             }
 #else
             if (ext == ".so") {
-                // 在Linux上，需要检查文件名或内容来确定类型
-                // 这里简化处理，都尝试作为原生插件
+                // 鍦↙inux涓婏紝闇€瑕佹鏌ユ枃浠跺悕鎴栧唴瀹规潵纭畾绫诲瀷
+                // 杩欓噷绠€鍖栧鐞嗭紝閮藉皾璇曚綔涓哄師鐢熸彃浠?
                 load_native_plugin(path);
             }
 #endif
@@ -135,23 +135,23 @@ void PluginManager::load_plugins_from_directory(const std::string& directory) {
 }
 
 std::unique_ptr<IAudioDecoder> PluginManager::get_decoder(const std::string& file_path) {
-    // 遍历所有解码器工厂，找到能处理该文件的
+    // 閬嶅巻鎵€鏈夎В鐮佸櫒宸ュ巶锛屾壘鍒拌兘澶勭悊璇ユ枃浠剁殑
     for (const auto& [key, factory] : native_plugins_) {
         PluginInfo info = factory->get_info();
         if (info.type != PluginType::AudioDecoder) {
             continue;
         }
 
-        // 创建解码器实例
+        // 鍒涘缓瑙ｇ爜鍣ㄥ疄渚?
         auto plugin = factory->create();
         if (!plugin) continue;
 
         auto decoder = dynamic_cast<IAudioDecoder*>(plugin.get());
         if (!decoder) continue;
 
-        // 检查是否能解码
+        // 妫€鏌ユ槸鍚﹁兘瑙ｇ爜
         if (decoder->can_decode(file_path)) {
-            plugin.release(); // 释放所有权
+            plugin.release(); // 閲婃斁鎵€鏈夋潈
             return std::unique_ptr<IAudioDecoder>(decoder);
         }
     }
@@ -166,7 +166,7 @@ std::vector<std::string> PluginManager::get_supported_formats() {
     for (const auto& [key, factory] : native_plugins_) {
         PluginInfo info = factory->get_info();
         if (info.type == PluginType::AudioDecoder) {
-            // 创建临时实例获取支持的格式
+            // 鍒涘缓涓存椂瀹炰緥鑾峰彇鏀寔鐨勬牸寮?
             auto plugin = factory->create();
             auto decoder = dynamic_cast<IAudioDecoder*>(plugin.get());
             if (decoder) {
@@ -176,7 +176,7 @@ std::vector<std::string> PluginManager::get_supported_formats() {
                 }
             }
         } else {
-            // 从插件信息获取
+            // 浠庢彃浠朵俊鎭幏鍙?
             for (const auto& ext : info.supported_formats) {
                 unique_formats.insert(ext);
             }

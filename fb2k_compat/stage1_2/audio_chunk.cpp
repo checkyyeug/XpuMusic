@@ -1,24 +1,24 @@
-#include "audio_chunk.h"
+﻿#include "audio_chunk.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>
 
 namespace fb2k {
 
-// audio_chunk_impl 实现
-// IUnknown 实现已经在头文件中完成
+// audio_chunk_impl 瀹炵幇
+// IUnknown 瀹炵幇宸茬粡鍦ㄥご鏂囦欢涓畬鎴?
 
-// 具体的工具函数实现
+// 鍏蜂綋鐨勫伐鍏峰嚱鏁板疄鐜?
 namespace audio_chunk_utils {
 
 std::unique_ptr<audio_chunk> create_chunk(size_t samples, uint32_t channels, uint32_t sample_rate) {
     auto chunk = std::make_unique<audio_chunk_impl>(samples);
     chunk->set_data_size(samples);
     
-    // 设置格式
+    // 璁剧疆鏍煎紡
     float* data = chunk->get_data();
     if(data) {
-        // 初始化为静音
+        // 鍒濆鍖栦负闈欓煶
         std::memset(data, 0, samples * channels * sizeof(float));
         chunk->set_data(data, samples, channels, sample_rate);
     }
@@ -27,7 +27,7 @@ std::unique_ptr<audio_chunk> create_chunk(size_t samples, uint32_t channels, uin
 }
 
 std::unique_ptr<audio_chunk> create_silence(size_t samples, uint32_t channels, uint32_t sample_rate) {
-    return create_chunk(samples, channels, sample_rate); // 相同实现
+    return create_chunk(samples, channels, sample_rate); // 鐩稿悓瀹炵幇
 }
 
 std::unique_ptr<audio_chunk> duplicate_chunk(const audio_chunk& source) {
@@ -41,7 +41,7 @@ std::unique_ptr<audio_chunk> concatenate_chunks(
     
     if(chunk1.get_sample_rate() != chunk2.get_sample_rate() ||
        chunk1.get_channels() != chunk2.get_channels()) {
-        return nullptr; // 格式不匹配
+        return nullptr; // 鏍煎紡涓嶅尮閰?
     }
     
     size_t total_samples = chunk1.get_sample_count() + chunk2.get_sample_count();
@@ -50,14 +50,14 @@ std::unique_ptr<audio_chunk> concatenate_chunks(
     float* dest_data = result->get_data();
     if(!dest_data) return nullptr;
     
-    // 复制第一个块
+    // 澶嶅埗绗竴涓潡
     const float* src1_data = chunk1.get_data();
     if(src1_data) {
         std::memcpy(dest_data, src1_data, 
                    chunk1.get_sample_count() * chunk1.get_channels() * sizeof(float));
     }
     
-    // 复制第二个块
+    // 澶嶅埗绗簩涓潡
     const float* src2_data = chunk2.get_data();
     if(src2_data) {
         std::memcpy(dest_data + chunk1.get_sample_count() * chunk1.get_channels(),
@@ -110,29 +110,29 @@ float calculate_peak(const audio_chunk& chunk) {
 
 } // namespace audio_chunk_utils
 
-// 验证和测试函数
+// 楠岃瘉鍜屾祴璇曞嚱鏁?
 namespace audio_chunk_validation {
 
 bool validate_audio_chunk_basic(const audio_chunk& chunk) {
-    // 基础验证
+    // 鍩虹楠岃瘉
     if(chunk.is_empty()) {
-        return true; // 空块是有效的
+        return true; // 绌哄潡鏄湁鏁堢殑
     }
     
     if(!chunk.is_valid()) {
         return false;
     }
     
-    // 检查数据指针
+    // 妫€鏌ユ暟鎹寚閽?
     const float* data = chunk.get_data();
     if(!data && chunk.get_sample_count() > 0) {
-        return false; // 有采样但没有数据
+        return false; // 鏈夐噰鏍蜂絾娌℃湁鏁版嵁
     }
     
-    // 检查参数一致性
+    // 妫€鏌ュ弬鏁颁竴鑷存€?
     size_t expected_size = chunk.get_sample_count() * chunk.get_channels();
     if(expected_size == 0) {
-        return false; // 不应该有零大小
+        return false; // 涓嶅簲璇ユ湁闆跺ぇ灏?
     }
     
     return true;
@@ -143,17 +143,17 @@ bool validate_audio_chunk_format(const audio_chunk& chunk) {
     uint32_t channels = chunk.get_channels();
     uint32_t channel_config = chunk.get_channel_config();
     
-    // 验证采样率
+    // 楠岃瘉閲囨牱鐜?
     if(sample_rate < 8000 || sample_rate > 192000) {
         return false;
     }
     
-    // 验证声道数
+    // 楠岃瘉澹伴亾鏁?
     if(channels == 0 || channels > 8) {
         return false;
     }
     
-    // 验证声道配置
+    // 楠岃瘉澹伴亾閰嶇疆
     uint32_t expected_config = 0;
     switch(channels) {
         case 1: expected_config = 0x4; break;      // mono
@@ -165,7 +165,7 @@ bool validate_audio_chunk_format(const audio_chunk& chunk) {
     }
     
     if(channel_config != expected_config) {
-        return false; // 声道配置不匹配
+        return false; // 澹伴亾閰嶇疆涓嶅尮閰?
     }
     
     return true;
@@ -181,11 +181,11 @@ bool validate_audio_chunk_data(const audio_chunk& chunk) {
     
     size_t total_samples = chunk.get_sample_count() * chunk.get_channels();
     
-    // 检查是否有无效值（NaN, Inf）
+    // 妫€鏌ユ槸鍚︽湁鏃犳晥鍊硷紙NaN, Inf锛?
     for(size_t i = 0; i < total_samples; ++i) {
         float sample = data[i];
         if(!std::isfinite(sample)) {
-            return false; // 发现无效浮点值
+            return false; // 鍙戠幇鏃犳晥娴偣鍊?
         }
     }
     

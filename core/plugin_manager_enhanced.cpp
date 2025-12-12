@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @file plugin_manager_enhanced.cpp
- * @brief 增强插件管理器的实现
+ * @brief 澧炲己鎻掍欢绠＄悊鍣ㄧ殑瀹炵幇
  * @date 2025-12-10
  */
 

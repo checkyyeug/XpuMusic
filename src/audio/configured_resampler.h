@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @file configured_resampler.h
- * @brief 配置驱动的重采样器头文件
+ * @brief 閰嶇疆椹卞姩鐨勯噸閲囨牱鍣ㄥご鏂囦欢
  * @date 2025-12-10
  */
 
@@ -16,9 +16,9 @@
 namespace audio {
 
 /**
- * @brief 配置驱动的重采样器
+ * @brief 閰嶇疆椹卞姩鐨勯噸閲囨牱鍣?
  *
- * 根据配置文件自动选择和配置合适的重采样算法
+ * 鏍规嵁閰嶇疆鏂囦欢鑷姩閫夋嫨鍜岄厤缃悎閫傜殑閲嶉噰鏍风畻娉?
  */
 class ConfiguredSampleRateConverter : public ISampleRateConverter {
 private:
@@ -29,57 +29,57 @@ private:
 
 public:
     /**
-     * @brief 构造函数
+     * @brief 鏋勯€犲嚱鏁?
      *
-     * 从配置管理器读取配置并创建相应的重采样器
+     * 浠庨厤缃鐞嗗櫒璇诲彇閰嶇疆骞跺垱寤虹浉搴旂殑閲嶉噰鏍峰櫒
      */
     ConfiguredSampleRateConverter();
 
     /**
-     * @brief 析构函数
+     * @brief 鏋愭瀯鍑芥暟
      */
     ~ConfiguredSampleRateConverter() override;
 
     /**
-     * @brief 配置重采样器
-     * @param input_rate 输入采样率
-     * @param output_rate 输出采样率
-     * @param channels 声道数
-     * @return 是否成功
+     * @brief 閰嶇疆閲嶉噰鏍峰櫒
+     * @param input_rate 杈撳叆閲囨牱鐜?
+     * @param output_rate 杈撳嚭閲囨牱鐜?
+     * @param channels 澹伴亾鏁?
+     * @return 鏄惁鎴愬姛
      */
     bool configure(int input_rate, int output_rate, int channels) override;
 
     /**
-     * @brief 处理音频数据（32位）
-     * @param input 输入缓冲区
-     * @param output 输出缓冲区
-     * @param input_frames 输入帧数
-     * @return 输出帧数
+     * @brief 澶勭悊闊抽鏁版嵁锛?2浣嶏級
+     * @param input 杈撳叆缂撳啿鍖?
+     * @param output 杈撳嚭缂撳啿鍖?
+     * @param input_frames 杈撳叆甯ф暟
+     * @return 杈撳嚭甯ф暟
      */
     int process(const float* input, float* output, int input_frames) override;
 
     /**
-     * @brief 处理音频数据（64位）
-     * @param input 输入缓冲区
-     * @param output 输出缓冲区
-     * @param input_frames 输入帧数
-     * @return 输出帧数
+     * @brief 澶勭悊闊抽鏁版嵁锛?4浣嶏級
+     * @param input 杈撳叆缂撳啿鍖?
+     * @param output 杈撳嚭缂撳啿鍖?
+     * @param input_frames 杈撳叆甯ф暟
+     * @return 杈撳嚭甯ф暟
      */
     int process_64(const double* input, double* output, int input_frames);
 
     /**
-     * @brief 获取输出延迟
-     * @param input_frames 输入帧数
-     * @return 输出延迟（帧数）
+     * @brief 鑾峰彇杈撳嚭寤惰繜
+     * @param input_frames 杈撳叆甯ф暟
+     * @return 杈撳嚭寤惰繜锛堝抚鏁帮級
      */
     int get_output_latency(int input_frames) const override;
 
     /**
-     * @brief 重置重采样器状态
+     * @brief 閲嶇疆閲嶉噰鏍峰櫒鐘舵€?
      */
     void reset() override;
 
-    // 获取内部转换器（用于高级配置）
+    // 鑾峰彇鍐呴儴杞崲鍣紙鐢ㄤ簬楂樼骇閰嶇疆锛?
     ISampleRateConverter* get_internal_converter() const {
         return converter_.get();
     }
@@ -88,21 +88,21 @@ public:
         return converter64_.get();
     }
 
-    // 获取当前精度
+    // 鑾峰彇褰撳墠绮惧害
     int get_precision() const { return precision_; }
     bool is_using_64bit() const { return use_64bit_; }
 };
 
 /**
- * @brief 创建配置驱动的重采样器
- * @return 重采样器实例
+ * @brief 鍒涘缓閰嶇疆椹卞姩鐨勯噸閲囨牱鍣?
+ * @return 閲嶉噰鏍峰櫒瀹炰緥
  */
 std::unique_ptr<ISampleRateConverter> create_configured_sample_rate_converter();
 
 /**
- * @brief 根据音频格式创建合适的重采样器
- * @param format 音频格式（如 "mp3", "flac" 等）
- * @return 重采样器实例
+ * @brief 鏍规嵁闊抽鏍煎紡鍒涘缓鍚堥€傜殑閲嶉噰鏍峰櫒
+ * @param format 闊抽鏍煎紡锛堝 "mp3", "flac" 绛夛級
+ * @return 閲嶉噰鏍峰櫒瀹炰緥
  */
 std::unique_ptr<ISampleRateConverter> create_sample_rate_converter_for_format(const std::string& format);
 

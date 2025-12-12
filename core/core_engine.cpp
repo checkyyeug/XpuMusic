@@ -1,4 +1,4 @@
-#include "core_engine.h"
+﻿#include "core_engine.h"
 #include "../platform/audio_output_factory.h"
 #include "mp_decoder.h"
 #include "mp_plugin.h"
@@ -92,9 +92,9 @@ Result CoreEngine::initialize() {
         // Try to initialize compatibility layer through plugin host
         auto* compat_service = plugin_host_->get_service("foobar_compat");
         if (compat_service) {
-            std::cout << "✓ XpuMusic compatibility service available" << std::endl;
+            std::cout << "鉁?XpuMusic compatibility service available" << std::endl;
         } else {
-            std::cout << "⚠ XpuMusic compatibility service not loaded" << std::endl;
+            std::cout << "鈿?XpuMusic compatibility service not loaded" << std::endl;
         }
     }
 #endif
@@ -269,7 +269,7 @@ Result CoreEngine::play_file(const std::string& file_path) {
         std::cerr << "Failed to load track: " << static_cast<int>(result) << std::endl;
         return result;
     }
-    std::cout << "✓ Track loaded successfully" << std::endl;
+    std::cout << "鉁?Track loaded successfully" << std::endl;
 
     // Start playback
     std::cout << "Starting playback..." << std::endl;
@@ -279,7 +279,7 @@ Result CoreEngine::play_file(const std::string& file_path) {
         return result;
     }
 
-    std::cout << "✓ Playback started successfully" << std::endl;
+    std::cout << "鉁?Playback started successfully" << std::endl;
 
     // Add a small delay to let audio start
     std::this_thread::sleep_for(std::chrono::milliseconds(100));

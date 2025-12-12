@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../stage1_3/dsp_effect.h"
 #include <windows.h>
@@ -9,7 +9,7 @@
 #include <mutex>
 #include <atomic>
 
-// VST SDK接口定义（简化版）
+// VST SDK鎺ュ彛瀹氫箟锛堢畝鍖栫増锛?
 
 #define VST_FORCE_DEPRECATED 0
 
@@ -22,7 +22,7 @@ typedef long long VstInt64;
 typedef float VstFloat;
 typedef double VstDouble;
 
-// VST音频缓冲区格式
+// VST闊抽缂撳啿鍖烘牸寮?
 enum VstSpeakerArrangementType {
     kSpeakerArrMono = 1,
     kSpeakerArrStereo = 2,
@@ -40,13 +40,13 @@ enum VstSpeakerArrangementType {
     kSpeakerArr7_1 = 14
 };
 
-// VST处理精度
+// VST澶勭悊绮惧害
 enum VstProcessPrecision {
     kProcessPrecision32 = 0,
     kProcessPrecision64 = 1
 };
 
-// VST插件标志
+// VST鎻掍欢鏍囧織
 enum VstPluginFlags {
     kPluginHasEditor = 1 << 0,
     kPluginCanMono = 1 << 1,
@@ -57,7 +57,7 @@ enum VstPluginFlags {
     kPluginBufferSizeDependent = 1 << 12
 };
 
-// VST事件类型
+// VST浜嬩欢绫诲瀷
 enum VstEventType {
     kVstMidiType = 1,
     kVstAudioType = 2,
@@ -67,7 +67,7 @@ enum VstEventType {
     kVstSysExType = 6
 };
 
-// VST事件结构
+// VST浜嬩欢缁撴瀯
 struct VstEvent {
     VstEventType type;
     VstInt32 byteSize;
@@ -83,21 +83,21 @@ struct VstEvent {
     void* data8;
 };
 
-// VST事件列表
+// VST浜嬩欢鍒楄〃
 struct VstEvents {
     VstInt32 numEvents;
     void* reserved;
     VstEvent* events[256];
 };
 
-// VST音频缓冲区
+// VST闊抽缂撳啿鍖?
 struct VstAudioBuffer {
     VstFloat** channels;
     VstInt32 numChannels;
     VstInt32 size;
 };
 
-// VST处理参数
+// VST澶勭悊鍙傛暟
 struct VstProcessParameter {
     VstInt32 index;
     VstFloat value;
@@ -112,7 +112,7 @@ struct VstProcessParameter {
     VstFloat maxValue;
 };
 
-// VST插件信息
+// VST鎻掍欢淇℃伅
 struct VstPluginInfo {
     char name[64];
     char vendor[64];
@@ -128,10 +128,10 @@ struct VstPluginInfo {
     char filePath[MAX_PATH];
 };
 
-// VST主机回调函数类型
+// VST涓绘満鍥炶皟鍑芥暟绫诲瀷
 typedef VstInt32 (*VstHostCallback)(VstInt32 opcode, VstInt32 index, VstInt32 value, void* ptr, VstFloat opt);
 
-// VST主操作码
+// VST涓绘搷浣滅爜
 enum VstHostOpcodes {
     kVstAudioMasterAutomate = 0,
     kVstAudioMasterVersion = 1,
@@ -150,7 +150,7 @@ enum VstHostOpcodes {
     kVstAudioMasterGetAutomationState = 21
 };
 
-// VST插件操作码
+// VST鎻掍欢鎿嶄綔鐮?
 enum VstPluginOpcodes {
     kVstEffectOpen = 0,
     kVstEffectClose = 1,
@@ -196,7 +196,7 @@ enum VstPluginOpcodes {
     kVstEffectGetVstVersion = 63
 };
 
-// VST时间信息
+// VST鏃堕棿淇℃伅
 struct VstTimeInfo {
     double samplePos;
     double sampleRate;
@@ -209,7 +209,7 @@ struct VstTimeInfo {
     VstInt32 flags;
 };
 
-// VST时间信息标志
+// VST鏃堕棿淇℃伅鏍囧織
 enum VstTimeInfoFlags {
     kVstTransportChanged = 1,
     kVstTransportPlaying = 2,
@@ -219,13 +219,13 @@ enum VstTimeInfoFlags {
     kVstAutomationReading = 32
 };
 
-// AEffect结构 - VST插件主结构
+// AEffect缁撴瀯 - VST鎻掍欢涓荤粨鏋?
 typedef struct AEffect {
     VstInt32 magic;           // 'VstP'
-    VstInt32 dispatcher;      // 函数指针
-    VstInt32 process;         // 函数指针
-    VstInt32 setParameter;    // 函数指针
-    VstInt32 getParameter;    // 函数指针
+    VstInt32 dispatcher;      // 鍑芥暟鎸囬拡
+    VstInt32 process;         // 鍑芥暟鎸囬拡
+    VstInt32 setParameter;    // 鍑芥暟鎸囬拡
+    VstInt32 getParameter;    // 鍑芥暟鎸囬拡
     VstInt32 numPrograms;
     VstInt32 numParams;
     VstInt32 numInputs;
@@ -244,12 +244,12 @@ typedef struct AEffect {
     VstHostCallback hostCallback;
 } AEffect;
 
-// VST插件主函数类型
+// VST鎻掍欢涓诲嚱鏁扮被鍨?
 typedef AEffect* (*VstPluginMainFunc)(VstHostCallback hostCallback);
 
 namespace fb2k {
 
-// VST参数信息
+// VST鍙傛暟淇℃伅
 struct vst_parameter_info {
     std::string name;
     std::string label;
@@ -263,24 +263,24 @@ struct vst_parameter_info {
     int discrete_steps;
 };
 
-// VST程序（预设）信息
+// VST绋嬪簭锛堥璁撅級淇℃伅
 struct vst_program_info {
     std::string name;
     std::vector<float> parameter_values;
 };
 
-// VST插件包装器接口
+// VST鎻掍欢鍖呰鍣ㄦ帴鍙?
 class vst_plugin_wrapper : public dsp_effect_advanced {
 public:
     vst_plugin_wrapper();
     ~vst_plugin_wrapper() override;
     
-    // 初始化和配置
+    // 鍒濆鍖栧拰閰嶇疆
     bool load_plugin(const std::string& dll_path);
     void unload_plugin();
     bool is_plugin_loaded() const { return plugin_loaded_; }
     
-    // 插件信息
+    // 鎻掍欢淇℃伅
     std::string get_plugin_name() const;
     std::string get_plugin_vendor() const;
     std::string get_plugin_version() const;
@@ -289,133 +289,133 @@ public:
     int get_num_parameters() const;
     int get_num_programs() const;
     
-    // 参数管理
+    // 鍙傛暟绠＄悊
     std::vector<vst_parameter_info> get_parameter_info() const;
     float get_parameter_value(int index) const;
     void set_parameter_value(int index, float value);
     std::string get_parameter_label(int index) const;
     std::string get_parameter_display(int index) const;
     
-    // 程序（预设）管理
+    // 绋嬪簭锛堥璁撅級绠＄悊
     std::vector<vst_program_info> get_programs() const;
     int get_current_program() const;
     void set_current_program(int index);
     std::string get_program_name(int index) const;
     void set_program_name(int index, const std::string& name);
     
-    // 音频处理
+    // 闊抽澶勭悊
     bool process_audio(const float** inputs, float** outputs, int num_samples);
     void process_events(const VstEvents* events);
     
-    // 配置
+    // 閰嶇疆
     bool get_chunk(std::vector<uint8_t>& data);
     bool set_chunk(const std::vector<uint8_t>& data);
     
-    // 编辑器支持
+    // 缂栬緫鍣ㄦ敮鎸?
     bool has_editor() const;
     bool open_editor(void* parent_window);
     void close_editor();
     bool get_editor_size(int& width, int& height) const;
     void resize_editor(int width, int height);
     
-    // 实时参数
+    // 瀹炴椂鍙傛暟
     void set_realtime_parameter(const std::string& param_name, float value) override;
     float get_realtime_parameter(const std::string& param_name) const override;
     std::vector<parameter_info> get_realtime_parameters() const override;
     
 protected:
-    // dsp_effect_advanced 实现
+    // dsp_effect_advanced 瀹炵幇
     bool instantiate(audio_chunk& chunk, uint32_t sample_rate, uint32_t channels) override;
     void run(audio_chunk& chunk, abort_callback& abort) override;
     void reset() override;
     
 private:
-    // VST插件实例
+    // VST鎻掍欢瀹炰緥
     AEffect* vst_effect_;
     HMODULE vst_dll_;
     std::string vst_plugin_path_;
     bool plugin_loaded_;
     
-    // 音频格式
+    // 闊抽鏍煎紡
     double current_sample_rate_;
     int current_block_size_;
     
-    // 参数缓存
+    // 鍙傛暟缂撳瓨
     std::vector<float> parameter_values_;
     std::vector<vst_parameter_info> parameter_info_;
     
-    // 程序缓存
+    // 绋嬪簭缂撳瓨
     std::vector<vst_program_info> programs_;
     int current_program_;
     
-    // 编辑器状态
+    // 缂栬緫鍣ㄧ姸鎬?
     bool editor_open_;
     void* editor_window_;
     
-    // 性能统计
+    // 鎬ц兘缁熻
     std::atomic<int64_t> total_samples_processed_;
     std::atomic<double> total_processing_time_;
     
-    // 线程安全
+    // 绾跨▼瀹夊叏
     mutable std::mutex vst_mutex_;
     
-    // VST主机回调
+    // VST涓绘満鍥炶皟
     static VstInt32 VSTCALLBACK host_callback(AEffect* effect, VstInt32 opcode, VstInt32 index, VstInt32 value, void* ptr, VstFloat opt);
     VstInt32 handle_host_callback(VstInt32 opcode, VstInt32 index, VstInt32 value, void* ptr, VstFloat opt);
     
-    // VST操作辅助函数
+    // VST鎿嶄綔杈呭姪鍑芥暟
     VstInt32 call_dispatcher(VstInt32 opcode, VstInt32 index, VstInt32 value, void* ptr, VstFloat opt);
     void call_set_parameter(VstInt32 index, VstFloat parameter);
     VstFloat call_get_parameter(VstInt32 index);
     
-    // 初始化和配置
+    // 鍒濆鍖栧拰閰嶇疆
     bool initialize_vst_plugin();
     bool configure_vst_plugin();
     void extract_plugin_info();
     void extract_parameter_info();
     void extract_program_info();
     
-    // 音频格式转换
+    // 闊抽鏍煎紡杞崲
     void convert_audio_format(const audio_chunk& chunk);
     void convert_audio_format_to_chunk(float** outputs, audio_chunk& chunk);
     
-    // 错误处理
+    // 閿欒澶勭悊
     void handle_vst_error(const std::string& operation, VstInt32 error_code);
     std::string get_vst_error_string(VstInt32 error_code) const;
 };
 
-// VST主机实现
+// VST涓绘満瀹炵幇
 class vst_host {
 public:
     vst_host();
     ~vst_host();
     
-    // 主机管理
+    // 涓绘満绠＄悊
     bool initialize();
     void shutdown();
     bool is_initialized() const { return initialized_; }
     
-    // 插件管理
+    // 鎻掍欢绠＄悊
     vst_plugin_wrapper* load_plugin(const std::string& dll_path);
     void unload_plugin(vst_plugin_wrapper* plugin);
     std::vector<std::string> scan_plugin_directory(const std::string& directory);
     
-    // 宿主信息
+    // 瀹夸富淇℃伅
     std::string get_host_name() const { return host_name_; }
     std::string get_host_version() const { return host_version_; }
     std::string get_host_vendor() const { return host_vendor_; }
     
-    // 全局设置
+    // 鍏ㄥ眬璁剧疆
     void set_sample_rate(double sample_rate) { host_sample_rate_ = sample_rate; }
     double get_sample_rate() const { return host_sample_rate_; }
     void set_block_size(int block_size) { host_block_size_ = block_size; }
     int get_block_size() const { return host_block_size_; }
     
-    // 时间信息
+    // 鏃堕棿淇℃伅
     VstTimeInfo* get_time_info() { return &time_info_; }
     void update_time_info(double sample_pos, double sample_rate, double tempo);
     
-    // 插件回调管理
+    // 鎻掍欢鍥炶皟绠＄悊
     void register_plugin(AEffect* effect, vst_plugin_wrapper* plugin);
     void unregister_plugin(AEffect* effect);
     vst_plugin_wrapper* get_plugin_from_effect(AEffect* effect);
@@ -436,38 +436,38 @@ private:
     
     bool initialized_;
     
-    // 插件扫描
+    // 鎻掍欢鎵弿
     bool is_vst_plugin(const std::string& file_path);
     std::string get_plugin_name_from_dll(const std::string& dll_path);
 };
 
-// VST桥接管理器
+// VST妗ユ帴绠＄悊鍣?
 class vst_bridge_manager {
 public:
     static vst_bridge_manager& get_instance();
     
-    // 桥接管理
+    // 妗ユ帴绠＄悊
     bool initialize();
     void shutdown();
     bool is_initialized() const { return initialized_; }
     
-    // VST插件管理
+    // VST鎻掍欢绠＄悊
     vst_plugin_wrapper* load_vst_plugin(const std::string& vst_path);
     void unload_vst_plugin(vst_plugin_wrapper* plugin);
     std::vector<std::string> scan_vst_plugins(const std::string& directory);
     std::vector<std::string> get_vst_plugin_paths() const;
     
-    // DSP效果器创建
+    // DSP鏁堟灉鍣ㄥ垱寤?
     std::unique_ptr<dsp_effect_advanced> create_vst_effect(const std::string& vst_path);
     std::vector<std::unique_ptr<dsp_effect_advanced>> create_vst_effects_from_directory(const std::string& directory);
     
-    // 配置管理
+    // 閰嶇疆绠＄悊
     void set_vst_directories(const std::vector<std::string>& directories);
     std::vector<std::string> get_vst_directories() const;
     void add_vst_directory(const std::string& directory);
     void remove_vst_directory(const std::string& directory);
     
-    // 性能设置
+    // 鎬ц兘璁剧疆
     void set_vst_buffer_size(int buffer_size);
     int get_vst_buffer_size() const;
     void set_vst_sample_rate(double sample_rate);
@@ -492,32 +492,32 @@ private:
     bool validate_vst_path(const std::string& path) const;
 };
 
-// VST参数自动化
+// VST鍙傛暟鑷姩鍖?
 class vst_parameter_automation {
 public:
     vst_parameter_automation(vst_plugin_wrapper* plugin);
     ~vst_parameter_automation();
     
-    // 自动化录制
+    // 鑷姩鍖栧綍鍒?
     void start_recording();
     void stop_recording();
     bool is_recording() const { return recording_; }
     
-    // 自动化播放
+    // 鑷姩鍖栨挱鏀?
     void start_playback();
     void stop_playback();
     bool is_playing() const { return playing_; }
     
-    // 参数自动化
+    // 鍙傛暟鑷姩鍖?
     void record_parameter_change(int parameter_index, float value, double time);
     void apply_automation(double current_time);
     
-    // 自动化数据管理
+    // 鑷姩鍖栨暟鎹鐞?
     void clear_automation();
     bool save_automation(const std::string& file_path);
     bool load_automation(const std::string& file_path);
     
-    // 编辑功能
+    // 缂栬緫鍔熻兘
     void add_automation_point(int parameter_index, double time, float value);
     void remove_automation_point(int parameter_index, int point_index);
     void move_automation_point(int parameter_index, int point_index, double new_time, float new_value);
@@ -526,7 +526,7 @@ private:
     struct automation_point {
         double time;
         float value;
-        bool is_tempered; // 是否经过手动调整
+        bool is_tempered; // 鏄惁缁忚繃鎵嬪姩璋冩暣
     };
     
     struct parameter_automation {
@@ -548,26 +548,26 @@ private:
     float calculate_interpolated_value(const std::vector<automation_point>& points, double time);
 };
 
-// VST预设管理器
+// VST棰勮绠＄悊鍣?
 class vst_preset_manager {
 public:
     vst_preset_manager(vst_plugin_wrapper* plugin);
     ~vst_preset_manager();
     
-    // 预设管理
+    // 棰勮绠＄悊
     bool save_preset(const std::string& name);
     bool load_preset(const std::string& name);
     bool delete_preset(const std::string& name);
     std::vector<std::string> get_preset_list() const;
     bool preset_exists(const std::string& name) const;
     
-    // 预设文件管理
+    // 棰勮鏂囦欢绠＄悊
     bool export_preset(const std::string& name, const std::string& file_path);
     bool import_preset(const std::string& file_path, const std::string& name);
     bool export_bank(const std::string& file_path);
     bool import_bank(const std::string& file_path);
     
-    // 工厂预设
+    // 宸ュ巶棰勮
     void load_factory_presets();
     bool has_factory_presets() const;
     std::vector<std::string> get_factory_preset_names() const;
@@ -586,7 +586,7 @@ private:
     bool deserialize_preset(const std::vector<uint8_t>& data);
 };
 
-// VST错误处理
+// VST閿欒澶勭悊
 class vst_error_handler {
 public:
     static std::string get_vst_error_string(VstInt32 error_code);
@@ -595,7 +595,7 @@ public:
     static void log_vst_error(const std::string& context, VstInt32 error_code);
 };
 
-// VST工具函数
+// VST宸ュ叿鍑芥暟
 namespace vst_utils {
     std::string get_vst_directory();
     std::vector<std::string> get_default_vst_directories();

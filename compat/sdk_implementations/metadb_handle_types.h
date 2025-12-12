@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file metadb_handle_types.h
  * @brief Concrete type definitions for metadb_handle implementation
  * @date 2025-12-11

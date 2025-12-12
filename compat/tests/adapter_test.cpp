@@ -1,4 +1,4 @@
-#include "test_framework.h"
+﻿#include "test_framework.h"
 #include "adapters/adapter_base.h"
 
 using namespace mp::compat;

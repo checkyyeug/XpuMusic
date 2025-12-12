@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @file dsp_resampler.cpp
- * @brief XpuMusic 码率转换DSP插件
+ * @brief XpuMusic 鐮佺巼杞崲DSP鎻掍欢
  * @date 2025-12-10
  */
 
@@ -28,7 +28,7 @@ private:
     int target_rate_;
     bool configured_;
 
-    // 内部缓冲区
+    // 鍐呴儴缂撳啿鍖?
     std::vector<float> input_buffer_;
     std::vector<float> output_buffer_;
 
@@ -80,7 +80,7 @@ public:
         output_format_ = output_format;
         target_rate_ = output_format.sample_rate;
 
-        // 创建合适的转换器
+        // 鍒涘缓鍚堥€傜殑杞崲鍣?
         switch (type_) {
             case ResamplerType::Linear:
                 resampler_ = std::make_unique<LinearSampleRateConverter>();
@@ -106,7 +106,7 @@ public:
             return false;
         }
 
-        // 初始化转换器
+        // 鍒濆鍖栬浆鎹㈠櫒
         if (!resampler_->initialize(input_format_.sample_rate,
                                    target_rate_,
                                    input_format_.channels)) {
@@ -115,10 +115,10 @@ public:
             return false;
         }
 
-        // 分配缓冲区
+        // 鍒嗛厤缂撳啿鍖?
         int max_output_frames = static_cast<int>(
-            input_format_.sample_rate * 2 * // 2秒输入
-            (static_cast<double>(target_rate_) / input_format_.sample_rate) * 1.5 // 估算输出
+            input_format_.sample_rate * 2 * // 2绉掕緭鍏?
+            (static_cast<double>(target_rate_) / input_format_.sample_rate) * 1.5 // 浼扮畻杈撳嚭
         );
 
         input_buffer_.resize(input_format_.channels * max_output_frames);
@@ -135,27 +135,27 @@ public:
             return -1;
         }
 
-        // 计算最大可能的输出帧数
+        // 璁＄畻鏈€澶у彲鑳界殑杈撳嚭甯ф暟
         double ratio = static_cast<double>(target_rate_) / input_format_.sample_rate;
         int max_output_frames = static_cast<int>(input.frames * ratio * 1.2);
 
-        // 确保输出缓冲区足够大
+        // 纭繚杈撳嚭缂撳啿鍖鸿冻澶熷ぇ
         if (output.channels * max_output_frames > static_cast<int>(output_buffer_.size())) {
             output_buffer_.resize(output.channels * max_output_frames);
         }
 
-        // 执行转换
+        // 鎵ц杞崲
         int output_frames = resampler_->convert(input.data, input.frames,
                                                output_buffer_.data(), max_output_frames);
 
-        // 如果输出缓冲区太小，需要调整
+        // 濡傛灉杈撳嚭缂撳啿鍖哄お灏忥紝闇€瑕佽皟鏁?
         if (output.channels * output_frames > output.frames) {
-            // 返回错误，让调用者分配更大的缓冲区
+            // 杩斿洖閿欒锛岃璋冪敤鑰呭垎閰嶆洿澶х殑缂撳啿鍖?
             last_error_ = "Output buffer too small";
-            return -output_frames; // 负数表示需要的大小
+            return -output_frames; // 璐熸暟琛ㄧず闇€瑕佺殑澶у皬
         }
 
-        // 复制到输出缓冲区
+        // 澶嶅埗鍒拌緭鍑虹紦鍐插尯
         memcpy(output.data, output_buffer_.data(),
                output_frames * output.channels * sizeof(float));
 
@@ -168,7 +168,7 @@ public:
             type_int = std::max(0, std::min(4, type_int));
             type_ = static_cast<ResamplerType>(type_int);
 
-            // 如果已配置，需要重新配置
+            // 濡傛灉宸查厤缃紝闇€瑕侀噸鏂伴厤缃?
             if (configured_) {
                 configure(input_format_, output_format_);
             }
@@ -181,11 +181,11 @@ public:
             }
         }
         else if (name == "quality" && resampler_) {
-            // 设置自适应转换器的质量
+            // 璁剧疆鑷€傚簲杞崲鍣ㄧ殑璐ㄩ噺
             if (auto adaptive = dynamic_cast<AdaptiveSampleRateConverter*>(resampler_.get())) {
                 int quality = static_cast<int>(value);
                 quality = std::max(0, std::min(3, quality));
-                // 这里需要实现质量设置方法
+                // 杩欓噷闇€瑕佸疄鐜拌川閲忚缃柟娉?
             }
         }
     }
@@ -193,7 +193,7 @@ public:
     double get_parameter(const std::string& name) override {
         if (name == "type") return static_cast<double>(type_);
         if (name == "target_rate") return static_cast<double>(target_rate_);
-        if (name == "quality") return 2.0; // 默认高质量
+        if (name == "quality") return 2.0; // 榛樿楂樿川閲?
         return 0.0;
     }
 
@@ -210,7 +210,7 @@ public:
     }
 
     int get_latency_samples() const override {
-        // 不同类型的延迟
+        // 涓嶅悓绫诲瀷鐨勫欢杩?
         switch (type_) {
             case ResamplerType::Linear: return 0;
             case ResamplerType::Cubic: return 4;
@@ -221,7 +221,7 @@ public:
         }
     }
 
-    // 额外方法：获取类型名称
+    // 棰濆鏂规硶锛氳幏鍙栫被鍨嬪悕绉?
     const char* get_type_name() const {
         switch (type_) {
             case ResamplerType::Linear: return "Linear";
@@ -234,7 +234,7 @@ public:
     }
 };
 
-// 插件工厂
+// 鎻掍欢宸ュ巶
 class ResamplerDSPFactory : public ITypedPluginFactory<IDSPProcessor> {
 public:
     std::unique_ptr<IDSPProcessor> create_typed() override {
@@ -253,5 +253,5 @@ public:
     }
 };
 
-// 导出插件
+// 瀵煎嚭鎻掍欢
 XPUMUSIC_EXPORT_DSP_PLUGIN(ResamplerDSPPlugin)

@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @file plugin_registry.h
- * @brief 插件注册表 - 管理所有已注册的插件
+ * @brief 鎻掍欢娉ㄥ唽琛?- 绠＄悊鎵€鏈夊凡娉ㄥ唽鐨勬彃浠?
  * @date 2025-12-10
  */
 
@@ -17,55 +17,55 @@ namespace xpumusic {
 
 class PluginRegistry {
 private:
-    // 插件工厂注册表
+    // 鎻掍欢宸ュ巶娉ㄥ唽琛?
     std::unordered_map<std::string, std::unique_ptr<IPluginFactory>> factories_;
 
-    // 文件扩展名到插件工厂的映射
+    // 鏂囦欢鎵╁睍鍚嶅埌鎻掍欢宸ュ巶鐨勬槧灏?
     std::unordered_map<std::string, std::vector<std::string>> extension_map_;
 
-    // 插件类型到工厂的映射
+    // 鎻掍欢绫诲瀷鍒板伐鍘傜殑鏄犲皠
     std::unordered_map<PluginType, std::vector<std::string>> type_map_;
 
-    // 线程安全
+    // 绾跨▼瀹夊叏
     mutable std::mutex mutex_;
 
-    // API版本
+    // API鐗堟湰
     uint32_t host_api_version_;
 
 public:
     explicit PluginRegistry(uint32_t api_version = xpumusic::XPUMUSIC_PLUGIN_API_VERSION)
         : host_api_version_(api_version) {}
 
-    // 注册插件工厂
+    // 娉ㄥ唽鎻掍欢宸ュ巶
     bool register_factory(const std::string& key,
                          std::unique_ptr<IPluginFactory> factory);
 
-    // 注销插件
+    // 娉ㄩ攢鎻掍欢
     bool unregister_factory(const std::string& key);
 
-    // 获取插件工厂
+    // 鑾峰彇鎻掍欢宸ュ巶
     IPluginFactory* get_factory(const std::string& key) const;
 
-    // 获取所有工厂
+    // 鑾峰彇鎵€鏈夊伐鍘?
     std::vector<IPluginFactory*> get_all_factories() const;
 
-    // 按类型获取工厂
+    // 鎸夌被鍨嬭幏鍙栧伐鍘?
     std::vector<IPluginFactory*> get_factories_by_type(PluginType type) const;
 
-    // 按扩展名获取解码器工厂
+    // 鎸夋墿灞曞悕鑾峰彇瑙ｇ爜鍣ㄥ伐鍘?
     std::vector<IPluginFactory*> get_decoder_factories_by_extension(
         const std::string& extension) const;
 
-    // 检查插件是否已注册
+    // 妫€鏌ユ彃浠舵槸鍚﹀凡娉ㄥ唽
     bool is_registered(const std::string& key) const;
 
-    // 获取支持的扩展名
+    // 鑾峰彇鏀寔鐨勬墿灞曞悕
     std::vector<std::string> get_supported_extensions() const;
 
-    // 清空注册表
+    // 娓呯┖娉ㄥ唽琛?
     void clear();
 
-    // 获取统计信息
+    // 鑾峰彇缁熻淇℃伅
     struct Stats {
         size_t total_factories;
         size_t decoder_factories;

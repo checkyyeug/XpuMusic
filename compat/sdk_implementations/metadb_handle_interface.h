@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file metadb_handle_interface.h
  * @brief Metadb handle interface definition for foobar2000 compatibility
  * @date 2025-12-10
@@ -8,7 +8,7 @@
 
 #include <string>
 
-namespace foobar2000_sdk {
+namespace xpumusic_sdk {
 
 // Forward declaration
 class file_info_impl;
@@ -27,4 +27,4 @@ public:
     virtual void set_info(const file_info_impl& p_info) = 0;
 };
 
-} // namespace foobar2000_sdk
+} // namespace xpumusic_sdk

@@ -1,4 +1,4 @@
-#include "audio_format_detector.h"
+﻿#include "audio_format_detector.h"
 #include "audio_decoder_registry.h"
 #include <fstream>
 #include <filesystem>
@@ -190,10 +190,10 @@ void AudioFormatDetector::init_builtin_formats() {
 }
 
 AudioFormatInfo AudioFormatDetector::detect_format(const std::string& file_path) {
-    // 首先尝试通过文件头魔数检测（最准确）
+    // 棣栧厛灏濊瘯閫氳繃鏂囦欢澶撮瓟鏁版娴嬶紙鏈€鍑嗙‘锛?
     AudioFormatInfo info = detect_by_magic_number(file_path);
     if (!info.format.empty() && info.format != "Unknown") {
-        // 检查解码器注册表以获取支持信息
+        // 妫€鏌ヨВ鐮佸櫒娉ㄥ唽琛ㄤ互鑾峰彇鏀寔淇℃伅
         auto& registry = AudioDecoderRegistry::get_instance();
         info.supported = registry.supports_format(file_path);
         if (info.supported) {
@@ -202,7 +202,7 @@ AudioFormatInfo AudioFormatDetector::detect_format(const std::string& file_path)
         return info;
     }
 
-    // 如果魔数检测失败，尝试通过扩展名检测
+    // 濡傛灉榄旀暟妫€娴嬪け璐ワ紝灏濊瘯閫氳繃鎵╁睍鍚嶆娴?
     info = detect_by_extension(file_path);
     auto& registry = AudioDecoderRegistry::get_instance();
     info.supported = registry.supports_format(file_path);
@@ -221,18 +221,18 @@ AudioFormatInfo AudioFormatDetector::detect_by_extension(const std::string& file
     auto it = formats_.find(ext);
     if (it != formats_.end()) {
         AudioFormatInfo info = it->second.info;
-        // 如果有自定义检测器，使用它来获取更详细的信息
+        // 濡傛灉鏈夎嚜瀹氫箟妫€娴嬪櫒锛屼娇鐢ㄥ畠鏉ヨ幏鍙栨洿璇︾粏鐨勪俊鎭?
         if (it->second.custom_detector) {
             try {
                 info = it->second.custom_detector(file_path);
             } catch (...) {
-                // 如果自定义检测器失败，使用基本信息
+                // 濡傛灉鑷畾涔夋娴嬪櫒澶辫触锛屼娇鐢ㄥ熀鏈俊鎭?
             }
         }
         return info;
     }
 
-    // 未知格式
+    // 鏈煡鏍煎紡
     AudioFormatInfo unknown;
     unknown.format = "Unknown";
     unknown.extension = ext;
@@ -247,13 +247,13 @@ AudioFormatInfo AudioFormatDetector::detect_by_magic_number(const std::string& f
         return AudioFormatInfo();
     }
 
-    // 检查已知的魔数
+    // 妫€鏌ュ凡鐭ョ殑榄旀暟
     for (const auto& [magic, ext] : magic_numbers_) {
         if (header.size() >= magic.size() &&
             std::equal(magic.begin(), magic.end(), header.begin())) {
             AudioFormatInfo info = detect_by_extension(file_path);
             if (info.format != "Unknown") {
-                // 对于OGG格式，需要进一步检测内容以确定编解码器
+                // 瀵逛簬OGG鏍煎紡锛岄渶瑕佽繘涓€姝ユ娴嬪唴瀹逛互纭畾缂栬В鐮佸櫒
                 if (ext == "ogg") {
                     return detect_by_content(file_path);
                 }
@@ -262,7 +262,7 @@ AudioFormatInfo AudioFormatDetector::detect_by_magic_number(const std::string& f
         }
     }
 
-    // 对于MP3，需要检测更多的魔数模式
+    // 瀵逛簬MP3锛岄渶瑕佹娴嬫洿澶氱殑榄旀暟妯″紡
     if (header.size() >= 3) {
         // ID3v2 tag
         if (header[0] == 0x49 && header[1] == 0x44 && header[2] == 0x33) {
@@ -274,7 +274,7 @@ AudioFormatInfo AudioFormatDetector::detect_by_magic_number(const std::string& f
         }
     }
 
-    // 对于WAV，检查RIFF头和WAVE标识
+    // 瀵逛簬WAV锛屾鏌IFF澶村拰WAVE鏍囪瘑
     if (header.size() >= 12) {
         if (header[0] == 0x52 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x46 &&
             header[8] == 0x57 && header[9] == 0x41 && header[10] == 0x56 && header[11] == 0x45) {
@@ -291,13 +291,13 @@ AudioFormatInfo AudioFormatDetector::detect_by_content(const std::string& file_p
         return AudioFormatInfo();
     }
 
-    // 读取更多内容用于深度检测
+    // 璇诲彇鏇村鍐呭鐢ㄤ簬娣卞害妫€娴?
     std::vector<uint8_t> buffer(1024);
     file.read(reinterpret_cast<char*>(buffer.data()), buffer.size());
     size_t bytes_read = file.gcount();
     buffer.resize(bytes_read);
 
-    // 对于OGG容器，检测内容中的编解码器
+    // 瀵逛簬OGG瀹瑰櫒锛屾娴嬪唴瀹逛腑鐨勭紪瑙ｇ爜鍣?
     if (bytes_read >= 4 && buffer[0] == 0x4F && buffer[1] == 0x67 && buffer[2] == 0x67 && buffer[3] == 0x53) {
         // OggS header
         size_t pos = 28; // Skip OggS header
@@ -328,7 +328,7 @@ AudioFormatInfo AudioFormatDetector::detect_by_content(const std::string& file_p
         }
     }
 
-    // 对于MP3，检测具体的Layer
+    // 瀵逛簬MP3锛屾娴嬪叿浣撶殑Layer
     if (bytes_read >= 4) {
         // Look for MPEG frame header
         for (size_t i = 0; i < bytes_read - 3; ++i) {
@@ -346,7 +346,7 @@ AudioFormatInfo AudioFormatDetector::detect_by_content(const std::string& file_p
         }
     }
 
-    // 默认返回扩展名检测结果
+    // 榛樿杩斿洖鎵╁睍鍚嶆娴嬬粨鏋?
     return detect_by_extension(file_path);
 }
 

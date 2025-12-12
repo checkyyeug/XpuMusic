@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../xpumusic_sdk/foobar2000_sdk_complete.h"
 #include <memory>

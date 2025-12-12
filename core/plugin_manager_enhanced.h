@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @file plugin_manager_enhanced.h
- * @brief 增强的插件管理器 - 支持热加载、依赖管理、版本检查等功能
+ * @brief 澧炲己鐨勬彃浠剁鐞嗗櫒 - 鏀寔鐑姞杞姐€佷緷璧栫鐞嗐€佺増鏈鏌ョ瓑鍔熻兘
  * @date 2025-12-10
  */
 
@@ -18,19 +18,19 @@
 namespace xpumusic {
 
 /**
- * @brief 插件依赖描述
+ * @brief 鎻掍欢渚濊禆鎻忚堪
  */
 struct PluginDependency {
-    std::string name;          // 依赖的插件名
-    std::string version;       // 最低版本要求
-    bool optional = false;     // 是否可选依赖
+    std::string name;          // 渚濊禆鐨勬彃浠跺悕
+    std::string version;       // 鏈€浣庣増鏈姹?
+    bool optional = false;     // 鏄惁鍙€変緷璧?
 
     bool is_satisfied_by(const std::string& installed_version) const;
     bool is_compatible(const PluginInfo& info) const;
 };
 
 /**
- * @brief 插件元数据
+ * @brief 鎻掍欢鍏冩暟鎹?
  */
 struct PluginMetadata {
     std::string name;
@@ -40,27 +40,27 @@ struct PluginMetadata {
     std::string license;
     std::string homepage;
     std::vector<PluginDependency> dependencies;
-    std::vector<std::string> provides;  // 提供的服务/接口
-    std::string config_schema;          // JSON配置模式
-    uint64_t load_time = 0;            // 加载时间戳
-    bool auto_load = true;             // 是否自动加载
-    bool hot_reloadable = true;         // 是否支持热重载
+    std::vector<std::string> provides;  // 鎻愪緵鐨勬湇鍔?鎺ュ彛
+    std::string config_schema;          // JSON閰嶇疆妯″紡
+    uint64_t load_time = 0;            // 鍔犺浇鏃堕棿鎴?
+    bool auto_load = true;             // 鏄惁鑷姩鍔犺浇
+    bool hot_reloadable = true;         // 鏄惁鏀寔鐑噸杞?
 };
 
 /**
- * @brief 插件加载状态
+ * @brief 鎻掍欢鍔犺浇鐘舵€?
  */
 enum class PluginLoadState {
-    NotLoaded,       // 未加载
-    Loading,         // 正在加载
-    Loaded,          // 已加载
-    Unloading,       // 正在卸载
-    Error,           // 加载错误
-    Disabled         // 已禁用
+    NotLoaded,       // 鏈姞杞?
+    Loading,         // 姝ｅ湪鍔犺浇
+    Loaded,          // 宸插姞杞?
+    Unloading,       // 姝ｅ湪鍗歌浇
+    Error,           // 鍔犺浇閿欒
+    Disabled         // 宸茬鐢?
 };
 
 /**
- * @brief 插件错误信息
+ * @brief 鎻掍欢閿欒淇℃伅
  */
 struct PluginError {
     std::string plugin_key;
@@ -76,7 +76,7 @@ struct PluginError {
 };
 
 /**
- * @brief 插件生命周期事件
+ * @brief 鎻掍欢鐢熷懡鍛ㄦ湡浜嬩欢
  */
 struct PluginLifecycleEvent {
     std::string plugin_key;
@@ -91,19 +91,19 @@ struct PluginLifecycleEvent {
 };
 
 /**
- * @brief 增强的插件管理器
+ * @brief 澧炲己鐨勬彃浠剁鐞嗗櫒
  */
 class PluginManagerEnhanced : public PluginManager {
 public:
-    // 插件热加载配置
+    // 鎻掍欢鐑姞杞介厤缃?
     struct HotReloadConfig {
         bool enabled = true;
-        int watch_interval_ms = 1000;  // 文件监控间隔
+        int watch_interval_ms = 1000;  // 鏂囦欢鐩戞帶闂撮殧
         bool auto_reload_on_change = true;
         std::vector<std::string> watch_extensions = {".so", ".dll", ".dylib"};
     };
 
-    // 依赖解析配置
+    // 渚濊禆瑙ｆ瀽閰嶇疆
     struct DependencyConfig {
         bool auto_resolve = true;
         bool allow_downgrade = false;
@@ -112,7 +112,7 @@ public:
     };
 
 private:
-    // 热加载相关
+    // 鐑姞杞界浉鍏?
     HotReloadConfig hot_reload_config_;
     std::atomic<bool> hot_reload_enabled_{true};
     std::thread watch_thread_;
@@ -120,12 +120,12 @@ private:
     std::condition_variable watch_cv_;
     std::mutex watch_mutex_;
 
-    // 依赖管理
+    // 渚濊禆绠＄悊
     DependencyConfig dep_config_;
     std::unordered_map<std::string, std::vector<std::string>> reverse_deps_;
     std::unordered_map<std::string, PluginMetadata> plugin_metadata_;
 
-    // 版本管理
+    // 鐗堟湰绠＄悊
     struct VersionInfo {
         std::string version;
         std::string min_compatible;
@@ -134,27 +134,27 @@ private:
     };
     std::unordered_map<std::string, VersionInfo> version_info_;
 
-    // 加载状态跟踪
+    // 鍔犺浇鐘舵€佽窡韪?
     std::unordered_map<std::string, PluginLoadState> load_states_;
     std::mutex load_state_mutex_;
 
-    // 配置持久化
+    // 閰嶇疆鎸佷箙鍖?
     std::string plugin_config_file_;
     std::unordered_map<std::string, nlohmann::json> plugin_configs_;
     std::mutex config_mutex_;
 
-    // 错误处理
+    // 閿欒澶勭悊
     std::vector<PluginError> error_history_;
     mutable std::mutex error_mutex_;
     size_t max_error_history_ = 1000;
 
-    // 日志记录
+    // 鏃ュ織璁板綍
     std::shared_ptr<spdlog::logger> plugin_logger_;
 
-    // 事件发布
+    // 浜嬩欢鍙戝竷
     std::shared_ptr<EventBus> event_bus_;
 
-    // 统计信息
+    // 缁熻淇℃伅
     struct EnhancedStats : public ManagerStats {
         size_t hot_reload_count = 0;
         size_t dependency_resolutions = 0;
@@ -172,36 +172,36 @@ public:
 
     ~PluginManagerEnhanced() override;
 
-    // 初始化增强功能
+    // 鍒濆鍖栧寮哄姛鑳?
     void initialize_enhanced(
         const HotReloadConfig& hot_config = {},
         const DependencyConfig& dep_config = {},
         const std::string& config_file = "~/.xpumusic/plugins.json");
 
-    // 热加载功能
+    // 鐑姞杞藉姛鑳?
     void enable_hot_reload(bool enable = true);
     bool is_hot_reload_enabled() const;
     void set_hot_reload_config(const HotReloadConfig& config);
     const HotReloadConfig& get_hot_reload_config() const;
 
-    // 手动热加载插件
+    // 鎵嬪姩鐑姞杞芥彃浠?
     bool reload_plugin(const std::string& plugin_key);
     bool reload_plugin_with_dependencies(const std::string& plugin_key);
 
-    // 依赖管理
+    // 渚濊禆绠＄悊
     bool check_dependencies(const std::string& plugin_key);
     bool resolve_dependencies(const std::string& plugin_key);
     std::vector<std::string> get_dependency_tree(const std::string& plugin_key);
     std::vector<std::string> get_dependents(const std::string& plugin_key);
     bool can_safely_unload(const std::string& plugin_key);
 
-    // 版本兼容性
+    // 鐗堟湰鍏煎鎬?
     bool is_version_compatible(const std::string& plugin_key,
                               const std::string& required_version) const;
     bool check_api_version(const PluginInfo& info) const;
     std::string get_compatible_version_range(const std::string& plugin_key) const;
 
-    // 配置管理
+    // 閰嶇疆绠＄悊
     bool load_plugin_config(const std::string& plugin_key);
     bool save_plugin_config(const std::string& plugin_key);
     void set_plugin_config(const std::string& plugin_key, const nlohmann::json& config);
@@ -210,12 +210,12 @@ public:
     void load_all_plugin_configs();
     void save_all_plugin_configs();
 
-    // 插件状态
+    // 鎻掍欢鐘舵€?
     PluginLoadState get_plugin_state(const std::string& plugin_key) const;
     std::vector<std::string> get_plugins_by_state(PluginLoadState state) const;
     bool is_plugin_ready(const std::string& plugin_key) const;
 
-    // 错误处理
+    // 閿欒澶勭悊
     std::vector<PluginError> get_error_history(const std::string& plugin_key = "") const;
     void clear_error_history(const std::string& plugin_key = "");
     std::string get_last_error(const std::string& plugin_key) const;
@@ -223,13 +223,13 @@ public:
                       const std::string& error_code,
                       const std::string& error_message);
 
-    // 元数据
+    // 鍏冩暟鎹?
     PluginMetadata get_plugin_metadata(const std::string& plugin_key) const;
     void set_plugin_metadata(const std::string& plugin_key,
                             const PluginMetadata& metadata);
     void update_plugin_timestamp(const std::string& plugin_key);
 
-    // 批量操作
+    // 鎵归噺鎿嶄綔
     struct BatchOperation {
         std::vector<std::string> plugins_to_load;
         std::vector<std::string> plugins_to_unload;
@@ -239,56 +239,56 @@ public:
 
     bool execute_batch_operation(const BatchOperation& op);
 
-    // 统计信息
+    // 缁熻淇℃伅
     EnhancedStats get_enhanced_stats() const;
     void reset_stats();
 
 protected:
-    // 重写基类方法以添加增强功能
+    // 閲嶅啓鍩虹被鏂规硶浠ユ坊鍔犲寮哄姛鑳?
     bool load_native_plugin(const std::string& path) override;
     bool unload_plugin(const std::string& key) override;
 
 private:
-    // 热加载实现
+    // 鐑姞杞藉疄鐜?
     void start_file_watcher();
     void stop_file_watcher();
     void file_watcher_thread();
     bool should_reload_plugin(const std::string& path, const std::string& plugin_key);
 
-    // 依赖解析实现
+    // 渚濊禆瑙ｆ瀽瀹炵幇
     bool dependency_dfs(const std::string& plugin_key,
                        std::unordered_set<std::string>& visited,
                        std::vector<std::string>& order);
     bool check_version_compatibility(const std::string& version1,
                                    const std::string& version2) const;
 
-    // 配置持久化实现
+    // 閰嶇疆鎸佷箙鍖栧疄鐜?
     std::string get_config_file_path() const;
     bool load_config_file();
     bool save_config_file();
     nlohmann::json serialize_plugin_metadata(const PluginMetadata& metadata) const;
     PluginMetadata deserialize_plugin_metadata(const nlohmann::json& json) const;
 
-    // 错误处理实现
+    // 閿欒澶勭悊瀹炵幇
     void log_error(const PluginError& error);
     void clear_old_errors();
 
-    // 事件发布
+    // 浜嬩欢鍙戝竷
     void publish_lifecycle_event(const PluginLifecycleEvent& event);
 
-    // 日志记录
+    // 鏃ュ織璁板綍
     void setup_logger();
     void log_plugin_operation(const std::string& operation,
                              const std::string& plugin_key,
                              const std::string& details = "");
 
-    // 版本比较
+    // 鐗堟湰姣旇緝
     int compare_versions(const std::string& v1, const std::string& v2) const;
     std::tuple<int, int, int> parse_version(const std::string& version) const;
 };
 
 /**
- * @brief 插件管理器工厂
+ * @brief 鎻掍欢绠＄悊鍣ㄥ伐鍘?
  */
 class PluginManagerFactory {
 public:

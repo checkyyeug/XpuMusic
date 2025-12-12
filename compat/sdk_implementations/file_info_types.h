@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file file_info_types.h
  * @brief File info type definitions for foobar2000 compatibility
  * @date 2025-12-10
@@ -10,7 +10,7 @@
 #include <map>
 #include <vector>
 
-namespace foobar2000_sdk {
+namespace xpumusic_sdk {
 
 // File information field types
 enum class field_type {
@@ -53,4 +53,4 @@ enum file_info_flags {
     flag_gapless = 1 << 3
 };
 
-} // namespace foobar2000_sdk
+} // namespace xpumusic_sdk

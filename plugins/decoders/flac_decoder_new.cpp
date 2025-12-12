@@ -1,4 +1,4 @@
-#include "flac_decoder.h"
+﻿#include "flac_decoder.h"
 #include <cstring>
 #include <algorithm>
 

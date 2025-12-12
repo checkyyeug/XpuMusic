@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "service_registry.h"
 #include "event_bus.h"

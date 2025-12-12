@@ -1,4 +1,4 @@
-#include "plugin_host.h"
+﻿#include "plugin_host.h"
 
 #ifdef _WIN32
     #include <windows.h>

@@ -1,4 +1,4 @@
-// FLAC Decoder Plugin Test Program
+﻿// FLAC Decoder Plugin Test Program
 // Demonstrates plugin loading and basic functionality
 
 #include "mp_plugin.h"
@@ -57,30 +57,30 @@ bool test_plugin_loading(const char* plugin_path) {
     // Load plugin library
     PluginHandle handle = LOAD_PLUGIN(plugin_path);
     if (!handle) {
-        std::cerr << "❌ Failed to load plugin: " << plugin_path << std::endl;
+        std::cerr << "鉂?Failed to load plugin: " << plugin_path << std::endl;
         return false;
     }
-    std::cout << "✅ Plugin library loaded: " << plugin_path << std::endl;
+    std::cout << "鉁?Plugin library loaded: " << plugin_path << std::endl;
     
     // Get plugin entry points
     auto create_plugin = (CreatePluginFunc)GET_FUNCTION(handle, "create_plugin");
     auto destroy_plugin = (DestroyPluginFunc)GET_FUNCTION(handle, "destroy_plugin");
     
     if (!create_plugin || !destroy_plugin) {
-        std::cerr << "❌ Failed to get plugin entry points" << std::endl;
+        std::cerr << "鉂?Failed to get plugin entry points" << std::endl;
         UNLOAD_PLUGIN(handle);
         return false;
     }
-    std::cout << "✅ Plugin entry points found" << std::endl;
+    std::cout << "鉁?Plugin entry points found" << std::endl;
     
     // Create plugin instance
     mp::IPlugin* plugin = create_plugin();
     if (!plugin) {
-        std::cerr << "❌ Failed to create plugin instance" << std::endl;
+        std::cerr << "鉂?Failed to create plugin instance" << std::endl;
         UNLOAD_PLUGIN(handle);
         return false;
     }
-    std::cout << "✅ Plugin instance created" << std::endl;
+    std::cout << "鉁?Plugin instance created" << std::endl;
     
     // Get plugin info
     const mp::PluginInfo& info = plugin->get_plugin_info();
@@ -104,11 +104,11 @@ bool test_plugin_loading(const char* plugin_path) {
     TestServiceRegistry registry;
     mp::Result result = plugin->initialize(&registry);
     if (result == mp::Result::Success) {
-        std::cout << "✅ Plugin initialized successfully" << std::endl;
+        std::cout << "鉁?Plugin initialized successfully" << std::endl;
     } else if (result == mp::Result::NotSupported) {
-        std::cout << "⚠️  Plugin initialized (stub mode - libFLAC not available)" << std::endl;
+        std::cout << "鈿狅笍  Plugin initialized (stub mode - libFLAC not available)" << std::endl;
     } else {
-        std::cerr << "❌ Plugin initialization failed" << std::endl;
+        std::cerr << "鉂?Plugin initialization failed" << std::endl;
         destroy_plugin(plugin);
         UNLOAD_PLUGIN(handle);
         return false;
@@ -119,7 +119,7 @@ bool test_plugin_loading(const char* plugin_path) {
     destroy_plugin(plugin);
     UNLOAD_PLUGIN(handle);
     
-    std::cout << "✅ Plugin unloaded successfully" << std::endl;
+    std::cout << "鉁?Plugin unloaded successfully" << std::endl;
     return true;
 }
 
@@ -153,13 +153,13 @@ bool test_decoder_interface(const char* plugin_path) {
     void* service = plugin->get_service(SERVICE_DECODER);
     
     if (!service) {
-        std::cerr << "❌ Failed to get decoder service" << std::endl;
+        std::cerr << "鉂?Failed to get decoder service" << std::endl;
         plugin->shutdown();
         destroy_plugin(plugin);
         UNLOAD_PLUGIN(handle);
         return false;
     }
-    std::cout << "✅ Decoder service obtained" << std::endl;
+    std::cout << "鉁?Decoder service obtained" << std::endl;
     
     mp::IDecoder* decoder = static_cast<mp::IDecoder*>(service);
     
@@ -171,9 +171,9 @@ bool test_decoder_interface(const char* plugin_path) {
     int confidence = decoder->probe_file(flac_header, 4);
     std::cout << "  FLAC file confidence: " << confidence << std::endl;
     if (confidence == 100) {
-        std::cout << "  ✅ FLAC file correctly identified" << std::endl;
+        std::cout << "  鉁?FLAC file correctly identified" << std::endl;
     } else {
-        std::cout << "  ❌ FLAC file detection failed" << std::endl;
+        std::cout << "  鉂?FLAC file detection failed" << std::endl;
     }
     
     // MP3 header (should not match)
@@ -181,9 +181,9 @@ bool test_decoder_interface(const char* plugin_path) {
     confidence = decoder->probe_file(mp3_header, 4);
     std::cout << "  MP3 file confidence: " << confidence << std::endl;
     if (confidence == 0) {
-        std::cout << "  ✅ MP3 file correctly rejected" << std::endl;
+        std::cout << "  鉁?MP3 file correctly rejected" << std::endl;
     } else {
-        std::cout << "  ❌ MP3 file detection failed" << std::endl;
+        std::cout << "  鉂?MP3 file detection failed" << std::endl;
     }
     
     // Get supported extensions
@@ -199,11 +199,11 @@ bool test_decoder_interface(const char* plugin_path) {
     mp::Result result = decoder->open_stream("test.flac", &handle_decoder);
     
     if (result == mp::Result::NotSupported) {
-        std::cout << "  ⚠️  Stream opening not supported (stub mode)" << std::endl;
+        std::cout << "  鈿狅笍  Stream opening not supported (stub mode)" << std::endl;
     } else if (result == mp::Result::FileNotFound) {
-        std::cout << "  ⚠️  Test file not found (expected without test.flac)" << std::endl;
+        std::cout << "  鈿狅笍  Test file not found (expected without test.flac)" << std::endl;
     } else if (result == mp::Result::Success) {
-        std::cout << "  ✅ Stream opened successfully" << std::endl;
+        std::cout << "  鉁?Stream opened successfully" << std::endl;
         
         // Get stream info
         mp::AudioStreamInfo info;
@@ -236,7 +236,7 @@ bool test_decoder_interface(const char* plugin_path) {
     destroy_plugin(plugin);
     UNLOAD_PLUGIN(handle);
     
-    std::cout << "✅ Decoder interface test completed" << std::endl;
+    std::cout << "鉁?Decoder interface test completed" << std::endl;
     return true;
 }
 
@@ -273,7 +273,7 @@ int main(int argc, char* argv[]) {
     // Check if plugin file exists
     std::ifstream test_file(plugin_path);
     if (!test_file.good()) {
-        std::cerr << "\n❌ Plugin file not found: " << plugin_path << std::endl;
+        std::cerr << "\n鉂?Plugin file not found: " << plugin_path << std::endl;
         print_usage(argv[0]);
         return 1;
     }
@@ -291,14 +291,14 @@ int main(int argc, char* argv[]) {
     print_separator();
     
     if (success) {
-        std::cout << "✅ All tests passed!" << std::endl;
+        std::cout << "鉁?All tests passed!" << std::endl;
         std::cout << "\nNote: To enable full FLAC decoding functionality:" << std::endl;
         std::cout << "  1. Install libFLAC library for your platform" << std::endl;
         std::cout << "  2. Rebuild the project" << std::endl;
         std::cout << "  3. Rerun tests with actual FLAC files" << std::endl;
         return 0;
     } else {
-        std::cerr << "❌ Some tests failed" << std::endl;
+        std::cerr << "鉂?Some tests failed" << std::endl;
         return 1;
     }
 }

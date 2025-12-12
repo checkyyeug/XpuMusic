@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "mp_plugin.h"
 #include "service_registry.h"

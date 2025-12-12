@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file demo_rate_conversions.cpp
  * @brief Demonstrate specific sample rate conversions requested by user
  * @date 2025-12-10
@@ -57,7 +57,7 @@ int main() {
     wav_writer.write(input_file.c_str(), input_audio.data(), input_frames,
                     input_rate, channels, 24);
     std::cout << std::setw(15) << "44100 Hz" << std::setw(15) << "44100 Hz"
-              << std::setw(20) << "Original" << std::setw(10) << "✓\n";
+              << std::setw(20) << "Original" << std::setw(10) << "鉁揬n";
 
     for (int output_rate : user_rates) {
         if (output_rate == input_rate) continue;
@@ -78,10 +78,10 @@ int main() {
         wav_writer.write(output_file.c_str(), output_audio.data(), converted,
                         output_rate, channels, 24);
 
-        std::cout << std::setw(14) << "44100 Hz" << " → " << std::setw(11)
+        std::cout << std::setw(14) << "44100 Hz" << " 鈫?" << std::setw(11)
                   << output_rate << " Hz" << std::setw(20)
                   << (std::to_string(output_rate) + " Hz output") << std::setw(10)
-                  << "✓\n";
+                  << "鉁揬n";
     }
 
     // Now convert from high rates back to standard rates
@@ -126,9 +126,9 @@ int main() {
         wav_writer.write(std_file.c_str(), standard_audio.data(), converted,
                         standard_rate, channels, 24);
 
-        std::cout << std::setw(14) << (std::to_string(high_rate) + " Hz") << " → "
+        std::cout << std::setw(14) << (std::to_string(high_rate) + " Hz") << " 鈫?"
                   << std::setw(11) << standard_rate << " Hz"
-                  << std::setw(20) << "High → Standard" << std::setw(10) << "✓\n";
+                  << std::setw(20) << "High 鈫?Standard" << std::setw(10) << "鉁揬n";
     }
 
     // Cross conversions within same family
@@ -136,14 +136,14 @@ int main() {
     std::cout << std::string(60, '-') << "\n";
 
     std::vector<std::pair<int, int>> family_conversions = {
-        {44100, 88200},      // CD ×2
-        {88200, 176400},     // DVD ×2
-        {176400, 352800},    // Professional ×2
-        {352800, 705600},    // HD ×2
-        {48000, 96000},      // DVD ×2
-        {96000, 192000},     // Professional ×2
-        {192000, 384000},    // HD ×2
-        {384000, 768000},    // HD ×2
+        {44100, 88200},      // CD 脳2
+        {88200, 176400},     // DVD 脳2
+        {176400, 352800},    // Professional 脳2
+        {352800, 705600},    // HD 脳2
+        {48000, 96000},      // DVD 脳2
+        {96000, 192000},     // Professional 脳2
+        {192000, 384000},    // HD 脳2
+        {384000, 768000},    // HD 脳2
     };
 
     for (auto& conversion : family_conversions) {
@@ -170,13 +170,13 @@ int main() {
                           std::to_string(to_rate) + ".wav";
         wav_writer.write(file.c_str(), to_audio.data(), converted, to_rate, channels, 24);
 
-        std::cout << std::setw(14) << (std::to_string(from_rate) + " Hz") << " → "
+        std::cout << std::setw(14) << (std::to_string(from_rate) + " Hz") << " 鈫?"
                   << std::setw(11) << to_rate << " Hz"
-                  << std::setw(20) << "Same Family" << std::setw(10) << "✓\n";
+                  << std::setw(20) << "Same Family" << std::setw(10) << "鉁揬n";
     }
 
     std::cout << "\n=== Demo Complete! ===\n";
-    std::cout << "✅ Generated demo WAV files for all requested conversions\n";
+    std::cout << "鉁?Generated demo WAV files for all requested conversions\n";
     std::cout << "Files created with 'demo_' prefix\n";
 
     return 0;

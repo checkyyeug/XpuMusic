@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @file resampler_plugin.cpp
- * @brief XpuMusic DSP码率转换插件示例
+ * @brief XpuMusic DSP鐮佺巼杞崲鎻掍欢绀轰緥
  * @date 2025-12-10
  */
 
@@ -26,7 +26,7 @@ private:
     int target_rate_;
     audio::ResampleQuality quality_;
 
-    // 内部缓冲区
+    // 鍐呴儴缂撳啿鍖?
     std::vector<float> internal_buffer_;
 
 public:
@@ -75,7 +75,7 @@ public:
         output_format_ = output_format;
         target_rate_ = output_format.sample_rate;
 
-        // 创建转换器
+        // 鍒涘缓杞崲鍣?
         resampler_ = std::make_unique<audio::AdaptiveSampleRateConverter>();
 
         if (!resampler_->initialize(
@@ -87,7 +87,7 @@ public:
             return false;
         }
 
-        // 分配内部缓冲区
+        // 鍒嗛厤鍐呴儴缂撳啿鍖?
         internal_buffer_.resize(input_format.channels * 4096);
 
         set_state(PluginState::Active);
@@ -101,11 +101,11 @@ public:
             return -1;
         }
 
-        // 计算所需输出帧数
+        // 璁＄畻鎵€闇€杈撳嚭甯ф暟
         double ratio = static_cast<double>(target_rate_) / input_format_.sample_rate;
         int max_output_frames = static_cast<int>(input.frames * ratio * 1.1); // 10% extra
 
-        // 执行转换
+        // 鎵ц杞崲
         int output_frames = resampler_->convert(
             input.data, input.frames,
             output.data, output.frames);
@@ -154,7 +154,7 @@ public:
 
     void reset() override {
         if (resampler_) {
-            // 重新初始化转换器
+            // 閲嶆柊鍒濆鍖栬浆鎹㈠櫒
             resampler_->initialize(
                 input_format_.sample_rate,
                 target_rate_,
@@ -163,12 +163,12 @@ public:
     }
 
     int get_latency_samples() const override {
-        // 转换器的延迟
-        return 256; // 示例值
+        // 杞崲鍣ㄧ殑寤惰繜
+        return 256; // 绀轰緥鍊?
     }
 };
 
-// 插件工厂
+// 鎻掍欢宸ュ巶
 class ResamplerDSPFactory : public ITypedPluginFactory<IDSPProcessor> {
 public:
     std::unique_ptr<IDSPProcessor> create_typed() override {
@@ -187,5 +187,5 @@ public:
     }
 };
 
-// 导出插件
+// 瀵煎嚭鎻掍欢
 XPUMUSIC_EXPORT_DSP_PLUGIN(ResamplerDSPPlugin)

@@ -1,7 +1,7 @@
-#pragma once
+﻿#pragma once
 
-// 阶段1.2：输出设备接口
-// 音频输出设备接口，支持WASAPI、DirectSound等
+// 闃舵1.2锛氳緭鍑鸿澶囨帴鍙?
+// 闊抽杈撳嚭璁惧鎺ュ彛锛屾敮鎸乄ASAPI銆丏irectSound绛?
 
 #include <string>
 #include <vector>
@@ -11,17 +11,17 @@
 
 namespace fb2k {
 
-// 输出设备状态
+// 杈撳嚭璁惧鐘舵€?
 enum class output_state {
-    closed,     // 关闭状态
-    opening,    // 正在打开
-    open,       // 已打开
-    playing,    // 正在播放
-    paused,     // 已暂停
-    error       // 错误状态
+    closed,     // 鍏抽棴鐘舵€?
+    opening,    // 姝ｅ湪鎵撳紑
+    open,       // 宸叉墦寮€
+    playing,    // 姝ｅ湪鎾斁
+    paused,     // 宸叉殏鍋?
+    error       // 閿欒鐘舵€?
 };
 
-// 输出设备格式
+// 杈撳嚭璁惧鏍煎紡
 struct output_format {
     uint32_t sample_rate;
     uint32_t channels;
@@ -46,7 +46,7 @@ struct output_format {
     }
 };
 
-// 输出设备能力
+// 杈撳嚭璁惧鑳藉姏
 struct output_device_caps {
     std::string name;
     std::string description;
@@ -60,49 +60,49 @@ struct output_device_caps {
                           supports_exclusive_mode(false), supports_event_driven(false) {}
 };
 
-// 输出设备接口 - 符合foobar2000规范
+// 杈撳嚭璁惧鎺ュ彛 - 绗﹀悎foobar2000瑙勮寖
 class output_device : public ServiceBase {
 public:
-    // 设备管理
+    // 璁惧绠＄悊
     virtual bool open(uint32_t sample_rate, uint32_t channels, abort_callback& abort) = 0;
     virtual void close(abort_callback& abort) = 0;
     virtual bool is_open() const = 0;
     
-    // 音频处理
+    // 闊抽澶勭悊
     virtual void process_chunk(audio_chunk& chunk, abort_callback& abort) = 0;
     virtual void flush(abort_callback& abort) = 0;
     
-    // 格式支持
+    // 鏍煎紡鏀寔
     virtual bool can_update_format() const = 0;
     virtual bool set_format(const output_format& format, abort_callback& abort) = 0;
     virtual output_format get_current_format() const = 0;
     virtual std::vector<output_format> get_supported_formats() const = 0;
     
-    // 延迟和缓冲
+    // 寤惰繜鍜岀紦鍐?
     virtual double get_latency() const = 0;
     virtual size_t get_buffer_size() const = 0;
     virtual bool set_buffer_size(size_t size, abort_callback& abort) = 0;
     
-    // 设备信息
+    // 璁惧淇℃伅
     virtual const char* get_name() const = 0;
     virtual const char* get_description() const = 0;
     virtual output_device_caps get_device_caps() const = 0;
     
-    // 状态管理
+    // 鐘舵€佺鐞?
     virtual output_state get_state() const = 0;
     virtual bool is_playing() const = 0;
     virtual bool is_paused() const = 0;
     
-    // 高级功能
+    // 楂樼骇鍔熻兘
     virtual bool supports_exclusive_mode() const = 0;
     virtual bool set_exclusive_mode(bool exclusive, abort_callback& abort) = 0;
     virtual bool get_exclusive_mode() const = 0;
     
-    // 事件和回调
+    // 浜嬩欢鍜屽洖璋?
     virtual void set_event_callback(std::function<void(output_state)> callback) = 0;
 };
 
-// 音频缓冲管理器
+// 闊抽缂撳啿绠＄悊鍣?
 class audio_buffer {
 private:
     std::vector<uint8_t> buffer_;
@@ -125,7 +125,7 @@ public:
         
         const uint8_t* src = static_cast<const uint8_t*>(data);
         
-        // 处理环形缓冲的写入
+        // 澶勭悊鐜舰缂撳啿鐨勫啓鍏?
         size_t first_part = std::min(writable, capacity_ - write_pos_);
         std::memcpy(&buffer_[write_pos_], src, first_part);
         
@@ -148,7 +148,7 @@ public:
         
         uint8_t* dst = static_cast<uint8_t*>(data);
         
-        // 处理环形缓冲的读取
+        // 澶勭悊鐜舰缂撳啿鐨勮鍙?
         size_t first_part = std::min(readable, capacity_ - read_pos_);
         std::memcpy(dst, &buffer_[read_pos_], first_part);
         
@@ -195,23 +195,23 @@ public:
     }
 };
 
-// 格式转换器
+// 鏍煎紡杞崲鍣?
 class format_converter {
 public:
-    // 浮点到16位整数
+    // 娴偣鍒?6浣嶆暣鏁?
     static void convert_float_to_int16(const float* src, int16_t* dst, size_t samples) {
         if(!src || !dst || samples == 0) return;
         
         const float scale = 32767.0f;
         for(size_t i = 0; i < samples; ++i) {
             float sample = src[i] * scale;
-            // 裁剪到16位范围
+            // 瑁佸壀鍒?6浣嶈寖鍥?
             sample = std::max(-32768.0f, std::min(32767.0f, sample));
             dst[i] = static_cast<int16_t>(sample);
         }
     }
     
-    // 16位整数到浮点
+    // 16浣嶆暣鏁板埌娴偣
     static void convert_int16_to_float(const int16_t* src, float* dst, size_t samples) {
         if(!src || !dst || samples == 0) return;
         
@@ -221,36 +221,36 @@ public:
         }
     }
     
-    // 浮点到24位整数（打包格式）
+    // 娴偣鍒?4浣嶆暣鏁帮紙鎵撳寘鏍煎紡锛?
     static void convert_float_to_int24(const float* src, uint8_t* dst, size_t samples) {
         if(!src || !dst || samples == 0) return;
         
         const float scale = 8388607.0f; // 2^23 - 1
         for(size_t i = 0; i < samples; ++i) {
             float sample = src[i] * scale;
-            // 裁剪到24位范围
+            // 瑁佸壀鍒?4浣嶈寖鍥?
             sample = std::max(-8388608.0f, std::min(8388607.0f, sample));
             int32_t value = static_cast<int32_t>(sample);
             
-            // 打包为3字节小端格式
+            // 鎵撳寘涓?瀛楄妭灏忕鏍煎紡
             dst[i * 3 + 0] = static_cast<uint8_t>(value & 0xFF);
             dst[i * 3 + 1] = static_cast<uint8_t>((value >> 8) & 0xFF);
             dst[i * 3 + 2] = static_cast<uint8_t>((value >> 16) & 0xFF);
         }
     }
     
-    // 24位整数到浮点（打包格式）
+    // 24浣嶆暣鏁板埌娴偣锛堟墦鍖呮牸寮忥級
     static void convert_int24_to_float(const uint8_t* src, float* dst, size_t samples) {
         if(!src || !dst || samples == 0) return;
         
         const float scale = 1.0f / 8388608.0f;
         for(size_t i = 0; i < samples; ++i) {
-            // 解包3字节小端格式
+            // 瑙ｅ寘3瀛楄妭灏忕鏍煎紡
             int32_t value = static_cast<int32_t>(src[i * 3 + 0]) |
                            (static_cast<int32_t>(src[i * 3 + 1]) << 8) |
                            (static_cast<int32_t>(src[i * 3 + 2]) << 16);
             
-            // 符号扩展
+            // 绗﹀彿鎵╁睍
             if(value & 0x800000) {
                 value |= 0xFF000000;
             }
@@ -259,7 +259,7 @@ public:
         }
     }
     
-    // 音频块格式转换
+    // 闊抽鍧楁牸寮忚浆鎹?
     static bool convert_chunk_format(const audio_chunk& src, audio_chunk& dst, 
                                     audio_format target_format) {
         if(src.is_empty()) return false;
@@ -271,26 +271,26 @@ public:
         
         switch(target_format) {
             case audio_format::float32:
-                // 已经是浮点格式，直接复制
+                // 宸茬粡鏄诞鐐规牸寮忥紝鐩存帴澶嶅埗
                 dst.copy(src);
                 return true;
                 
             case audio_format::int16: {
-                // 转换为16位整数
+                // 杞崲涓?6浣嶆暣鏁?
                 std::vector<int16_t> temp_buffer(total_samples);
                 convert_float_to_int16(src_data, temp_buffer.data(), total_samples);
                 
-                // 这里需要将int16数据包装到audio_chunk中
-                // 实际实现需要扩展audio_chunk接口
+                // 杩欓噷闇€瑕佸皢int16鏁版嵁鍖呰鍒癮udio_chunk涓?
+                // 瀹為檯瀹炵幇闇€瑕佹墿灞昦udio_chunk鎺ュ彛
                 return true;
             }
             
             case audio_format::int24: {
-                // 转换为24位整数
+                // 杞崲涓?4浣嶆暣鏁?
                 std::vector<uint8_t> temp_buffer(total_samples * 3);
                 convert_float_to_int24(src_data, temp_buffer.data(), total_samples);
                 
-                // 这里需要将24位数据包装到audio_chunk中
+                // 杩欓噷闇€瑕佸皢24浣嶆暟鎹寘瑁呭埌audio_chunk涓?
                 return true;
             }
             
@@ -300,7 +300,7 @@ public:
     }
 };
 
-// 输出设备基类实现
+// 杈撳嚭璁惧鍩虹被瀹炵幇
 class output_device_base : public output_device {
 protected:
     output_state state_;
@@ -309,7 +309,7 @@ protected:
     
 public:
     output_device_base() : state_(output_state::closed) {
-        current_format_ = output_format(); // 默认格式
+        current_format_ = output_format(); // 榛樿鏍煎紡
     }
     
     void set_state(output_state new_state) {
@@ -346,11 +346,11 @@ public:
     }
     
     bool supports_exclusive_mode() const override {
-        return false; // 基类不支持独占模式
+        return false; // 鍩虹被涓嶆敮鎸佺嫭鍗犳ā寮?
     }
     
     bool set_exclusive_mode(bool exclusive, abort_callback& abort) override {
-        return !exclusive; // 只能关闭独占模式
+        return !exclusive; // 鍙兘鍏抽棴鐙崰妯″紡
     }
     
     bool get_exclusive_mode() const override {
@@ -358,7 +358,7 @@ public:
     }
 };
 
-// 输出设备管理器
+// 杈撳嚭璁惧绠＄悊鍣?
 class output_device_manager {
 private:
     std::vector<service_ptr_t<output_device>> devices_;
@@ -386,7 +386,7 @@ public:
     bool set_current_device(service_ptr_t<output_device> device) {
         if(!device.is_valid()) return false;
         
-        // 关闭当前设备
+        // 鍏抽棴褰撳墠璁惧
         if(current_device_.is_valid() && current_device_->is_open()) {
             abort_callback_dummy abort;
             current_device_->close(abort);
@@ -404,7 +404,7 @@ public:
         return current_device_.get();
     }
     
-    // 便利函数
+    // 渚垮埄鍑芥暟
     bool open_current_device(uint32_t sample_rate, uint32_t channels, abort_callback& abort) {
         if(!current_device_.is_valid()) return false;
         return current_device_->open(sample_rate, channels, abort);
@@ -423,10 +423,10 @@ public:
     }
 };
 
-// 输出设备工具函数
+// 杈撳嚭璁惧宸ュ叿鍑芥暟
 class output_device_utils {
 public:
-    // 创建标准输出格式
+    // 鍒涘缓鏍囧噯杈撳嚭鏍煎紡
     static output_format create_standard_format(uint32_t sample_rate, uint32_t channels) {
         return output_format(sample_rate, channels, 16, audio_format::int16);
     }
@@ -435,18 +435,18 @@ public:
         return output_format(sample_rate, channels, 32, audio_format::float32);
     }
     
-    // 验证输出格式
+    // 楠岃瘉杈撳嚭鏍煎紡
     static bool validate_output_format(const output_format& format) {
         return format.is_valid();
     }
     
-    // 计算格式所需的缓冲区大小
+    // 璁＄畻鏍煎紡鎵€闇€鐨勭紦鍐插尯澶у皬
     static size_t calculate_buffer_size(const output_format& format, size_t samples) {
         size_t bytes_per_sample = format.bits_per_sample / 8;
         return samples * format.channels * bytes_per_sample;
     }
     
-    // 获取格式描述字符串
+    // 鑾峰彇鏍煎紡鎻忚堪瀛楃涓?
     static std::string get_format_description(const output_format& format) {
         char buffer[256];
         snprintf(buffer, sizeof(buffer), "%u Hz, %u ch, %u-bit %s",
@@ -456,15 +456,15 @@ public:
         return std::string(buffer);
     }
     
-    // 比较两个格式是否兼容
+    // 姣旇緝涓や釜鏍煎紡鏄惁鍏煎
     static bool are_formats_compatible(const output_format& format1, const output_format& format2) {
-        // 简化实现：只检查采样率和声道数
+        // 绠€鍖栧疄鐜帮細鍙鏌ラ噰鏍风巼鍜屽０閬撴暟
         return format1.sample_rate == format2.sample_rate &&
                format1.channels == format2.channels;
     }
 };
 
-// 输出设备验证器
+// 杈撳嚭璁惧楠岃瘉鍣?
 class output_device_validator {
 public:
     struct validation_result {
@@ -478,35 +478,35 @@ public:
         validation_result result;
         result.is_valid = true;
         
-        // 基础验证
+        // 鍩虹楠岃瘉
         if(!device.is_valid()) {
             result.is_valid = false;
-            result.error_message = "输出设备无效";
+            result.error_message = "杈撳嚭璁惧鏃犳晥";
             return result;
         }
         
-        // 检查设备能力
+        // 妫€鏌ヨ澶囪兘鍔?
         auto caps = device.get_device_caps();
         if(caps.supported_formats.empty()) {
             result.is_valid = false;
-            result.error_message = "设备不支持任何音频格式";
+            result.error_message = "璁惧涓嶆敮鎸佷换浣曢煶棰戞牸寮?;
             return result;
         }
         
-        // 检查延迟范围
+        // 妫€鏌ュ欢杩熻寖鍥?
         if(caps.min_latency_ms > caps.max_latency_ms) {
             result.is_valid = false;
-            result.error_message = "设备延迟范围无效";
+            result.error_message = "璁惧寤惰繜鑼冨洿鏃犳晥";
             return result;
         }
         
-        // 警告和建议
+        // 璀﹀憡鍜屽缓璁?
         if(caps.min_latency_ms > 50.0) {
-            result.warnings.push_back("设备最小延迟较高: " + std::to_string(caps.min_latency_ms) + " ms");
+            result.warnings.push_back("璁惧鏈€灏忓欢杩熻緝楂? " + std::to_string(caps.min_latency_ms) + " ms");
         }
         
         if(!caps.supports_exclusive_mode) {
-            result.recommendations.push_back("考虑使用支持独占模式的设备以降低延迟");
+            result.recommendations.push_back("鑰冭檻浣跨敤鏀寔鐙崰妯″紡鐨勮澶囦互闄嶄綆寤惰繜");
         }
         
         return result;

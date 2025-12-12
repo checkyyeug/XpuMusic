@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // Foobar2000 SDK Interface Stubs
 // This file contains minimal interface definitions for foobar2000 plugin compatibility
@@ -16,7 +16,6 @@ namespace xpumusic_sdk {
 
 // Forward declarations
 class service_base;
-class abort_callback;
 class input_decoder;
 
 // Audio information structure
@@ -277,6 +276,61 @@ public:
     virtual uint32_t get_subsong_index() const = 0;
     virtual void set_subsong_index(uint32_t index) = 0;
     virtual bool is_empty() const = 0;
+};
+
+// Metadb interface
+class metadb : public service_base {
+public:
+    virtual ~metadb() = default;
+    // Methods to be defined
+};
+
+// Playback control interface
+class playback_control : public service_base {
+public:
+    virtual ~playback_control() = default;
+    // Methods to be defined
+};
+
+// Input manager interface
+class input_manager : public service_base {
+public:
+    virtual ~input_manager() = default;
+    virtual bool instantiate() = 0;
+    virtual bool open(const char* filename, service_ptr_t<input_decoder>& decoder, abort_callback& abort) = 0;
+};
+
+// Input decoder interface
+class input_decoder : public service_base {
+public:
+    virtual ~input_decoder() = default;
+    virtual bool get_info(uint32_t subsong, file_info& info, abort_callback& abort) = 0;
+};
+
+
+// Helper template for service creation
+template<typename T>
+service_ptr_t<T> standard_api_create_t() {
+    // For now return empty smart pointer since we don't have concrete implementations
+    return service_ptr_t<T>();
+}
+
+// Concrete implementations (minimal for testing)
+class concrete_input_manager : public input_manager {
+public:
+    bool instantiate() override { return true; }
+    bool open(const char* filename, service_ptr_t<input_decoder>& decoder, abort_callback& abort) override {
+        // Return false for now
+        return false;
+    }
+};
+
+class concrete_input_decoder : public input_decoder {
+public:
+    bool get_info(uint32_t subsong, file_info& info, abort_callback& abort) override {
+        // Return false for now
+        return false;
+    }
 };
 
 // Metadb handle interface - ABSTRACT INTERFACE

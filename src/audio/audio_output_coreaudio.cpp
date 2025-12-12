@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file audio_output_coreaudio.cpp
  * @brief CoreAudio audio output implementation for macOS
  * @date 2025-12-10

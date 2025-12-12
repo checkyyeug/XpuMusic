@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file music_player_plugin.cpp
  * @brief Music player with foobar2000 plugin support
  * @date 2025-12-10

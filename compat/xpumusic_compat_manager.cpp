@@ -1,4 +1,4 @@
-#include "xpumusic_compat_manager.h"
+﻿#include "xpumusic_compat_manager.h"
 #include "adapter_base.h"
 #include "data_migration_manager.h"
 #include <cstdarg>

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../../sdk/xpumusic_plugin_sdk.h"
 #include <FLAC/stream_decoder.h>
@@ -20,41 +20,41 @@ using xpumusic::MetadataItem;
 using xpumusic::PluginType;
 
 /**
- * @brief FLAC解码器插件
+ * @brief FLAC瑙ｇ爜鍣ㄦ彃浠?
  *
- * 使用libFLAC库解码FLAC文件，支持：
- * - 无损音频解码
- * - 多种采样率和位深度
- * - 完整的元数据支持
- * - 快速定位
- * - 流式解码
+ * 浣跨敤libFLAC搴撹В鐮丗LAC鏂囦欢锛屾敮鎸侊細
+ * - 鏃犳崯闊抽瑙ｇ爜
+ * - 澶氱閲囨牱鐜囧拰浣嶆繁搴?
+ * - 瀹屾暣鐨勫厓鏁版嵁鏀寔
+ * - 蹇€熷畾浣?
+ * - 娴佸紡瑙ｇ爜
  */
 class FLACDecoder : public IAudioDecoder {
 private:
-    // FLAC解码器
+    // FLAC瑙ｇ爜鍣?
     FLAC__StreamDecoder* decoder_;
 
-    // 文件信息
+    // 鏂囦欢淇℃伅
     std::string file_path_;
     FLAC__bool is_open_;
 
-    // 音频格式
+    // 闊抽鏍煎紡
     AudioFormat format_;
 
-    // 解码状态
+    // 瑙ｇ爜鐘舵€?
     std::vector<float> output_buffer_;
     size_t output_buffer_size_;
     size_t output_buffer_pos_;
     FLAC__bool end_of_stream_;
 
-    // 流信息
+    // 娴佷俊鎭?
     FLAC__uint64 total_samples_;
     unsigned sample_rate_;
     unsigned channels_;
     unsigned bits_per_sample_;
     double duration_;
 
-    // 元数据
+    // 鍏冩暟鎹?
     struct FLACMetadata {
         std::string title;
         std::string artist;
@@ -66,17 +66,17 @@ private:
         unsigned total_tracks;
     } metadata_;
 
-    // 错误信息
+    // 閿欒淇℃伅
     std::string last_error_;
 
-    // 当前位置
+    // 褰撳墠浣嶇疆
     FLAC__uint64 current_sample_;
 
 public:
     FLACDecoder();
     ~FLACDecoder() override;
 
-    // IPlugin 接口
+    // IPlugin 鎺ュ彛
     bool initialize() override;
     void shutdown() override;
     PluginState get_state() const override;
@@ -84,7 +84,7 @@ public:
     PluginInfo get_info() const override;
     std::string get_last_error() const override;
 
-    // IAudioDecoder 接口
+    // IAudioDecoder 鎺ュ彛
     bool can_decode(const std::string& file_path) override;
     std::vector<std::string> get_supported_extensions() override;
     bool open(const std::string& file_path) override;
@@ -92,16 +92,16 @@ public:
     void close() override;
     AudioFormat get_format() const override;
 
-    // FLAC特定功能
+    // FLAC鐗瑰畾鍔熻兘
     bool seek(double seconds);
     double get_duration() const;
     FLACMetadata get_metadata() const;
 
-    // 元数据
+    // 鍏冩暟鎹?
     nlohmann::json get_metadata() const override;
 
 private:
-    // FLAC回调函数
+    // FLAC鍥炶皟鍑芥暟
     static FLAC__StreamDecoderWriteStatus write_callback(
         const FLAC__StreamDecoder* decoder,
         const FLAC__int32* const* buffer,
@@ -139,7 +139,7 @@ private:
         FLAC__StreamDecoderErrorStatus status,
         void* client_data);
 
-    // 内部方法
+    // 鍐呴儴鏂规硶
     bool initialize_decoder();
     void cleanup();
     void set_error(const std::string& error);
@@ -148,7 +148,7 @@ private:
     void process_picture(const FLAC__StreamMetadata* metadata);
 };
 
-// FLAC解码器工厂
+// FLAC瑙ｇ爜鍣ㄥ伐鍘?
 class FLACDecoderFactory : public ITypedPluginFactory<IAudioDecoder> {
 public:
     std::unique_ptr<IAudioDecoder> create_typed() override {
@@ -163,8 +163,8 @@ public:
 
 } // namespace xpumusic::plugins
 
-// 导出插件
+// 瀵煎嚭鎻掍欢
 QODER_EXPORT_AUDIO_PLUGIN(xpumusic::plugins::FLACDecoder)
 
-// 自动注册解码器
+// 鑷姩娉ㄥ唽瑙ｇ爜鍣?
 QODER_AUTO_REGISTER_DECODER(xpumusic::plugins::FLACDecoder, {"flac", "oga"})

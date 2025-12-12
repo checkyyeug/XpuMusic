@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file plugin_audio_decoder.h
  * @brief Audio decoder that uses foobar2000 plugins
  * @date 2025-12-10
@@ -13,6 +13,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <map>
 
 // Forward declarations
 class WAVWriter;
@@ -74,9 +75,13 @@ private:
     // Internal buffer for converted data
     std::vector<float> conversion_buffer_;
 
+    // Built-in decoder registration
+    std::map<std::string, std::string> builtin_decoders_;
+
     // Plugin registration
     bool initialize_plugin_system();
     void register_known_decoders();
+    bool register_builtin_decoder(const std::string& extension, const std::string& name);
     xpumusic_sdk::service_ptr_t<xpumusic_sdk::input_decoder> find_decoder_for_file(const char* path) const;
 
 public:

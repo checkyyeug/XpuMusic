@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file flac_decoder_minimal.cpp
  * @brief Minimal FLAC decoder stub
  * @date 2025-12-11

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file audio_output_stub.cpp
  * @brief Stub audio output implementation (always available)
  * @date 2025-12-10

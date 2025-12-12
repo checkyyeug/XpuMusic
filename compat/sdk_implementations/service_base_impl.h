@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file service_base_impl.h
  * @brief Service base implementation for foobar2000 compatibility
  * @date 2025-12-10

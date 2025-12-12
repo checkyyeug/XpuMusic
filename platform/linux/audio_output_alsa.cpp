@@ -1,4 +1,4 @@
-#include "mp_audio_output.h"
+﻿#include "mp_audio_output.h"
 #ifndef NO_ALSA
 #include <alsa/asoundlib.h>
 #endif

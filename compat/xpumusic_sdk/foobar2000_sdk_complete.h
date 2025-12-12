@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // Complete Foobar2000 SDK Implementation
 // This is a clean-room implementation providing foobar2000 compatibility

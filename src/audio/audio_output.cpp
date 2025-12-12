@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file audio_output.cpp
  * @brief Factory implementation for audio backends
  * @date 2025-12-10

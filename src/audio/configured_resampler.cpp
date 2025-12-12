@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @file configured_resampler.cpp
- * @brief 配置驱动的重采样器
+ * @brief 閰嶇疆椹卞姩鐨勯噸閲囨牱鍣?
  * @date 2025-12-10
  */
 
@@ -16,20 +16,20 @@ ConfiguredSampleRateConverter::ConfiguredSampleRateConverter()
     , precision_(32)
     , use_64bit_(false) {
 
-    // 从配置管理器获取设置
+    // 浠庨厤缃鐞嗗櫒鑾峰彇璁剧疆
     const auto& config = ConfigManagerSingleton::get_instance().get_config().resampler;
 
-    // 确定精度
+    // 纭畾绮惧害
     precision_ = config.floating_precision;
     use_64bit_ = (precision_ == 64);
 
     std::cout << "Initializing resampler with " << precision_ << "-bit floating point precision" << std::endl;
 
-    // 根据配置创建转换器
+    // 鏍规嵁閰嶇疆鍒涘缓杞崲鍣?
     std::string quality = config.quality;
 
     if (use_64bit_) {
-        // 创建64位转换器
+        // 鍒涘缓64浣嶈浆鎹㈠櫒
         if (quality == "fast") {
             converter64_ = std::make_unique<LinearSampleRateConverter64>();
             std::cout << "Using 64-bit Linear resampler (fast quality)" << std::endl;
@@ -49,7 +49,7 @@ ConfiguredSampleRateConverter::ConfiguredSampleRateConverter()
         else if (quality == "adaptive" || config.enable_adaptive) {
             auto adaptive = std::make_unique<AdaptiveSampleRateConverter64>();
 
-            // 配置自适应参数
+            // 閰嶇疆鑷€傚簲鍙傛暟
             if (config.cpu_threshold > 0.0 && config.cpu_threshold <= 1.0) {
                 adaptive->set_cpu_threshold(config.cpu_threshold);
                 std::cout << "Using 64-bit Adaptive resampler with CPU threshold: "
@@ -59,13 +59,13 @@ ConfiguredSampleRateConverter::ConfiguredSampleRateConverter()
             converter64_ = std::move(adaptive);
         }
         else {
-            // 默认使用64位自适应
+            // 榛樿浣跨敤64浣嶈嚜閫傚簲
             converter64_ = std::make_unique<AdaptiveSampleRateConverter64>();
             std::cout << "Using default 64-bit Adaptive resampler" << std::endl;
         }
     }
     else {
-        // 创建32位转换器
+        // 鍒涘缓32浣嶈浆鎹㈠櫒
         if (quality == "fast") {
             converter_ = std::make_unique<LinearSampleRateConverter>();
             std::cout << "Using 32-bit Linear resampler (fast quality)" << std::endl;
@@ -85,7 +85,7 @@ ConfiguredSampleRateConverter::ConfiguredSampleRateConverter()
         else if (quality == "adaptive" || config.enable_adaptive) {
             auto adaptive = std::make_unique<AdaptiveSampleRateConverter>();
 
-            // 配置自适应参数
+            // 閰嶇疆鑷€傚簲鍙傛暟
             if (config.cpu_threshold > 0.0 && config.cpu_threshold <= 1.0) {
                 adaptive->set_cpu_threshold(config.cpu_threshold);
                 std::cout << "Using 32-bit Adaptive resampler with CPU threshold: "
@@ -95,7 +95,7 @@ ConfiguredSampleRateConverter::ConfiguredSampleRateConverter()
             converter_ = std::move(adaptive);
         }
         else {
-            // 默认使用32位自适应
+            // 榛樿浣跨敤32浣嶈嚜閫傚簲
             converter_ = std::make_unique<AdaptiveSampleRateConverter>();
             std::cout << "Using default 32-bit Adaptive resampler" << std::endl;
         }
@@ -157,16 +157,16 @@ void ConfiguredSampleRateConverter::reset() {
     }
 }
 
-// 工厂函数
+// 宸ュ巶鍑芥暟
 std::unique_ptr<ISampleRateConverter> create_configured_sample_rate_converter() {
     return std::make_unique<ConfiguredSampleRateConverter>();
 }
 
-// 根据格式创建重采样器
+// 鏍规嵁鏍煎紡鍒涘缓閲嶉噰鏍峰櫒
 std::unique_ptr<ISampleRateConverter> create_sample_rate_converter_for_format(const std::string& format) {
     const auto& config = ConfigManagerSingleton::get_instance().get_config().resampler;
 
-    // 查找格式特定的质量设置
+    // 鏌ユ壘鏍煎紡鐗瑰畾鐨勮川閲忚缃?
     auto it = config.format_quality.find(format);
     std::string quality = (it != config.format_quality.end()) ? it->second : config.quality;
 
@@ -186,7 +186,7 @@ std::unique_ptr<ISampleRateConverter> create_sample_rate_converter_for_format(co
         return std::make_unique<SincSampleRateConverter>(16);
     }
     else {
-        // 自适应或默认
+        // 鑷€傚簲鎴栭粯璁?
         if (config.enable_adaptive) {
             auto adaptive = std::make_unique<AdaptiveSampleRateConverter>();
             if (config.cpu_threshold > 0.0 && config.cpu_threshold <= 1.0) {

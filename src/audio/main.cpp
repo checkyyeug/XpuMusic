@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file main.cpp
  * @brief Test program for audio backend auto-detection
  * @date 2025-12-10
@@ -30,9 +30,9 @@ struct WAVHeader {
 };
 
 int main(int argc, char* argv[]) {
-    std::cout << "╔══════════════════════════════════════════════╗\n";
-    std::cout << "║    Audio Backend Auto-Detection Test           ║\n";
-    std::cout << "╚══════════════════════════════════════════════╝\n\n";
+    std::cout << "鈺斺晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晽\n";
+    std::cout << "鈺?   Audio Backend Auto-Detection Test           鈺慭n";
+    std::cout << "鈺氣晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨暆\n\n";
 
     // Show detected backend
     std::cout << "Detected audio backend: " << audio::get_audio_backend_name() << "\n\n";
@@ -94,7 +94,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    std::cout << "✓ Audio device opened successfully\n";
+    std::cout << "鉁?Audio device opened successfully\n";
     std::cout << "  Buffer Size: " << audio->get_buffer_size() << " frames\n";
     std::cout << "  Latency: " << audio->get_latency() << " ms\n\n";
 
@@ -140,7 +140,7 @@ int main(int argc, char* argv[]) {
 
     // Close audio device
     audio->close();
-    std::cout << "✓ Audio device closed\n";
+    std::cout << "鉁?Audio device closed\n";
 
     std::cout << "Test completed successfully!\n";
     std::cout << "\nAudio backend '" << audio::get_audio_backend_name() << "' ";

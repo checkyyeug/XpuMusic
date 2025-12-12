@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file universal_sample_rate_converter.h
  * @brief Universal sample rate converter supporting all common audio rates
  * @date 2025-12-10

@@ -1,4 +1,4 @@
-#include "minihost.h"
+﻿#include "minihost.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -10,7 +10,7 @@
 
 namespace fb2k {
 
-// GUID定义
+// GUID瀹氫箟
 // {E92063D0-C149-4B31-BF37-5F5C9D013C6A}
 static const GUID IID_IInputDecoder = 
     { 0xe92063d0, 0xc149, 0x4b31, { 0xbf, 0x37, 0x5f, 0x5c, 0x9d, 0x01, 0x3c, 0x6a } };
@@ -21,7 +21,7 @@ static const GUID CLSID_InputDecoderService =
 
 } // namespace fb2k
 
-// 字符串转换
+// 瀛楃涓茶浆鎹?
 std::string wide_to_utf8(const std::wstring& wide) {
     if(wide.empty()) return "";
     
@@ -44,7 +44,7 @@ std::wstring utf8_to_wide(const std::string& utf8) {
     return result;
 }
 
-// 日志函数
+// 鏃ュ織鍑芥暟
 void log_info(const char* format, ...) {
     char buffer[1024];
     va_list args;
@@ -65,11 +65,11 @@ void log_error(const char* format, ...) {
     std::cerr << "[ERROR] " << buffer << std::endl;
 }
 
-// mini_host实现
+// mini_host瀹炵幇
 bool mini_host::initialize() {
     log_info("Initializing mini host...");
     
-    // 初始化COM
+    // 鍒濆鍖朇OM
     HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
     if(FAILED(hr) && hr != RPC_E_CHANGED_MODE) {
         log_error("Failed to initialize COM: 0x%08X", hr);
@@ -83,17 +83,17 @@ bool mini_host::initialize() {
 bool mini_host::load_component(const std::wstring& dll_path) {
     log_info("Loading component: %s", wide_to_utf8(dll_path).c_str());
     
-    // 加载DLL
+    // 鍔犺浇DLL
     HMODULE module = LoadLibraryW(dll_path.c_str());
     if(!module) {
         log_error("Failed to load DLL: %lu", GetLastError());
         return false;
     }
     
-    // 查找服务入口点
+    // 鏌ユ壘鏈嶅姟鍏ュ彛鐐?
     auto get_service = (fb2k::get_service_func)GetProcAddress(module, "fb2k_get_service");
     if(!get_service) {
-        // 尝试其他常见的入口点名
+        // 灏濊瘯鍏朵粬甯歌鐨勫叆鍙ｇ偣鍚?
         get_service = (fb2k::get_service_func)GetProcAddress(module, "get_service");
         if(!get_service) {
             get_service = (fb2k::get_service_func)GetProcAddress(module, "_fb2k_get_service@8");
@@ -106,7 +106,7 @@ bool mini_host::load_component(const std::wstring& dll_path) {
         return false;
     }
     
-    // 测试获取输入解码器服务
+    // 娴嬭瘯鑾峰彇杈撳叆瑙ｇ爜鍣ㄦ湇鍔?
     void* service_ptr = nullptr;
     HRESULT hr = get_service(fb2k::CLSID_InputDecoderService, &service_ptr);
     if(FAILED(hr) || !service_ptr) {
@@ -115,7 +115,7 @@ bool mini_host::load_component(const std::wstring& dll_path) {
         return false;
     }
     
-    // 获取组件名称
+    // 鑾峰彇缁勪欢鍚嶇О
     std::string component_name = wide_to_utf8(dll_path);
     size_t pos = component_name.find_last_of("/\\");
     if(pos != std::string::npos) {
@@ -140,7 +140,7 @@ mini_host::decoder_ptr mini_host::create_decoder_for_path(const std::string& pat
         return {};
     }
     
-    // 获取输入解码器服务
+    // 鑾峰彇杈撳叆瑙ｇ爜鍣ㄦ湇鍔?
     void* service_ptr = nullptr;
     HRESULT hr = get_service_(fb2k::CLSID_InputDecoderService, &service_ptr);
     if(FAILED(hr) || !service_ptr) {
@@ -148,10 +148,10 @@ mini_host::decoder_ptr mini_host::create_decoder_for_path(const std::string& pat
         return {};
     }
     
-    // 尝试转换为输入解码器
+    // 灏濊瘯杞崲涓鸿緭鍏ヨВ鐮佸櫒
     fb2k::input_decoder* decoder = static_cast<fb2k::input_decoder*>(service_ptr);
     
-    // 检查是否支持该路径
+    // 妫€鏌ユ槸鍚︽敮鎸佽璺緞
     if(!decoder->is_our_path(path.c_str())) {
         log_info("Decoder does not support path: %s", path.c_str());
         decoder->Release();
@@ -169,18 +169,18 @@ std::vector<std::string> mini_host::get_loaded_components() const {
 bool mini_host::test_decode(const std::string& audio_file) {
     log_info("Testing decode for: %s", audio_file.c_str());
     
-    // 创建解码器
+    // 鍒涘缓瑙ｇ爜鍣?
     auto decoder = create_decoder_for_path(audio_file);
     if(!decoder.is_valid()) {
         log_error("Failed to create decoder");
         return false;
     }
     
-    // 创建文件信息对象
+    // 鍒涘缓鏂囦欢淇℃伅瀵硅薄
     fb2k::file_info_impl file_info;
     fb2k::abort_callback_dummy abort_cb;
     
-    // 打开文件
+    // 鎵撳紑鏂囦欢
     if(!decoder->open(audio_file.c_str(), file_info, abort_cb)) {
         log_error("Failed to open file");
         return false;
@@ -192,7 +192,7 @@ bool mini_host::test_decode(const std::string& audio_file) {
     log_info("  Channels: %u", file_info.get_audio_info().channels);
     log_info("  Bitrate: %u kbps", file_info.get_audio_info().bitrate);
     
-    // 测试解码一小段
+    // 娴嬭瘯瑙ｇ爜涓€灏忔
     const int test_samples = 1024;
     std::vector<float> buffer(test_samples * file_info.get_audio_info().channels);
     
@@ -205,7 +205,7 @@ bool mini_host::test_decode(const std::string& audio_file) {
     
     log_info("Successfully decoded %d samples", decoded);
     
-    // 关闭解码器
+    // 鍏抽棴瑙ｇ爜鍣?
     decoder->close();
     log_info("Decode test completed successfully");
     

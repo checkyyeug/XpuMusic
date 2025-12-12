@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <memory>
 #include <chrono>
 #include <thread>
@@ -6,7 +6,7 @@
 #include <cmath>
 #include <fstream>
 
-// 包含必要的头文件
+// 鍖呭惈蹇呰鐨勫ご鏂囦欢
 #include "dsp_equalizer.h"
 #include "dsp_reverb.h"
 #include "dsp_manager.h"
@@ -17,17 +17,17 @@
 
 namespace fb2k {
 
-// 测试配置
+// 娴嬭瘯閰嶇疆
 struct test_config {
     uint32_t sample_rate = 44100;
     uint32_t channels = 2;
     size_t test_duration_seconds = 5;
     bool enable_dsp = true;
-    bool enable_output = false; // 默认禁用输出以避免声音
+    bool enable_output = false; // 榛樿绂佺敤杈撳嚭浠ラ伩鍏嶅０闊?
     bool verbose = true;
 };
 
-// 测试音频源
+// 娴嬭瘯闊抽婧?
 class test_audio_source : public audio_source {
 public:
     test_audio_source(uint32_t sample_rate, uint32_t channels, float frequency = 440.0f)
@@ -42,7 +42,7 @@ public:
             return false;
         }
         
-        // 创建测试音频数据
+        // 鍒涘缓娴嬭瘯闊抽鏁版嵁
         size_t samples_per_chunk = 512;
         chunk.set_sample_count(samples_per_chunk);
         chunk.set_channels(channels_);
@@ -54,9 +54,9 @@ public:
         for(size_t i = 0; i < samples_per_chunk; ++i) {
             float sample = std::sin(current_phase_);
             
-            // 写入所有声道
+            // 鍐欏叆鎵€鏈夊０閬?
             for(uint32_t ch = 0; ch < channels_; ++ch) {
-                data[i * channels_ + ch] = sample * 0.5f; // 降低音量
+                data[i * channels_ + ch] = sample * 0.5f; // 闄嶄綆闊抽噺
             }
             
             current_phase_ += phase_increment;
@@ -69,7 +69,7 @@ public:
     }
     
     bool is_eof() const override {
-        return false; // 无限生成测试音频
+        return false; // 鏃犻檺鐢熸垚娴嬭瘯闊抽
     }
     
     void reset() override {
@@ -83,7 +83,7 @@ private:
     float current_phase_;
 };
 
-// 测试音频输出
+// 娴嬭瘯闊抽杈撳嚭
 class test_audio_sink : public audio_sink {
 public:
     test_audio_sink(const std::string& name = "TestSink")
@@ -97,17 +97,17 @@ public:
             return false;
         }
         
-        // 记录统计信息
+        // 璁板綍缁熻淇℃伅
         total_samples_written_ += chunk.get_sample_count() * chunk.get_channels();
         chunk_count_++;
         
-        // 计算RMS电平
+        // 璁＄畻RMS鐢靛钩
         float rms = chunk.calculate_rms();
         
-        // 每100个块输出一次统计
+        // 姣?00涓潡杈撳嚭涓€娆＄粺璁?
         if(chunk_count_ % 100 == 0) {
-            std::cout << "[TestSink] " << name_ << " - 块数: " << chunk_count_ 
-                      << ", 总采样: " << total_samples_written_ 
+            std::cout << "[TestSink] " << name_ << " - 鍧楁暟: " << chunk_count_ 
+                      << ", 鎬婚噰鏍? " << total_samples_written_ 
                       << ", RMS: " << std::fixed << std::setprecision(3) << rms << std::endl;
         }
         
@@ -137,32 +137,32 @@ private:
     size_t chunk_count_;
 };
 
-// 测试辅助函数
+// 娴嬭瘯杈呭姪鍑芥暟
 class test_helper {
 public:
     static void print_test_header(const std::string& test_name) {
         std::cout << "\n" << std::string(60, '=') << std::endl;
-        std::cout << "测试: " << test_name << std::endl;
+        std::cout << "娴嬭瘯: " << test_name << std::endl;
         std::cout << std::string(60, '-') << std::endl;
     }
     
     static void print_test_result(bool success, const std::string& message) {
-        std::cout << "结果: " << (success ? "✓ 通过" : "✗ 失败") << " - " << message << std::endl;
+        std::cout << "缁撴灉: " << (success ? "鉁?閫氳繃" : "鉁?澶辫触") << " - " << message << std::endl;
     }
     
     static void print_performance_stats(const audio_processor_stats& stats) {
-        std::cout << "\n性能统计:" << std::endl;
-        std::cout << "  总采样数: " << stats.total_samples_processed << std::endl;
-        std::cout << "  总处理时间: " << std::fixed << std::setprecision(3) 
+        std::cout << "\n鎬ц兘缁熻:" << std::endl;
+        std::cout << "  鎬婚噰鏍锋暟: " << stats.total_samples_processed << std::endl;
+        std::cout << "  鎬诲鐞嗘椂闂? " << std::fixed << std::setprecision(3) 
                   << stats.total_processing_time_ms << "ms" << std::endl;
-        std::cout << "  平均处理时间: " << stats.average_processing_time_ms << "ms" << std::endl;
-        std::cout << "  当前CPU占用: " << std::fixed << std::setprecision(1) 
+        std::cout << "  骞冲潎澶勭悊鏃堕棿: " << stats.average_processing_time_ms << "ms" << std::endl;
+        std::cout << "  褰撳墠CPU鍗犵敤: " << std::fixed << std::setprecision(1) 
                   << stats.current_cpu_usage << "%" << std::endl;
-        std::cout << "  峰值CPU占用: " << stats.peak_cpu_usage << "%" << std::endl;
-        std::cout << "  延迟: " << std::fixed << std::setprecision(2) 
+        std::cout << "  宄板€糃PU鍗犵敤: " << stats.peak_cpu_usage << "%" << std::endl;
+        std::cout << "  寤惰繜: " << std::fixed << std::setprecision(2) 
                   << stats.latency_ms << "ms" << std::endl;
-        std::cout << "  丢包数: " << stats.dropout_count << std::endl;
-        std::cout << "  错误数: " << stats.error_count << std::endl;
+        std::cout << "  涓㈠寘鏁? " << stats.dropout_count << std::endl;
+        std::cout << "  閿欒鏁? " << stats.error_count << std::endl;
     }
     
     static bool save_test_audio(const audio_chunk& chunk, const std::string& filename) {
@@ -171,11 +171,11 @@ public:
             return false;
         }
         
-        // 简化的WAV文件头（实际应该使用完整的WAV格式）
+        // 绠€鍖栫殑WAV鏂囦欢澶达紙瀹為檯搴旇浣跨敤瀹屾暣鐨刉AV鏍煎紡锛?
         const float* data = chunk.get_data();
         size_t total_samples = chunk.get_sample_count() * chunk.get_channels();
         
-        // 写入数据（这里简化处理，实际应该写入完整的WAV文件）
+        // 鍐欏叆鏁版嵁锛堣繖閲岀畝鍖栧鐞嗭紝瀹為檯搴旇鍐欏叆瀹屾暣鐨刉AV鏂囦欢锛?
         file.write(reinterpret_cast<const char*>(data), total_samples * sizeof(float));
         
         file.close();
@@ -183,93 +183,93 @@ public:
     }
 };
 
-// 测试1: 基础DSP效果器测试
+// 娴嬭瘯1: 鍩虹DSP鏁堟灉鍣ㄦ祴璇?
 bool test_basic_dsp_effects(const test_config& config) {
-    test_helper::print_test_header("基础DSP效果器测试");
+    test_helper::print_test_header("鍩虹DSP鏁堟灉鍣ㄦ祴璇?);
     
     bool all_passed = true;
     
     try {
-        // 创建DSP管理器
+        // 鍒涘缓DSP绠＄悊鍣?
         auto dsp_manager = std::make_unique<dsp_manager>();
         dsp_config dsp_config;
         dsp_config.enable_standard_effects = true;
         dsp_config.enable_performance_monitoring = true;
         
         if(!dsp_manager->initialize(dsp_config)) {
-            test_helper::print_test_result(false, "DSP管理器初始化失败");
+            test_helper::print_test_result(false, "DSP绠＄悊鍣ㄥ垵濮嬪寲澶辫触");
             return false;
         }
         
-        // 测试1.1: 创建均衡器
+        // 娴嬭瘯1.1: 鍒涘缓鍧囪　鍣?
         auto eq = dsp_manager->create_equalizer_10band();
         if(!eq) {
-            test_helper::print_test_result(false, "创建10段均衡器失败");
+            test_helper::print_test_result(false, "鍒涘缓10娈靛潎琛″櫒澶辫触");
             all_passed = false;
         } else {
             dsp_manager->add_effect(std::move(eq));
-            test_helper::print_test_result(true, "创建并添加10段均衡器");
+            test_helper::print_test_result(true, "鍒涘缓骞舵坊鍔?0娈靛潎琛″櫒");
         }
         
-        // 测试1.2: 创建混响
+        // 娴嬭瘯1.2: 鍒涘缓娣峰搷
         auto reverb = dsp_manager->create_reverb();
         if(!reverb) {
-            test_helper::print_test_result(false, "创建混响效果器失败");
+            test_helper::print_test_result(false, "鍒涘缓娣峰搷鏁堟灉鍣ㄥけ璐?);
             all_passed = false;
         } else {
             dsp_manager->add_effect(std::move(reverb));
-            test_helper::print_test_result(true, "创建并添加混响效果器");
+            test_helper::print_test_result(true, "鍒涘缓骞舵坊鍔犳贩鍝嶆晥鏋滃櫒");
         }
         
-        // 测试1.3: 创建压缩器
+        // 娴嬭瘯1.3: 鍒涘缓鍘嬬缉鍣?
         auto compressor = dsp_manager->create_compressor();
         if(!compressor) {
-            test_helper::print_test_result(false, "创建压缩器失败");
+            test_helper::print_test_result(false, "鍒涘缓鍘嬬缉鍣ㄥけ璐?);
             all_passed = false;
         } else {
             dsp_manager->add_effect(std::move(compressor));
-            test_helper::print_test_result(true, "创建并添加压缩器");
+            test_helper::print_test_result(true, "鍒涘缓骞舵坊鍔犲帇缂╁櫒");
         }
         
-        // 测试1.4: 验证效果器数量
+        // 娴嬭瘯1.4: 楠岃瘉鏁堟灉鍣ㄦ暟閲?
         size_t effect_count = dsp_manager->get_effect_count();
         if(effect_count == 3) {
-            test_helper::print_test_result(true, "效果器数量验证: " + std::to_string(effect_count));
+            test_helper::print_test_result(true, "鏁堟灉鍣ㄦ暟閲忛獙璇? " + std::to_string(effect_count));
         } else {
-            test_helper::print_test_result(false, "效果器数量不匹配: " + std::to_string(effect_count) + " != 3");
+            test_helper::print_test_result(false, "鏁堟灉鍣ㄦ暟閲忎笉鍖归厤: " + std::to_string(effect_count) + " != 3");
             all_passed = false;
         }
         
-        // 测试1.5: 生成DSP报告
+        // 娴嬭瘯1.5: 鐢熸垚DSP鎶ュ憡
         std::string dsp_report = dsp_manager->generate_dsp_report();
         if(!dsp_report.empty()) {
-            test_helper::print_test_result(true, "生成DSP报告成功");
+            test_helper::print_test_result(true, "鐢熸垚DSP鎶ュ憡鎴愬姛");
             if(config.verbose) {
-                std::cout << "\nDSP报告预览:\n" << dsp_report.substr(0, 200) << "..." << std::endl;
+                std::cout << "\nDSP鎶ュ憡棰勮:\n" << dsp_report.substr(0, 200) << "..." << std::endl;
             }
         } else {
-            test_helper::print_test_result(false, "DSP报告为空");
+            test_helper::print_test_result(false, "DSP鎶ュ憡涓虹┖");
             all_passed = false;
         }
         
         dsp_manager->shutdown();
         
     } catch(const std::exception& e) {
-        test_helper::print_test_result(false, std::string("异常: ") + e.what());
+        test_helper::print_test_result(false, std::string("寮傚父: ") + e.what());
         all_passed = false;
     }
     
     return all_passed;
 }
 
-// 测试2: 高级混响效果器测试
+// 娴嬭瘯2: 楂樼骇娣峰搷鏁堟灉鍣ㄦ祴璇?
 bool test_advanced_reverb(const test_config& config) {
-    test_helper::print_test_header("高级混响效果器测试");
+    test_helper::print_test_header("楂樼骇娣峰搷鏁堟灉鍣ㄦ祴璇?);
     
     bool all_passed = true;
     
     try {
-        // 创建混响参数
+        // 鍒涘缓娣峰搷鍙傛暟
         dsp_effect_params reverb_params;
         reverb_params.type = dsp_effect_type::reverb;
         reverb_params.name = "Advanced Reverb";
@@ -278,23 +278,23 @@ bool test_advanced_reverb(const test_config& config) {
         reverb_params.cpu_usage_estimate = 15.0f;
         reverb_params.latency_ms = 10.0;
         
-        // 创建高级混响效果器
+        // 鍒涘缓楂樼骇娣峰搷鏁堟灉鍣?
         auto reverb = std::make_unique<dsp_reverb_advanced>(reverb_params);
         
-        // 测试2.1: 加载不同预设
-        reverb->load_room_preset(0.3f); // 小房间
-        test_helper::print_test_result(true, "加载小房间预设");
+        // 娴嬭瘯2.1: 鍔犺浇涓嶅悓棰勮
+        reverb->load_room_preset(0.3f); // 灏忔埧闂?
+        test_helper::print_test_result(true, "鍔犺浇灏忔埧闂撮璁?);
         
-        reverb->load_hall_preset(0.7f); // 大厅
-        test_helper::print_test_result(true, "加载大厅预设");
+        reverb->load_hall_preset(0.7f); // 澶у巺
+        test_helper::print_test_result(true, "鍔犺浇澶у巺棰勮");
         
-        reverb->load_plate_preset(); // 板式混响
-        test_helper::print_test_result(true, "加载板式混响预设");
+        reverb->load_plate_preset(); // 鏉垮紡娣峰搷
+        test_helper::print_test_result(true, "鍔犺浇鏉垮紡娣峰搷棰勮");
         
-        reverb->load_cathedral_preset(); // 大教堂
-        test_helper::print_test_result(true, "加载大教堂预设");
+        reverb->load_cathedral_preset(); // 澶ф暀鍫?
+        test_helper::print_test_result(true, "鍔犺浇澶ф暀鍫傞璁?);
         
-        // 测试2.2: 参数调节
+        // 娴嬭瘯2.2: 鍙傛暟璋冭妭
         reverb->set_room_size(0.6f);
         reverb->set_damping(0.4f);
         reverb->set_wet_level(0.3f);
@@ -304,25 +304,25 @@ bool test_advanced_reverb(const test_config& config) {
         reverb->set_decay_time(2.5f);
         reverb->set_diffusion(0.8f);
         
-        test_helper::print_test_result(true, "混响参数调节");
+        test_helper::print_test_result(true, "娣峰搷鍙傛暟璋冭妭");
         
-        // 测试2.3: 调制功能
+        // 娴嬭瘯2.3: 璋冨埗鍔熻兘
         reverb->set_modulation_rate(0.5f);
         reverb->set_modulation_depth(0.2f);
         reverb->enable_modulation(true);
-        test_helper::print_test_result(true, "启用调制功能");
+        test_helper::print_test_result(true, "鍚敤璋冨埗鍔熻兘");
         
-        // 测试2.4: 滤波功能
+        // 娴嬭瘯2.4: 婊ゆ尝鍔熻兘
         reverb->enable_filtering(true);
-        test_helper::print_test_result(true, "启用滤波功能");
+        test_helper::print_test_result(true, "鍚敤婊ゆ尝鍔熻兘");
         
-        // 测试2.5: 实例化和处理
+        // 娴嬭瘯2.5: 瀹炰緥鍖栧拰澶勭悊
         audio_chunk test_chunk;
         test_chunk.set_sample_count(512);
         test_chunk.set_channels(config.channels);
         test_chunk.set_sample_rate(config.sample_rate);
         
-        // 填充测试数据
+        // 濉厖娴嬭瘯鏁版嵁
         float* data = test_chunk.get_data();
         for(size_t i = 0; i < 512 * config.channels; ++i) {
             data[i] = std::sin(2.0f * M_PI * 440.0f * i / config.sample_rate) * 0.5f;
@@ -331,44 +331,44 @@ bool test_advanced_reverb(const test_config& config) {
         abort_callback_dummy abort;
         
         if(reverb->instantiate(test_chunk, config.sample_rate, config.channels)) {
-            test_helper::print_test_result(true, "混响效果器实例化成功");
+            test_helper::print_test_result(true, "娣峰搷鏁堟灉鍣ㄥ疄渚嬪寲鎴愬姛");
             
-            // 处理音频
+            // 澶勭悊闊抽
             reverb->run(test_chunk, abort);
-            test_helper::print_test_result(true, "混响音频处理成功");
+            test_helper::print_test_result(true, "娣峰搷闊抽澶勭悊鎴愬姛");
             
-            // 验证输出
+            // 楠岃瘉杈撳嚭
             float output_rms = test_chunk.calculate_rms();
             if(output_rms > 0.0f) {
-                test_helper::print_test_result(true, "混响输出验证通过，RMS: " + std::to_string(output_rms));
+                test_helper::print_test_result(true, "娣峰搷杈撳嚭楠岃瘉閫氳繃锛孯MS: " + std::to_string(output_rms));
             } else {
-                test_helper::print_test_result(false, "混响输出为空");
+                test_helper::print_test_result(false, "娣峰搷杈撳嚭涓虹┖");
                 all_passed = false;
             }
         } else {
-            test_helper::print_test_result(false, "混响效果器实例化失败");
+            test_helper::print_test_result(false, "娣峰搷鏁堟灉鍣ㄥ疄渚嬪寲澶辫触");
             all_passed = false;
         }
         
     } catch(const std::exception& e) {
-        test_helper::print_test_result(false, std::string("异常: ") + e.what());
+        test_helper::print_test_result(false, std::string("寮傚父: ") + e.what());
         all_passed = false;
     }
     
     return all_passed;
 }
 
-// 测试3: 音频处理器集成测试
+// 娴嬭瘯3: 闊抽澶勭悊鍣ㄩ泦鎴愭祴璇?
 bool test_audio_processor_integration(const test_config& config) {
-    test_helper::print_test_header("音频处理器集成测试");
+    test_helper::print_test_header("闊抽澶勭悊鍣ㄩ泦鎴愭祴璇?);
     
     bool all_passed = true;
     
     try {
-        // 创建音频处理器
+        // 鍒涘缓闊抽澶勭悊鍣?
         auto processor = create_audio_processor();
         
-        // 配置音频处理器
+        // 閰嶇疆闊抽澶勭悊鍣?
         audio_processor_config processor_config;
         processor_config.processing_mode = processing_mode::realtime;
         processor_config.target_latency_ms = 10.0;
@@ -378,26 +378,26 @@ bool test_audio_processor_integration(const test_config& config) {
         processor_config.enable_performance_monitoring = true;
         
         if(!processor->initialize(processor_config)) {
-            test_helper::print_test_result(false, "音频处理器初始化失败");
+            test_helper::print_test_result(false, "闊抽澶勭悊鍣ㄥ垵濮嬪寲澶辫触");
             return false;
         }
-        test_helper::print_test_result(true, "音频处理器初始化成功");
+        test_helper::print_test_result(true, "闊抽澶勭悊鍣ㄥ垵濮嬪寲鎴愬姛");
         
-        // 添加DSP效果器
+        // 娣诲姞DSP鏁堟灉鍣?
         auto eq = dsp_manager().create_equalizer_10band();
         auto reverb = dsp_manager().create_reverb();
         
         processor->add_dsp_effect(std::move(eq));
         processor->add_dsp_effect(std::move(reverb));
-        test_helper::print_test_result(true, "添加DSP效果器成功");
+        test_helper::print_test_result(true, "娣诲姞DSP鏁堟灉鍣ㄦ垚鍔?);
         
-        // 测试3.1: 基本音频处理
+        // 娴嬭瘯3.1: 鍩烘湰闊抽澶勭悊
         audio_chunk input_chunk;
         input_chunk.set_sample_count(512);
         input_chunk.set_channels(config.channels);
         input_chunk.set_sample_rate(config.sample_rate);
         
-        // 生成测试音频
+        // 鐢熸垚娴嬭瘯闊抽
         float* input_data = input_chunk.get_data();
         for(size_t i = 0; i < 512 * config.channels; ++i) {
             input_data[i] = std::sin(2.0f * M_PI * 440.0f * i / config.sample_rate) * 0.5f;
@@ -414,22 +414,22 @@ bool test_audio_processor_integration(const test_config& config) {
         double processing_time_ms = duration.count() / 1000.0;
         
         if(process_success) {
-            test_helper::print_test_result(true, "音频处理成功，耗时: " + std::to_string(processing_time_ms) + "ms");
+            test_helper::print_test_result(true, "闊抽澶勭悊鎴愬姛锛岃€楁椂: " + std::to_string(processing_time_ms) + "ms");
             
-            // 验证输出
+            // 楠岃瘉杈撳嚭
             float output_rms = output_chunk.calculate_rms();
             if(output_rms > 0.0f) {
-                test_helper::print_test_result(true, "输出验证通过，RMS: " + std::to_string(output_rms));
+                test_helper::print_test_result(true, "杈撳嚭楠岃瘉閫氳繃锛孯MS: " + std::to_string(output_rms));
             } else {
-                test_helper::print_test_result(false, "输出为空");
+                test_helper::print_test_result(false, "杈撳嚭涓虹┖");
                 all_passed = false;
             }
         } else {
-            test_helper::print_test_result(false, "音频处理失败");
+            test_helper::print_test_result(false, "闊抽澶勭悊澶辫触");
             all_passed = false;
         }
         
-        // 测试3.2: 音量控制
+        // 娴嬭瘯3.2: 闊抽噺鎺у埗
         processor->set_volume(0.5f);
         processor->process_audio(input_chunk, output_chunk, abort);
         float half_volume_rms = output_chunk.calculate_rms();
@@ -439,13 +439,13 @@ bool test_audio_processor_integration(const test_config& config) {
         float full_volume_rms = output_chunk.calculate_rms();
         
         if(std::abs(half_volume_rms - full_volume_rms * 0.5f) < full_volume_rms * 0.1f) {
-            test_helper::print_test_result(true, "音量控制验证通过");
+            test_helper::print_test_result(true, "闊抽噺鎺у埗楠岃瘉閫氳繃");
         } else {
-            test_helper::print_test_result(false, "音量控制验证失败");
+            test_helper::print_test_result(false, "闊抽噺鎺у埗楠岃瘉澶辫触");
             all_passed = false;
         }
         
-        // 测试3.3: 静音功能
+        // 娴嬭瘯3.3: 闈欓煶鍔熻兘
         processor->set_mute(true);
         processor->process_audio(input_chunk, output_chunk, abort);
         float muted_rms = output_chunk.calculate_rms();
@@ -453,63 +453,63 @@ bool test_audio_processor_integration(const test_config& config) {
         processor->set_mute(false);
         
         if(muted_rms < 0.001f) {
-            test_helper::print_test_result(true, "静音功能验证通过");
+            test_helper::print_test_result(true, "闈欓煶鍔熻兘楠岃瘉閫氳繃");
         } else {
-            test_helper::print_test_result(false, "静音功能验证失败");
+            test_helper::print_test_result(false, "闈欓煶鍔熻兘楠岃瘉澶辫触");
             all_passed = false;
         }
         
-        // 测试3.4: 实时参数调节
+        // 娴嬭瘯3.4: 瀹炴椂鍙傛暟璋冭妭
         processor->set_realtime_parameter("Reverb", "room_size", 0.7f);
         float room_size = processor->get_realtime_parameter("Reverb", "room_size");
         
         if(std::abs(room_size - 0.7f) < 0.01f) {
-            test_helper::print_test_result(true, "实时参数调节验证通过");
+            test_helper::print_test_result(true, "瀹炴椂鍙傛暟璋冭妭楠岃瘉閫氳繃");
         } else {
-            test_helper::print_test_result(false, "实时参数调节验证失败");
+            test_helper::print_test_result(false, "瀹炴椂鍙傛暟璋冭妭楠岃瘉澶辫触");
             all_passed = false;
         }
         
-        // 测试3.5: 性能统计
+        // 娴嬭瘯3.5: 鎬ц兘缁熻
         auto stats = processor->get_stats();
         if(stats.total_samples_processed > 0) {
-            test_helper::print_test_result(true, "性能统计收集成功");
+            test_helper::print_test_result(true, "鎬ц兘缁熻鏀堕泦鎴愬姛");
             test_helper::print_performance_stats(stats);
         } else {
-            test_helper::print_test_result(false, "性能统计为空");
+            test_helper::print_test_result(false, "鎬ц兘缁熻涓虹┖");
             all_passed = false;
         }
         
-        // 测试3.6: 状态报告
+        // 娴嬭瘯3.6: 鐘舵€佹姤鍛?
         std::string status_report = processor->get_status_report();
         if(!status_report.empty()) {
-            test_helper::print_test_result(true, "状态报告生成成功");
+            test_helper::print_test_result(true, "鐘舵€佹姤鍛婄敓鎴愭垚鍔?);
             if(config.verbose) {
-                std::cout << "\n状态报告预览:\n" << status_report.substr(0, 300) << "..." << std::endl;
+                std::cout << "\n鐘舵€佹姤鍛婇瑙?\n" << status_report.substr(0, 300) << "..." << std::endl;
             }
         } else {
-            test_helper::print_test_result(false, "状态报告为空");
+            test_helper::print_test_result(false, "鐘舵€佹姤鍛婁负绌?);
             all_passed = false;
         }
         
         processor->shutdown();
         
     } catch(const std::exception& e) {
-        test_helper::print_test_result(false, std::string("异常: ") + e.what());
+        test_helper::print_test_result(false, std::string("寮傚父: ") + e.what());
         all_passed = false;
     }
     
     return all_passed;
 }
 
-// 测试4: 音频流处理测试
+// 娴嬭瘯4: 闊抽娴佸鐞嗘祴璇?
 bool test_audio_stream_processing(const test_config& config) {
-    test_helper::print_test_header("音频流处理测试");
+    test_helper::print_test_header("闊抽娴佸鐞嗘祴璇?);
     
     bool all_passed = true;
     
     try {
-        // 创建音频处理器
+        // 鍒涘缓闊抽澶勭悊鍣?
         auto processor = create_audio_processor();
         
         audio_processor_config processor_config;
@@ -519,25 +519,25 @@ bool test_audio_stream_processing(const test_config& config) {
         processor_config.buffer_size = 1024;
         
         if(!processor->initialize(processor_config)) {
-            test_helper::print_test_result(false, "音频处理器初始化失败");
+            test_helper::print_test_result(false, "闊抽澶勭悊鍣ㄥ垵濮嬪寲澶辫触");
             return false;
         }
         
-        // 添加效果器
+        // 娣诲姞鏁堟灉鍣?
         auto eq = dsp_manager().create_equalizer_10band();
         auto reverb = dsp_manager().create_reverb();
         processor->add_dsp_effect(std::move(eq));
         processor->add_dsp_effect(std::move(reverb));
         
-        // 创建音频源和输出
+        // 鍒涘缓闊抽婧愬拰杈撳嚭
         auto audio_source = std::make_unique<test_audio_source>(config.sample_rate, config.channels, 440.0f);
         auto audio_sink = std::make_unique<test_audio_sink>("StreamTest");
         
-        // 测试4.1: 基本流处理
+        // 娴嬭瘯4.1: 鍩烘湰娴佸鐞?
         abort_callback_dummy abort;
-        abort.set_timeout(1000); // 1秒超时
+        abort.set_timeout(1000); // 1绉掕秴鏃?
         
-        std::cout << "开始流处理测试..." << std::endl;
+        std::cout << "寮€濮嬫祦澶勭悊娴嬭瘯..." << std::endl;
         auto start_time = std::chrono::steady_clock::now();
         
         bool stream_success = processor->process_stream(audio_source.get(), audio_sink.get(), abort);
@@ -546,58 +546,58 @@ bool test_audio_stream_processing(const test_config& config) {
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
         
         if(stream_success) {
-            test_helper::print_test_result(true, "流处理成功，耗时: " + std::to_string(duration.count()) + "ms");
-            test_helper::print_test_result(true, "处理采样数: " + std::to_string(audio_sink->get_total_samples()));
+            test_helper::print_test_result(true, "娴佸鐞嗘垚鍔燂紝鑰楁椂: " + std::to_string(duration.count()) + "ms");
+            test_helper::print_test_result(true, "澶勭悊閲囨牱鏁? " + std::to_string(audio_sink->get_total_samples()));
         } else {
-            test_helper::print_test_result(false, "流处理失败");
+            test_helper::print_test_result(false, "娴佸鐞嗗け璐?);
             all_passed = false;
         }
         
-        // 测试4.2: 中断处理
+        // 娴嬭瘯4.2: 涓柇澶勭悊
         auto abort_source = std::make_unique<test_audio_source>(config.sample_rate, config.channels, 880.0f);
         auto abort_sink = std::make_unique<test_audio_sink>("AbortTest");
         
-        // 设置快速中断
+        // 璁剧疆蹇€熶腑鏂?
         abort_callback_dummy fast_abort;
-        fast_abort.set_timeout(100); // 100ms后中断
+        fast_abort.set_timeout(100); // 100ms鍚庝腑鏂?
         
         bool abort_success = processor->process_stream(abort_source.get(), abort_sink.get(), fast_abort);
         
         if(!abort_success && fast_abort.is_aborting()) {
-            test_helper::print_test_result(true, "中断处理验证通过");
+            test_helper::print_test_result(true, "涓柇澶勭悊楠岃瘉閫氳繃");
         } else {
-            test_helper::print_test_result(false, "中断处理验证失败");
+            test_helper::print_test_result(false, "涓柇澶勭悊楠岃瘉澶辫触");
             all_passed = false;
         }
         
-        // 测试4.3: 性能监控
+        // 娴嬭瘯4.3: 鎬ц兘鐩戞帶
         auto final_stats = processor->get_stats();
         if(final_stats.total_samples_processed > 0) {
-            test_helper::print_test_result(true, "流处理性能统计收集成功");
+            test_helper::print_test_result(true, "娴佸鐞嗘€ц兘缁熻鏀堕泦鎴愬姛");
             test_helper::print_performance_stats(final_stats);
         } else {
-            test_helper::print_test_result(false, "流处理性能统计为空");
+            test_helper::print_test_result(false, "娴佸鐞嗘€ц兘缁熻涓虹┖");
             all_passed = false;
         }
         
         processor->shutdown();
         
     } catch(const std::exception& e) {
-        test_helper::print_test_result(false, std::string("异常: ") + e.what());
+        test_helper::print_test_result(false, std::string("寮傚父: ") + e.what());
         all_passed = false;
     }
     
     return all_passed;
 }
 
-// 测试5: 性能基准测试
+// 娴嬭瘯5: 鎬ц兘鍩哄噯娴嬭瘯
 bool test_performance_benchmark(const test_config& config) {
-    test_helper::print_test_header("性能基准测试");
+    test_helper::print_test_header("鎬ц兘鍩哄噯娴嬭瘯");
     
     bool all_passed = true;
     
     try {
-        // 创建音频处理器
+        // 鍒涘缓闊抽澶勭悊鍣?
         auto processor = create_audio_processor();
         
         audio_processor_config processor_config;
@@ -608,11 +608,11 @@ bool test_performance_benchmark(const test_config& config) {
         processor_config.enable_performance_monitoring = true;
         
         if(!processor->initialize(processor_config)) {
-            test_helper::print_test_result(false, "音频处理器初始化失败");
+            test_helper::print_test_result(false, "闊抽澶勭悊鍣ㄥ垵濮嬪寲澶辫触");
             return false;
         }
         
-        // 添加多个效果器进行压力测试
+        // 娣诲姞澶氫釜鏁堟灉鍣ㄨ繘琛屽帇鍔涙祴璇?
         for(int i = 0; i < 5; ++i) {
             auto eq = dsp_manager().create_equalizer_10band();
             auto reverb = dsp_manager().create_reverb();
@@ -620,13 +620,13 @@ bool test_performance_benchmark(const test_config& config) {
             processor->add_dsp_effect(std::move(reverb));
         }
         
-        // 测试5.1: 处理速度基准
+        // 娴嬭瘯5.1: 澶勭悊閫熷害鍩哄噯
         audio_chunk test_chunk;
         test_chunk.set_sample_count(1024);
         test_chunk.set_channels(config.channels);
         test_chunk.set_sample_rate(config.sample_rate);
         
-        // 生成复杂的测试信号
+        // 鐢熸垚澶嶆潅鐨勬祴璇曚俊鍙?
         float* data = test_chunk.get_data();
         for(size_t i = 0; i < 1024 * config.channels; ++i) {
             data[i] = std::sin(2.0f * M_PI * 440.0f * i / config.sample_rate) * 0.3f +
@@ -648,12 +648,12 @@ bool test_performance_benchmark(const test_config& config) {
             
             if(success) {
                 auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
-                processing_times.push_back(duration.count() / 1000.0); // 转换为毫秒
+                processing_times.push_back(duration.count() / 1000.0); // 杞崲涓烘绉?
             }
         }
         
         if(!processing_times.empty()) {
-            // 计算统计信息
+            // 璁＄畻缁熻淇℃伅
             double total_time = 0.0;
             double min_time = processing_times[0];
             double max_time = processing_times[0];
@@ -665,52 +665,52 @@ bool test_performance_benchmark(const test_config& config) {
             }
             
             double avg_time = total_time / processing_times.size();
-            double rtf = (avg_time / (1024.0 / config.sample_rate * 1000.0)); // 实时倍数
+            double rtf = (avg_time / (1024.0 / config.sample_rate * 1000.0)); // 瀹炴椂鍊嶆暟
             
-            std::cout << "\n性能基准结果:" << std::endl;
-            std::cout << "  测试次数: " << processing_times.size() << std::endl;
-            std::cout << "  平均处理时间: " << std::fixed << std::setprecision(3) << avg_time << "ms" << std::endl;
-            std::cout << "  最小处理时间: " << min_time << "ms" << std::endl;
-            std::cout << "  最大处理时间: " << max_time << "ms" << std::endl;
-            std::cout << "  实时倍数: " << std::fixed << std::setprecision(2) << rtf << "x" << std::endl;
+            std::cout << "\n鎬ц兘鍩哄噯缁撴灉:" << std::endl;
+            std::cout << "  娴嬭瘯娆℃暟: " << processing_times.size() << std::endl;
+            std::cout << "  骞冲潎澶勭悊鏃堕棿: " << std::fixed << std::setprecision(3) << avg_time << "ms" << std::endl;
+            std::cout << "  鏈€灏忓鐞嗘椂闂? " << min_time << "ms" << std::endl;
+            std::cout << "  鏈€澶у鐞嗘椂闂? " << max_time << "ms" << std::endl;
+            std::cout << "  瀹炴椂鍊嶆暟: " << std::fixed << std::setprecision(2) << rtf << "x" << std::endl;
             
             if(rtf < 1.0) {
-                test_helper::print_test_result(true, "性能基准测试通过（实时倍数 < 1.0）");
+                test_helper::print_test_result(true, "鎬ц兘鍩哄噯娴嬭瘯閫氳繃锛堝疄鏃跺€嶆暟 < 1.0锛?);
             } else {
-                test_helper::print_test_result(false, "性能基准测试失败（实时倍数 >= 1.0）");
+                test_helper::print_test_result(false, "鎬ц兘鍩哄噯娴嬭瘯澶辫触锛堝疄鏃跺€嶆暟 >= 1.0锛?);
                 all_passed = false;
             }
         } else {
-            test_helper::print_test_result(false, "性能基准测试无有效数据");
+            test_helper::print_test_result(false, "鎬ц兘鍩哄噯娴嬭瘯鏃犳湁鏁堟暟鎹?);
             all_passed = false;
         }
         
-        // 测试5.2: 内存使用检查（简化版）
+        // 娴嬭瘯5.2: 鍐呭瓨浣跨敤妫€鏌ワ紙绠€鍖栫増锛?
         auto final_stats = processor->get_stats();
         if(final_stats.error_count == 0) {
-            test_helper::print_test_result(true, "处理过程中无错误");
+            test_helper::print_test_result(true, "澶勭悊杩囩▼涓棤閿欒");
         } else {
-            test_helper::print_test_result(false, "处理过程中出现错误: " + std::to_string(final_stats.error_count));
+            test_helper::print_test_result(false, "澶勭悊杩囩▼涓嚭鐜伴敊璇? " + std::to_string(final_stats.error_count));
             all_passed = false;
         }
         
         processor->shutdown();
         
     } catch(const std::exception& e) {
-        test_helper::print_test_result(false, std::string("异常: ") + e.what());
+        test_helper::print_test_result(false, std::string("寮傚父: ") + e.what());
         all_passed = false;
     }
     
     return all_passed;
 }
 
-// 主测试函数
+// 涓绘祴璇曞嚱鏁?
 int main(int argc, char* argv[]) {
-    std::cout << "foobar2000兼容层 - 阶段1.3功能测试" << std::endl;
+    std::cout << "foobar2000鍏煎灞?- 闃舵1.3鍔熻兘娴嬭瘯" << std::endl;
     std::cout << "====================================" << std::endl;
-    std::cout << "测试时间: " << std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) << std::endl;
+    std::cout << "娴嬭瘯鏃堕棿: " << std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) << std::endl;
     
-    // 解析命令行参数
+    // 瑙ｆ瀽鍛戒护琛屽弬鏁?
     test_config config;
     
     for(int i = 1; i < argc; ++i) {
@@ -727,32 +727,32 @@ int main(int argc, char* argv[]) {
         } else if(arg == "--quiet") {
             config.verbose = false;
         } else if(arg == "--help") {
-            std::cout << "用法: " << argv[0] << " [选项]" << std::endl;
-            std::cout << "选项:" << std::endl;
-            std::cout << "  --sample-rate <rate>   设置测试采样率 (默认: 44100)" << std::endl;
-            std::cout << "  --channels <num>       设置测试声道数 (默认: 2)" << std::endl;
-            std::cout << "  --duration <seconds>   设置测试持续时间 (默认: 5)" << std::endl;
-            std::cout << "  --enable-output        启用音频输出（会产生声音）" << std::endl;
-            std::cout << "  --quiet                减少输出信息" << std::endl;
-            std::cout << "  --help                 显示帮助信息" << std::endl;
+            std::cout << "鐢ㄦ硶: " << argv[0] << " [閫夐」]" << std::endl;
+            std::cout << "閫夐」:" << std::endl;
+            std::cout << "  --sample-rate <rate>   璁剧疆娴嬭瘯閲囨牱鐜?(榛樿: 44100)" << std::endl;
+            std::cout << "  --channels <num>       璁剧疆娴嬭瘯澹伴亾鏁?(榛樿: 2)" << std::endl;
+            std::cout << "  --duration <seconds>   璁剧疆娴嬭瘯鎸佺画鏃堕棿 (榛樿: 5)" << std::endl;
+            std::cout << "  --enable-output        鍚敤闊抽杈撳嚭锛堜細浜х敓澹伴煶锛? << std::endl;
+            std::cout << "  --quiet                鍑忓皯杈撳嚭淇℃伅" << std::endl;
+            std::cout << "  --help                 鏄剧ず甯姪淇℃伅" << std::endl;
             return 0;
         }
     }
     
-    std::cout << "\n测试配置:" << std::endl;
-    std::cout << "  采样率: " << config.sample_rate << "Hz" << std::endl;
-    std::cout << "  声道数: " << config.channels << std::endl;
-    std::cout << "  测试持续时间: " << config.test_duration_seconds << "秒" << std::endl;
-    std::cout << "  音频输出: " << (config.enable_output ? "启用" : "禁用") << std::endl;
-    std::cout << "  详细输出: " << (config.verbose ? "启用" : "禁用") << std::endl;
+    std::cout << "\n娴嬭瘯閰嶇疆:" << std::endl;
+    std::cout << "  閲囨牱鐜? " << config.sample_rate << "Hz" << std::endl;
+    std::cout << "  澹伴亾鏁? " << config.channels << std::endl;
+    std::cout << "  娴嬭瘯鎸佺画鏃堕棿: " << config.test_duration_seconds << "绉? << std::endl;
+    std::cout << "  闊抽杈撳嚭: " << (config.enable_output ? "鍚敤" : "绂佺敤") << std::endl;
+    std::cout << "  璇︾粏杈撳嚭: " << (config.verbose ? "鍚敤" : "绂佺敤") << std::endl;
     
-    // 运行所有测试
+    // 杩愯鎵€鏈夋祴璇?
     std::vector<std::pair<std::string, std::function<bool(const test_config&)>>> tests = {
-        {"基础DSP效果器测试", test_basic_dsp_effects},
-        {"高级混响效果器测试", test_advanced_reverb},
-        {"音频处理器集成测试", test_audio_processor_integration},
-        {"音频流处理测试", test_audio_stream_processing},
-        {"性能基准测试", test_performance_benchmark}
+        {"鍩虹DSP鏁堟灉鍣ㄦ祴璇?, test_basic_dsp_effects},
+        {"楂樼骇娣峰搷鏁堟灉鍣ㄦ祴璇?, test_advanced_reverb},
+        {"闊抽澶勭悊鍣ㄩ泦鎴愭祴璇?, test_audio_processor_integration},
+        {"闊抽娴佸鐞嗘祴璇?, test_audio_stream_processing},
+        {"鎬ц兘鍩哄噯娴嬭瘯", test_performance_benchmark}
     };
     
     int passed_count = 0;
@@ -764,23 +764,23 @@ int main(int argc, char* argv[]) {
             passed_count++;
         }
         
-        std::cout << "\n" << test_name << " 结果: " << (passed ? "通过" : "失败") << std::endl;
+        std::cout << "\n" << test_name << " 缁撴灉: " << (passed ? "閫氳繃" : "澶辫触") << std::endl;
     }
     
-    // 总结
+    // 鎬荤粨
     std::cout << "\n" << std::string(60, '=') << std::endl;
-    std::cout << "测试总结:" << std::endl;
-    std::cout << "  总测试数: " << total_count << std::endl;
-    std::cout << "  通过测试: " << passed_count << std::endl;
-    std::cout << "  失败测试: " << (total_count - passed_count) << std::endl;
-    std::cout << "  通过率: " << std::fixed << std::setprecision(1) 
+    std::cout << "娴嬭瘯鎬荤粨:" << std::endl;
+    std::cout << "  鎬绘祴璇曟暟: " << total_count << std::endl;
+    std::cout << "  閫氳繃娴嬭瘯: " << passed_count << std::endl;
+    std::cout << "  澶辫触娴嬭瘯: " << (total_count - passed_count) << std::endl;
+    std::cout << "  閫氳繃鐜? " << std::fixed << std::setprecision(1) 
               << (passed_count * 100.0 / total_count) << "%" << std::endl;
     
     if(passed_count == total_count) {
-        std::cout << "\n✓ 所有测试通过！阶段1.3功能正常。" << std::endl;
+        std::cout << "\n鉁?鎵€鏈夋祴璇曢€氳繃锛侀樁娈?.3鍔熻兘姝ｅ父銆? << std::endl;
         return 0;
     } else {
-        std::cout << "\n✗ 部分测试失败，请检查错误信息。" << std::endl;
+        std::cout << "\n鉁?閮ㄥ垎娴嬭瘯澶辫触锛岃妫€鏌ラ敊璇俊鎭€? << std::endl;
         return 1;
     }
 }

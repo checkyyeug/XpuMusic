@@ -1,4 +1,4 @@
-#include "audio_decoder_registry.h"
+﻿#include "audio_decoder_registry.h"
 #include <algorithm>
 #include <filesystem>
 
@@ -16,7 +16,7 @@ void AudioDecoderRegistry::register_decoder(const std::string& name,
     info.factory = factory;
     info.supported_formats = supported_formats;
 
-    // 转换为小写
+    // 杞崲涓哄皬鍐?
     for (auto& format : info.supported_formats) {
         std::transform(format.begin(), format.end(), format.begin(), ::tolower);
     }
@@ -32,7 +32,7 @@ void AudioDecoderRegistry::register_decoder(const std::string& name,
     info.supported_formats = factory->get_info().supported_formats;
     info.plugin_factory = std::move(factory);
 
-    // 转换为小写
+    // 杞崲涓哄皬鍐?
     for (auto& format : info.supported_formats) {
         std::transform(format.begin(), format.end(), format.begin(), ::tolower);
     }
@@ -43,7 +43,7 @@ void AudioDecoderRegistry::register_decoder(const std::string& name,
 std::unique_ptr<IAudioDecoder> AudioDecoderRegistry::get_decoder(const std::string& file_path) {
     std::string extension = extract_extension(file_path);
 
-    // 检查是否有该格式的默认解码器
+    // 妫€鏌ユ槸鍚︽湁璇ユ牸寮忕殑榛樿瑙ｇ爜鍣?
     auto default_it = format_defaults_.find(extension);
     if (default_it != format_defaults_.end()) {
         auto decoder_it = decoders_.find(default_it->second);
@@ -56,7 +56,7 @@ std::unique_ptr<IAudioDecoder> AudioDecoderRegistry::get_decoder(const std::stri
         }
     }
 
-    // 查找支持该格式的解码器
+    // 鏌ユ壘鏀寔璇ユ牸寮忕殑瑙ｇ爜鍣?
     for (const auto& [name, info] : decoders_) {
         if (!info.enabled) continue;
 
@@ -92,7 +92,7 @@ std::vector<PluginInfo> AudioDecoderRegistry::get_registered_decoders() const {
         if (info.plugin_factory) {
             infos.push_back(info.plugin_factory->get_info());
         } else {
-            // 创建临时解码器实例以获取信息
+            // 鍒涘缓涓存椂瑙ｇ爜鍣ㄥ疄渚嬩互鑾峰彇淇℃伅
             auto decoder = info.factory();
             if (decoder) {
                 infos.push_back(decoder->get_info());
@@ -162,7 +162,7 @@ bool AudioDecoderRegistry::is_decoder_enabled(const std::string& decoder_name) c
 void AudioDecoderRegistry::unregister_decoder(const std::string& decoder_name) {
     decoders_.erase(decoder_name);
 
-    // 清理默认解码器设置
+    // 娓呯悊榛樿瑙ｇ爜鍣ㄨ缃?
     for (auto it = format_defaults_.begin(); it != format_defaults_.end();) {
         if (it->second == decoder_name) {
             it = format_defaults_.erase(it);
@@ -176,7 +176,7 @@ std::string AudioDecoderRegistry::extract_extension(const std::string& file_path
     std::filesystem::path path(file_path);
     std::string ext = path.extension().string();
 
-    // 去掉前面的点并转换为小写
+    // 鍘绘帀鍓嶉潰鐨勭偣骞惰浆鎹负灏忓啓
     if (!ext.empty() && ext[0] == '.') {
         ext = ext.substr(1);
     }

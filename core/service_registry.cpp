@@ -1,4 +1,4 @@
-#include "service_registry.h"
+﻿#include "service_registry.h"
 
 namespace mp {
 namespace core {

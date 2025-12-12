@@ -1,34 +1,34 @@
-#include "dsp_interfaces.h"
+﻿#include "dsp_interfaces.h"
 #include <cstring>
 #include <algorithm>
 
 namespace fb2k {
 
-// dsp_preset_impl 具体实现（已在头文件中部分实现）
-// 这里是完整的序列化/反序列化实现
+// dsp_preset_impl 鍏蜂綋瀹炵幇锛堝凡鍦ㄥご鏂囦欢涓儴鍒嗗疄鐜帮級
+// 杩欓噷鏄畬鏁寸殑搴忓垪鍖?鍙嶅簭鍒楀寲瀹炵幇
 
 void dsp_preset_impl::serialize(std::vector<uint8_t>& data) const {
     data.clear();
     
-    // 二进制序列化格式:
+    // 浜岃繘鍒跺簭鍒楀寲鏍煎紡:
     // [magic:4][version:4][name_len:4][name][float_count:4][float_params][string_count:4][string_params]
     
     const uint32_t magic = 0x46504244; // "FPBD" (Foobar2000 DSP Binary Data)
     const uint32_t version = 1;
     const uint32_t name_len = static_cast<uint32_t>(name_.length());
     
-    // 魔数和版本
+    // 榄旀暟鍜岀増鏈?
     data.insert(data.end(), reinterpret_cast<const uint8_t*>(&magic), 
                reinterpret_cast<const uint8_t*>(&magic) + sizeof(magic));
     data.insert(data.end(), reinterpret_cast<const uint8_t*>(&version),
                reinterpret_cast<const uint8_t*>(&version) + sizeof(version));
     
-    // 名称
+    // 鍚嶇О
     data.insert(data.end(), reinterpret_cast<const uint8_t*>(&name_len),
                reinterpret_cast<const uint8_t*>(&name_len) + sizeof(name_len));
     data.insert(data.end(), name_.begin(), name_.end());
     
-    // 浮点参数
+    // 娴偣鍙傛暟
     const uint32_t float_count = static_cast<uint32_t>(float_params_.size());
     data.insert(data.end(), reinterpret_cast<const uint8_t*>(&float_count),
                reinterpret_cast<const uint8_t*>(&float_count) + sizeof(float_count));
@@ -43,7 +43,7 @@ void dsp_preset_impl::serialize(std::vector<uint8_t>& data) const {
                    reinterpret_cast<const uint8_t*>(&value) + sizeof(value));
     }
     
-    // 字符串参数
+    // 瀛楃涓插弬鏁?
     const uint32_t string_count = static_cast<uint32_t>(string_params_.size());
     data.insert(data.end(), reinterpret_cast<const uint8_t*>(&string_count),
                reinterpret_cast<const uint8_t*>(&string_count) + sizeof(string_count));
@@ -64,13 +64,13 @@ void dsp_preset_impl::serialize(std::vector<uint8_t>& data) const {
 bool dsp_preset_impl::deserialize(const uint8_t* data, size_t size) {
     if(!data || size == 0) return false;
     
-    reset(); // 先重置
+    reset(); // 鍏堥噸缃?
     
-    if(size < 12) return false; // 最小大小：magic + version + name_len
+    if(size < 12) return false; // 鏈€灏忓ぇ灏忥細magic + version + name_len
     
     size_t pos = 0;
     
-    // 读取魔数和版本
+    // 璇诲彇榄旀暟鍜岀増鏈?
     uint32_t magic, version;
     std::memcpy(&magic, data + pos, sizeof(magic));
     pos += sizeof(magic);
@@ -78,11 +78,11 @@ bool dsp_preset_impl::deserialize(const uint8_t* data, size_t size) {
     std::memcpy(&version, data + pos, sizeof(version));
     pos += sizeof(version);
     
-    // 验证魔数
+    // 楠岃瘉榄旀暟
     if(magic != 0x46504244) return false; // "FPBD"
     if(version != 1) return false;
     
-    // 读取名称
+    // 璇诲彇鍚嶇О
     uint32_t name_len;
     std::memcpy(&name_len, data + pos, sizeof(name_len));
     pos += sizeof(name_len);
@@ -92,14 +92,14 @@ bool dsp_preset_impl::deserialize(const uint8_t* data, size_t size) {
     name_.assign(reinterpret_cast<const char*>(data + pos), name_len);
     pos += name_len;
     
-    // 读取浮点参数
+    // 璇诲彇娴偣鍙傛暟
     uint32_t float_count;
     if(pos + sizeof(float_count) > size) return false;
     std::memcpy(&float_count, data + pos, sizeof(float_count));
     pos += sizeof(float_count);
     
     for(uint32_t i = 0; i < float_count; ++i) {
-        // 读取参数名长度
+        // 璇诲彇鍙傛暟鍚嶉暱搴?
         uint32_t key_len;
         if(pos + sizeof(key_len) > size) return false;
         std::memcpy(&key_len, data + pos, sizeof(key_len));
@@ -109,7 +109,7 @@ bool dsp_preset_impl::deserialize(const uint8_t* data, size_t size) {
         std::string key(reinterpret_cast<const char*>(data + pos), key_len);
         pos += key_len;
         
-        // 读取参数值
+        // 璇诲彇鍙傛暟鍊?
         float value;
         if(pos + sizeof(value) > size) return false;
         std::memcpy(&value, data + pos, sizeof(value));
@@ -118,14 +118,14 @@ bool dsp_preset_impl::deserialize(const uint8_t* data, size_t size) {
         float_params_[key] = value;
     }
     
-    // 读取字符串参数
+    // 璇诲彇瀛楃涓插弬鏁?
     uint32_t string_count;
     if(pos + sizeof(string_count) > size) return false;
     std::memcpy(&string_count, data + pos, sizeof(string_count));
     pos += sizeof(string_count);
     
     for(uint32_t i = 0; i < string_count; ++i) {
-        // 读取参数名长度
+        // 璇诲彇鍙傛暟鍚嶉暱搴?
         uint32_t key_len;
         if(pos + sizeof(key_len) > size) return false;
         std::memcpy(&key_len, data + pos, sizeof(key_len));
@@ -135,7 +135,7 @@ bool dsp_preset_impl::deserialize(const uint8_t* data, size_t size) {
         std::string key(reinterpret_cast<const char*>(data + pos), key_len);
         pos += key_len;
         
-        // 读取参数值长度
+        // 璇诲彇鍙傛暟鍊奸暱搴?
         uint32_t value_len;
         if(pos + sizeof(value_len) > size) return false;
         std::memcpy(&value_len, data + pos, sizeof(value_len));
@@ -152,7 +152,7 @@ bool dsp_preset_impl::deserialize(const uint8_t* data, size_t size) {
     return true;
 }
 
-// dsp_chain 实现
+// dsp_chain 瀹炵幇
 void dsp_chain::add_effect(service_ptr_t<dsp> effect) {
     if(effect.is_valid()) {
         effects_.push_back(effect);
@@ -183,16 +183,16 @@ void dsp_chain::run_chain(audio_chunk& chunk, abort_callback& abort) {
         return;
     }
     
-    // 确保所有效果器都已实例化
+    // 纭繚鎵€鏈夋晥鏋滃櫒閮藉凡瀹炰緥鍖?
     for(auto& effect : effects_) {
         if(effect.is_valid()) {
             if(!effect->instantiate(chunk, chunk.get_sample_rate(), chunk.get_channels())) {
-                return; // 实例化失败
+                return; // 瀹炰緥鍖栧け璐?
             }
         }
     }
     
-    // 处理音频数据
+    // 澶勭悊闊抽鏁版嵁
     audio_chunk* current_chunk = &chunk;
     
     for(size_t i = 0; i < effects_.size() && !abort.is_aborting(); ++i) {
@@ -239,7 +239,7 @@ std::vector<std::string> dsp_chain::get_effect_names() const {
     return names;
 }
 
-// dsp_config_helper 实现
+// dsp_config_helper 瀹炵幇
 std::unique_ptr<dsp_preset> dsp_config_helper::create_basic_preset(const char* name) {
     return std::make_unique<dsp_preset_impl>(name ? name : "Basic");
 }
@@ -250,7 +250,7 @@ std::unique_ptr<dsp_preset> dsp_config_helper::create_equalizer_preset(
     
     auto preset = std::make_unique<dsp_preset_impl>(name);
     
-    // 设置均衡器参数
+    // 璁剧疆鍧囪　鍣ㄥ弬鏁?
     for(size_t i = 0; i < bands.size(); ++i) {
         std::string param_name = "band_" + std::to_string(i);
         preset->set_parameter_float(param_name.c_str(), bands[i]);
@@ -270,27 +270,27 @@ bool dsp_config_helper::validate_dsp_config(const dsp& effect, const dsp_preset&
     
     for(const auto& param : params) {
         if(!preset.has_parameter(param.name.c_str())) {
-            return false; // 缺少必需参数
+            return false; // 缂哄皯蹇呴渶鍙傛暟
         }
         
         float value = preset.get_parameter_float(param.name.c_str());
         if(value < param.min_value || value > param.max_value) {
-            return false; // 参数值超出范围
+            return false; // 鍙傛暟鍊艰秴鍑鸿寖鍥?
         }
     }
     
     return true;
 }
 
-// dsp_utils 实现
+// dsp_utils 瀹炵幇
 float dsp_utils::estimate_cpu_usage(const dsp_chain& chain) {
     float total_usage = 0.0f;
     
     for(size_t i = 0; i < chain.get_effect_count(); ++i) {
         dsp* effect = chain.get_effect(i);
         if(effect) {
-            // 这里需要根据具体DSP效果估算CPU占用
-            // 简化实现：每个效果基础占用1%
+            // 杩欓噷闇€瑕佹牴鎹叿浣揇SP鏁堟灉浼扮畻CPU鍗犵敤
+            // 绠€鍖栧疄鐜帮細姣忎釜鏁堟灉鍩虹鍗犵敤1%
             total_usage += 1.0f;
         }
     }
@@ -302,11 +302,11 @@ bool dsp_utils::validate_dsp_chain(const dsp_chain& chain) {
     for(size_t i = 0; i < chain.get_effect_count(); ++i) {
         dsp* effect = chain.get_effect(i);
         if(!effect) {
-            return false; // 有空效果器
+            return false; // 鏈夌┖鏁堟灉鍣?
         }
         
         if(!effect->is_valid()) {
-            return false; // 效果器无效
+            return false; // 鏁堟灉鍣ㄦ棤鏁?
         }
     }
     

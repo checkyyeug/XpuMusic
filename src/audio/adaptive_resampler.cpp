@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file adaptive_resampler.cpp
  * @brief Adaptive sample rate converter implementation
  * @date 2025-12-10

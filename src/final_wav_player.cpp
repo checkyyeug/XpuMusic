@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file final_wav_player.cpp
  * @brief FINAL WAV Player - Uses System-Native Format
  * @version 1.0 - Production Ready
@@ -28,7 +28,7 @@ struct AudioFormat {
 // Safe HRESULT checking
 bool hr_ok(HRESULT hr) { return hr == S_OK; }
 void print_hr(const char* step, HRESULT hr) {
-    std::cerr << "❌ " << step << " failed: 0x" << std::hex << hr << std::dec << std::endl;
+    std::cerr << "鉂?" << step << " failed: 0x" << std::hex << hr << std::dec << std::endl;
 }
 
 class WASAPIPlayer {
@@ -87,7 +87,7 @@ public:
         }
         
         // Display what system actually uses
-        std::cout << "\n✓ System audio format:" << std::endl;
+        std::cout << "\n鉁?System audio format:" << std::endl;
         std::cout << "  Sample Rate: " << system_format_->nSamplesPerSec << " Hz" << std::endl;
         std::cout << "  Channels: " << system_format_->nChannels << std::endl;
         std::cout << "  Bits: " << system_format_->wBitsPerSample << std::endl;
@@ -132,8 +132,8 @@ public:
         UINT32 buffer_size = 0;
         client_->GetBufferSize(&buffer_size);
         
-        std::cout << "\n✓ Playback started" << std::endl;
-        std::cout << "✓ Buffer: " << buffer_size << " frames" << std::endl;
+        std::cout << "\n鉁?Playback started" << std::endl;
+        std::cout << "鉁?Buffer: " << buffer_size << " frames" << std::endl;
         
         // Convert to system format if needed
         bool needs_resample = (sample_rate != system_format_->nSamplesPerSec) ||
@@ -141,7 +141,7 @@ public:
         bool needs_format_convert = (bits != system_format_->wBitsPerSample);
 
         if (needs_resample || needs_format_convert) {
-            std::cout << "⚠️  Format conversion needed:" << std::endl;
+            std::cout << "鈿狅笍  Format conversion needed:" << std::endl;
             std::cout << "  File: " << sample_rate << " Hz, " << channels << " ch, " << bits << "-bit" << std::endl;
             std::cout << "  System: " << system_format_->nSamplesPerSec << " Hz, "
                      << system_format_->nChannels << " ch, " << system_format_->wBitsPerSample << "-bit" << std::endl;
@@ -155,7 +155,7 @@ public:
 
         // Convert to 32-bit float if needed
         if (needs_format_convert && bits == 16) {
-            std::cout << "✓ Converting 16-bit to 32-bit float..." << std::endl;
+            std::cout << "鉁?Converting 16-bit to 32-bit float..." << std::endl;
             uint32_t samples = data_size / 2; // 16-bit = 2 bytes
             converted_data.resize(samples);
 
@@ -201,8 +201,8 @@ public:
         }
         
         float duration = (float)data_size / (sample_rate * block_align);
-        std::cout << "\n✓ Data streamed (" << bytes_sent << " bytes)" << std::endl;
-        std::cout << "✓ Expected duration: " << duration << " seconds" << std::endl;
+        std::cout << "\n鉁?Data streamed (" << bytes_sent << " bytes)" << std::endl;
+        std::cout << "鉁?Expected duration: " << duration << " seconds" << std::endl;
         
         // Wait for playback with progress indicator
         std::cout << "  Playing";
@@ -244,9 +244,9 @@ bool parse_wav_header(const char* filename, uint32_t& data_size,
 int main(int argc, char** argv) {
     const char* filename = (argc > 1) ? argv[1] : "1khz.wav";
     
-    std::cout << "╔══════════════════════════════════════════════╗" << std::endl;
-    std::cout << "║    FINAL WAV PLAYER - System Native Format  ║" << std::endl;
-    std::cout << "╚══════════════════════════════════════════════╝" << std::endl;
+    std::cout << "鈺斺晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晽" << std::endl;
+    std::cout << "鈺?   FINAL WAV PLAYER - System Native Format  鈺?" << std::endl;
+    std::cout << "鈺氣晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨暆" << std::endl;
     std::cout << std::endl;
     
     std::cout << "File: " << filename << std::endl;
@@ -256,11 +256,11 @@ int main(int argc, char** argv) {
     uint32_t data_size, sample_rate;
     uint16_t channels, bits;
     if (!parse_wav_header(filename, data_size, sample_rate, channels, bits)) {
-        std::cerr << "❌ Failed to parse WAV header" << std::endl;
+        std::cerr << "鉂?Failed to parse WAV header" << std::endl;
         return 1;
     }
     
-    std::cout << "\n✓ WAV Format:" << std::endl;
+    std::cout << "\n鉁?WAV Format:" << std::endl;
     std::cout << "  Sample Rate: " << sample_rate << " Hz" << std::endl;
     std::cout << "  Channels: " << channels << std::endl;
     std::cout << "  Bits: " << bits << std::endl;
@@ -273,30 +273,30 @@ int main(int argc, char** argv) {
     f.read(reinterpret_cast<char*>(audio_data.data()), data_size);
     f.close();
     
-    std::cout << "✓ Read " << audio_data.size() << " bytes" << std::endl;
+    std::cout << "鉁?Read " << audio_data.size() << " bytes" << std::endl;
     
     // Create and initialize player
     WASAPIPlayer player;
     if (!player.initialize()) {
-        std::cerr << "❌ Failed to initialize audio" << std::endl;
+        std::cerr << "鉂?Failed to initialize audio" << std::endl;
         return 1;
     }
     
-    std::cout << "\n╔══════════════════════════════════════════════╗" << std::endl;
-    std::cout << "║  NOW PLAYING...                             ║" << std::endl;
-    std::cout << "║  Check your volume!                         ║" << std::endl;
-    std::cout << "╚══════════════════════════════════════════════╝" << std::endl;
+    std::cout << "\n鈺斺晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晽" << std::endl;
+    std::cout << "鈺? NOW PLAYING...                             鈺?" << std::endl;
+    std::cout << "鈺? Check your volume!                         鈺?" << std::endl;
+    std::cout << "鈺氣晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨暆" << std::endl;
     std::cout << std::endl;
     
     if (!player.play_pcm_stream(audio_data.data(), data_size, 
                                sample_rate, channels, bits)) {
-        std::cerr << "❌ Playback failed" << std::endl;
+        std::cerr << "鉂?Playback failed" << std::endl;
         return 1;
     }
     
-    std::cout << "\n╔══════════════════════════════════════════════╗" << std::endl;
-    std::cout << "║  ✅ SUCCESS! Playback completed!            ║" << std::endl;
-    std::cout << "╚══════════════════════════════════════════════╝" << std::endl;
+    std::cout << "\n鈺斺晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晽" << std::endl;
+    std::cout << "鈺? 鉁?SUCCESS! Playback completed!            鈺?" << std::endl;
+    std::cout << "鈺氣晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨晲鈺愨暆" << std::endl;
     return 0;
 #else
     // Linux version - test WAV parsing and format conversion
@@ -306,11 +306,11 @@ int main(int argc, char** argv) {
     uint32_t data_size, sample_rate;
     uint16_t channels, bits;
     if (!parse_wav_header(filename, data_size, sample_rate, channels, bits)) {
-        std::cerr << "❌ Failed to parse WAV header" << std::endl;
+        std::cerr << "鉂?Failed to parse WAV header" << std::endl;
         return 1;
     }
 
-    std::cout << "\n✓ WAV Format:" << std::endl;
+    std::cout << "\n鉁?WAV Format:" << std::endl;
     std::cout << "  Sample Rate: " << sample_rate << " Hz" << std::endl;
     std::cout << "  Channels: " << channels << std::endl;
     std::cout << "  Bits: " << bits << std::endl;
@@ -323,11 +323,11 @@ int main(int argc, char** argv) {
     f.read(reinterpret_cast<char*>(audio_data.data()), data_size);
     f.close();
 
-    std::cout << "✓ Read " << audio_data.size() << " bytes" << std::endl;
+    std::cout << "鉁?Read " << audio_data.size() << " bytes" << std::endl;
 
     // Test format conversion (16-bit to 32-bit float)
     if (bits == 16) {
-        std::cout << "\n✓ Testing 16-bit to 32-bit float conversion..." << std::endl;
+        std::cout << "\n鉁?Testing 16-bit to 32-bit float conversion..." << std::endl;
 
         uint32_t samples = data_size / 2; // 16-bit = 2 bytes per sample
         std::vector<float> converted_data(samples);
@@ -341,7 +341,7 @@ int main(int argc, char** argv) {
         std::cout << "  Example: " << src[0] << " -> " << converted_data[0] << std::endl;
     }
 
-    std::cout << "\n✅ Linux test completed successfully!" << std::endl;
+    std::cout << "\n鉁?Linux test completed successfully!" << std::endl;
     std::cout << "  Note: Audio playback requires Windows WASAPI or Linux ALSA" << std::endl;
     return 0;
 #endif

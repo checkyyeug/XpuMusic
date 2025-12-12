@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @file test_plugin_loader.cpp
- * @brief 插件加载器测试
+ * @brief 鎻掍欢鍔犺浇鍣ㄦ祴璇?
  * @date 2025-12-09
  */
 
@@ -54,22 +54,22 @@ void assert_true(bool condition, const char* message) {
 }
 
 //==============================================================================
-// 测试用例
+// 娴嬭瘯鐢ㄤ緥
 //==============================================================================
 
 TEST(loader_create) {
-    // 创建兼容性管理器
+    // 鍒涘缓鍏煎鎬х鐞嗗櫒
     XpuMusicCompatManager compat_manager;
     
-    // 创建加载器
+    // 鍒涘缓鍔犺浇鍣?
     XpuMusicPluginLoader loader(&compat_manager);
     
     assert_true(loader.get_module_count() == 0, "Initially no modules loaded");
 }
 
 TEST(wrapper_create) {
-    // 创建 mock factory
-    // 注意：在真实测试中需要实际的 foobar2000 插件
+    // 鍒涘缓 mock factory
+    // 娉ㄦ剰锛氬湪鐪熷疄娴嬭瘯涓渶瑕佸疄闄呯殑 foobar2000 鎻掍欢
     service_factory_base* mock_factory = nullptr;
     
     ServiceFactoryWrapper wrapper(mock_factory);
@@ -78,8 +78,8 @@ TEST(wrapper_create) {
 }
 
 TEST(registry_bridge_create) {
-    // 创建 mock ServiceRegistry
-    // 注意：在真实测试中需要实际的 ServiceRegistry
+    // 鍒涘缓 mock ServiceRegistry
+    // 娉ㄦ剰锛氬湪鐪熷疄娴嬭瘯涓渶瑕佸疄闄呯殑 ServiceRegistry
     mp::core::ServiceRegistry* mock_registry = nullptr;
     
     ServiceRegistryBridgeImpl bridge(mock_registry);
@@ -88,8 +88,8 @@ TEST(registry_bridge_create) {
 }
 
 //==============================================================================
-// 注意：这些是基础架构测试
-// 实际插件测试需要真实的 foobar2000 DLL 文件
+// 娉ㄦ剰锛氳繖浜涙槸鍩虹鏋舵瀯娴嬭瘯
+// 瀹為檯鎻掍欢娴嬭瘯闇€瑕佺湡瀹炵殑 foobar2000 DLL 鏂囦欢
 //==============================================================================
 
 #ifdef _WIN32
@@ -111,7 +111,7 @@ TEST(unload_with_null) {
 #endif
 
 //==============================================================================
-// 主函数
+// 涓诲嚱鏁?
 //==============================================================================
 
 int main() {
@@ -122,10 +122,10 @@ int main() {
         std::cout << "Full plugin loading tests require actual foobar2000 DLLs." << std::endl;
         
         if (failed > 0) {
-            std::cerr << "\n❌ Plugin loader tests FAILED" << std::endl;
+            std::cerr << "\n鉂?Plugin loader tests FAILED" << std::endl;
             return 1;
         } else {
-            std::cout << "\n✅ All tests PASSED" << std::endl;
+            std::cout << "\n鉁?All tests PASSED" << std::endl;
             return 0;
         }
     } catch (const std::exception& e) {

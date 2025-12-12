@@ -1,4 +1,4 @@
-#include "audio_processor.h"
+﻿#include "audio_processor.h"
 #include <chrono>
 #include <thread>
 #include <atomic>
@@ -10,13 +10,13 @@
 
 namespace fb2k {
 
-// 高级音频处理器实现
+// 楂樼骇闊抽澶勭悊鍣ㄥ疄鐜?
 class audio_processor_impl : public audio_processor_advanced {
 public:
     audio_processor_impl();
     ~audio_processor_impl() override;
 
-    // audio_processor接口实现
+    // audio_processor鎺ュ彛瀹炵幇
     bool initialize(const audio_processor_config& config) override;
     void shutdown() override;
     
@@ -47,7 +47,7 @@ public:
     
     std::string get_status_report() const override;
     
-    // 高级功能
+    // 楂樼骇鍔熻兘
     bool set_processing_mode(processing_mode mode) override;
     processing_mode get_processing_mode() const override;
     
@@ -65,27 +65,27 @@ public:
     
     std::vector<plugin_info> get_loaded_plugins() const override;
     
-    // 配置管理
+    // 閰嶇疆绠＄悊
     bool save_configuration(const std::string& config_file) override;
     bool load_configuration(const std::string& config_file) override;
     
-    // 实时参数调节
+    // 瀹炴椂鍙傛暟璋冭妭
     void set_realtime_parameter(const std::string& effect_name, const std::string& param_name, float value) override;
     float get_realtime_parameter(const std::string& effect_name, const std::string& param_name) const override;
     
     std::vector<parameter_info> get_realtime_parameters(const std::string& effect_name) const override;
 
 private:
-    // 配置
+    // 閰嶇疆
     audio_processor_config config_;
     
-    // DSP管理器
+    // DSP绠＄悊鍣?
     std::unique_ptr<dsp_manager> dsp_manager_;
     
-    // 输出设备
+    // 杈撳嚭璁惧
     std::unique_ptr<output_device> output_device_;
     
-    // 状态管理
+    // 鐘舵€佺鐞?
     std::atomic<bool> is_initialized_;
     std::atomic<bool> is_processing_;
     std::atomic<bool> dsp_enabled_;
@@ -94,40 +94,40 @@ private:
     std::atomic<bool> performance_monitoring_enabled_;
     std::atomic<bool> should_stop_;
     
-    // 音频处理参数
+    // 闊抽澶勭悊鍙傛暟
     std::atomic<float> volume_;
     std::atomic<processing_mode> processing_mode_;
     std::atomic<double> latency_target_ms_;
     std::atomic<float> cpu_usage_limit_;
     
-    // 性能监控
+    // 鎬ц兘鐩戞帶
     mutable audio_processor_stats stats_;
     mutable std::mutex stats_mutex_;
     
-    // 线程管理
+    // 绾跨▼绠＄悊
     std::thread processing_thread_;
     std::atomic<bool> processing_thread_running_;
     std::condition_variable processing_cv_;
     std::mutex processing_mutex_;
     
-    // 音频缓冲管理
+    // 闊抽缂撳啿绠＄悊
     std::unique_ptr<ring_buffer> input_buffer_;
     std::unique_ptr<ring_buffer> output_buffer_;
     std::unique_ptr<ring_buffer> dsp_buffer_;
     
-    // 音频格式
+    // 闊抽鏍煎紡
     audio_format_info current_format_;
     std::atomic<bool> format_changed_;
     
-    // 插件管理
+    // 鎻掍欢绠＄悊
     std::map<std::string, std::unique_ptr<audio_plugin>> loaded_plugins_;
     mutable std::mutex plugin_mutex_;
     
-    // 实时参数管理
+    // 瀹炴椂鍙傛暟绠＄悊
     std::map<std::string, std::map<std::string, float>> realtime_parameters_;
     mutable std::mutex param_mutex_;
     
-    // 私有方法
+    // 绉佹湁鏂规硶
     bool initialize_dsp_manager();
     bool initialize_output_device();
     bool initialize_buffers();
@@ -158,7 +158,7 @@ private:
     std::string generate_performance_report() const;
 };
 
-// 构造函数
+// 鏋勯€犲嚱鏁?
 audio_processor_impl::audio_processor_impl()
     : is_initialized_(false),
       is_processing_(false),
@@ -174,7 +174,7 @@ audio_processor_impl::audio_processor_impl()
       processing_thread_running_(false),
       format_changed_(false) {
     
-    // 初始化统计信息
+    // 鍒濆鍖栫粺璁′俊鎭?
     stats_.total_samples_processed = 0;
     stats_.total_processing_time_ms = 0.0;
     stats_.average_processing_time_ms = 0.0;
@@ -191,69 +191,69 @@ audio_processor_impl::audio_processor_impl()
     current_format_.format = sample_format::float32;
 }
 
-// 析构函数
+// 鏋愭瀯鍑芥暟
 audio_processor_impl::~audio_processor_impl() {
     if(is_initialized_.load()) {
         shutdown();
     }
 }
 
-// 初始化
+// 鍒濆鍖?
 bool audio_processor_impl::initialize(const audio_processor_config& config) {
-    std::cout << "[AudioProcessor] 初始化音频处理器..." << std::endl;
+    std::cout << "[AudioProcessor] 鍒濆鍖栭煶棰戝鐞嗗櫒..." << std::endl;
     
     if(is_initialized_.load()) {
-        std::cerr << "[AudioProcessor] 音频处理器已初始化" << std::endl;
+        std::cerr << "[AudioProcessor] 闊抽澶勭悊鍣ㄥ凡鍒濆鍖? << std::endl;
         return false;
     }
     
     config_ = config;
     
     try {
-        // 初始化DSP管理器
+        // 鍒濆鍖朌SP绠＄悊鍣?
         if(!initialize_dsp_manager()) {
-            std::cerr << "[AudioProcessor] DSP管理器初始化失败" << std::endl;
+            std::cerr << "[AudioProcessor] DSP绠＄悊鍣ㄥ垵濮嬪寲澶辫触" << std::endl;
             return false;
         }
         
-        // 初始化输出设备
+        // 鍒濆鍖栬緭鍑鸿澶?
         if(!initialize_output_device()) {
-            std::cerr << "[AudioProcessor] 输出设备初始化失败" << std::endl;
+            std::cerr << "[AudioProcessor] 杈撳嚭璁惧鍒濆鍖栧け璐? << std::endl;
             return false;
         }
         
-        // 初始化缓冲区
+        // 鍒濆鍖栫紦鍐插尯
         if(!initialize_buffers()) {
-            std::cerr << "[AudioProcessor] 缓冲区初始化失败" << std::endl;
+            std::cerr << "[AudioProcessor] 缂撳啿鍖哄垵濮嬪寲澶辫触" << std::endl;
             return false;
         }
         
-        // 初始化处理线程
+        // 鍒濆鍖栧鐞嗙嚎绋?
         if(!initialize_processing_thread()) {
-            std::cerr << "[AudioProcessor] 处理线程初始化失败" << std::endl;
+            std::cerr << "[AudioProcessor] 澶勭悊绾跨▼鍒濆鍖栧け璐? << std::endl;
             return false;
         }
         
         is_initialized_.store(true);
-        std::cout << "[AudioProcessor] 音频处理器初始化成功" << std::endl;
-        std::cout << "[AudioProcessor] 配置:" << std::endl;
-        std::cout << "  - 处理模式: " << (config_.processing_mode == processing_mode::realtime ? "实时" : "高保真") << std::endl;
-        std::cout << "  - 目标延迟: " << config_.target_latency_ms << "ms" << std::endl;
-        std::cout << "  - CPU限制: " << config_.cpu_usage_limit_percent << "%" << std::endl;
-        std::cout << "  - 缓冲区大小: " << config_.buffer_size << "样本" << std::endl;
+        std::cout << "[AudioProcessor] 闊抽澶勭悊鍣ㄥ垵濮嬪寲鎴愬姛" << std::endl;
+        std::cout << "[AudioProcessor] 閰嶇疆:" << std::endl;
+        std::cout << "  - 澶勭悊妯″紡: " << (config_.processing_mode == processing_mode::realtime ? "瀹炴椂" : "楂樹繚鐪?) << std::endl;
+        std::cout << "  - 鐩爣寤惰繜: " << config_.target_latency_ms << "ms" << std::endl;
+        std::cout << "  - CPU闄愬埗: " << config_.cpu_usage_limit_percent << "%" << std::endl;
+        std::cout << "  - 缂撳啿鍖哄ぇ灏? " << config_.buffer_size << "鏍锋湰" << std::endl;
         
         return true;
         
     } catch(const std::exception& e) {
-        std::cerr << "[AudioProcessor] 初始化异常: " << e.what() << std::endl;
+        std::cerr << "[AudioProcessor] 鍒濆鍖栧紓甯? " << e.what() << std::endl;
         shutdown();
         return false;
     }
 }
 
-// 关闭
+// 鍏抽棴
 void audio_processor_impl::shutdown() {
-    std::cout << "[AudioProcessor] 关闭音频处理器..." << std::endl;
+    std::cout << "[AudioProcessor] 鍏抽棴闊抽澶勭悊鍣?.." << std::endl;
     
     if(!is_initialized_.load()) {
         return;
@@ -262,52 +262,52 @@ void audio_processor_impl::shutdown() {
     should_stop_.store(true);
     is_processing_.store(false);
     
-    // 停止处理线程
+    // 鍋滄澶勭悊绾跨▼
     shutdown_processing_thread();
     
-    // 关闭其他组件
+    // 鍏抽棴鍏朵粬缁勪欢
     shutdown_dsp_manager();
     shutdown_output_device();
     shutdown_buffers();
     
-    // 清理插件
+    // 娓呯悊鎻掍欢
     {
         std::lock_guard<std::mutex> lock(plugin_mutex_);
         loaded_plugins_.clear();
     }
     
     is_initialized_.store(false);
-    std::cout << "[AudioProcessor] 音频处理器已关闭" << std::endl;
+    std::cout << "[AudioProcessor] 闊抽澶勭悊鍣ㄥ凡鍏抽棴" << std::endl;
 }
 
-// 处理音频
+// 澶勭悊闊抽
 bool audio_processor_impl::process_audio(const audio_chunk& input_chunk, audio_chunk& output_chunk, abort_callback& abort) {
     if(!is_initialized_.load() || should_stop_.load() || abort.is_aborting()) {
         return false;
     }
     
     try {
-        // 验证音频格式
+        // 楠岃瘉闊抽鏍煎紡
         if(!validate_audio_format(input_chunk)) {
-            handle_error("process_audio", "音频格式验证失败");
+            handle_error("process_audio", "闊抽鏍煎紡楠岃瘉澶辫触");
             return false;
         }
         
-        // 开始计时
+        // 寮€濮嬭鏃?
         auto start_time = std::chrono::high_resolution_clock::now();
         
-        // 处理音频
+        // 澶勭悊闊抽
         bool success = process_audio_internal(input_chunk, output_chunk, abort);
         
-        // 结束计时
+        // 缁撴潫璁℃椂
         auto end_time = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
         double processing_time_ms = duration.count() / 1000.0;
         
-        // 更新统计信息
+        // 鏇存柊缁熻淇℃伅
         update_stats(output_chunk, processing_time_ms);
         
-        // 检查性能限制
+        // 妫€鏌ユ€ц兘闄愬埗
         check_performance_limits();
         
         return success;
@@ -318,7 +318,7 @@ bool audio_processor_impl::process_audio(const audio_chunk& input_chunk, audio_c
     }
 }
 
-// 处理流
+// 澶勭悊娴?
 bool audio_processor_impl::process_stream(audio_source* source, audio_sink* sink, abort_callback& abort) {
     if(!is_initialized_.load() || !source || !sink || should_stop_.load() || abort.is_aborting()) {
         return false;
@@ -330,22 +330,22 @@ bool audio_processor_impl::process_stream(audio_source* source, audio_sink* sink
         audio_chunk input_chunk;
         audio_chunk output_chunk;
         
-        // 处理音频流
+        // 澶勭悊闊抽娴?
         while(!abort.is_aborting() && !should_stop_.load()) {
-            // 从源获取音频数据
+            // 浠庢簮鑾峰彇闊抽鏁版嵁
             if(!source->get_next_chunk(input_chunk, abort)) {
                 break;
             }
             
-            // 处理音频块
+            // 澶勭悊闊抽鍧?
             if(!process_audio(input_chunk, output_chunk, abort)) {
-                std::cerr << "[AudioProcessor] 音频处理失败" << std::endl;
+                std::cerr << "[AudioProcessor] 闊抽澶勭悊澶辫触" << std::endl;
                 break;
             }
             
-            // 输出到目标
+            // 杈撳嚭鍒扮洰鏍?
             if(!sink->write_chunk(output_chunk, abort)) {
-                std::cerr << "[AudioProcessor] 音频输出失败" << std::endl;
+                std::cerr << "[AudioProcessor] 闊抽杈撳嚭澶辫触" << std::endl;
                 break;
             }
         }
@@ -360,63 +360,63 @@ bool audio_processor_impl::process_stream(audio_source* source, audio_sink* sink
     }
 }
 
-// 添加DSP效果器
+// 娣诲姞DSP鏁堟灉鍣?
 void audio_processor_impl::add_dsp_effect(std::unique_ptr<dsp_effect_advanced> effect) {
     if(!dsp_manager_) {
         return;
     }
     
     dsp_manager_->add_effect(std::move(effect));
-    std::cout << "[AudioProcessor] 添加DSP效果器" << std::endl;
+    std::cout << "[AudioProcessor] 娣诲姞DSP鏁堟灉鍣? << std::endl;
 }
 
-// 移除DSP效果器
+// 绉婚櫎DSP鏁堟灉鍣?
 void audio_processor_impl::remove_dsp_effect(size_t index) {
     if(!dsp_manager_) {
         return;
     }
     
     dsp_manager_->remove_effect(index);
-    std::cout << "[AudioProcessor] 移除DSP效果器" << std::endl;
+    std::cout << "[AudioProcessor] 绉婚櫎DSP鏁堟灉鍣? << std::endl;
 }
 
-// 清空DSP效果器
+// 娓呯┖DSP鏁堟灉鍣?
 void audio_processor_impl::clear_dsp_effects() {
     if(!dsp_manager_) {
         return;
     }
     
     dsp_manager_->clear_effects();
-    std::cout << "[AudioProcessor] 清空所有DSP效果器" << std::endl;
+    std::cout << "[AudioProcessor] 娓呯┖鎵€鏈塂SP鏁堟灉鍣? << std::endl;
 }
 
-// 获取DSP效果器数量
+// 鑾峰彇DSP鏁堟灉鍣ㄦ暟閲?
 size_t audio_processor_impl::get_dsp_effect_count() const {
     return dsp_manager_ ? dsp_manager_->get_effect_count() : 0;
 }
 
-// 获取DSP效果器
+// 鑾峰彇DSP鏁堟灉鍣?
 dsp_effect_advanced* audio_processor_impl::get_dsp_effect(size_t index) {
     return dsp_manager_ ? dsp_manager_->get_effect(index) : nullptr;
 }
 
-// 设置输出设备
+// 璁剧疆杈撳嚭璁惧
 void audio_processor_impl::set_output_device(std::unique_ptr<output_device> device) {
     if(is_processing_.load()) {
-        std::cerr << "[AudioProcessor] 无法在处理过程中更改输出设备" << std::endl;
+        std::cerr << "[AudioProcessor] 鏃犳硶鍦ㄥ鐞嗚繃绋嬩腑鏇存敼杈撳嚭璁惧" << std::endl;
         return;
     }
     
     output_device_ = std::move(device);
-    std::cout << "[AudioProcessor] 设置输出设备" << std::endl;
+    std::cout << "[AudioProcessor] 璁剧疆杈撳嚭璁惧" << std::endl;
 }
 
-// 获取输出设备
+// 鑾峰彇杈撳嚭璁惧
 output_device* audio_processor_impl::get_output_device() {
     return output_device_.get();
 }
 
-// 设置音量
+// 璁剧疆闊抽噺
 void audio_processor_impl::set_volume(float volume) {
     volume_.store(std::max(0.0f, std::min(1.0f, volume)));
     
@@ -424,54 +424,54 @@ void audio_processor_impl::set_volume(float volume) {
         output_device_->volume_set(volume_.load());
     }
     
-    std::cout << "[AudioProcessor] 设置音量: " << volume_.load() << std::endl;
+    std::cout << "[AudioProcessor] 璁剧疆闊抽噺: " << volume_.load() << std::endl;
 }
 
-// 获取音量
+// 鑾峰彇闊抽噺
 float audio_processor_impl::get_volume() const {
     return volume_.load();
 }
 
-// 设置静音
+// 璁剧疆闈欓煶
 void audio_processor_impl::set_mute(bool mute) {
     is_muted_.store(mute);
-    std::cout << "[AudioProcessor] 设置静音: " << (mute ? "启用" : "禁用") << std::endl;
+    std::cout << "[AudioProcessor] 璁剧疆闈欓煶: " << (mute ? "鍚敤" : "绂佺敤") << std::endl;
 }
 
-// 是否静音
+// 鏄惁闈欓煶
 bool audio_processor_impl::is_muted() const {
     return is_muted_.load();
 }
 
-// 启用DSP
+// 鍚敤DSP
 void audio_processor_impl::enable_dsp(bool enable) {
     dsp_enabled_.store(enable);
-    std::cout << "[AudioProcessor] DSP: " << (enable ? "启用" : "禁用") << std::endl;
+    std::cout << "[AudioProcessor] DSP: " << (enable ? "鍚敤" : "绂佺敤") << std::endl;
 }
 
-// 是否启用DSP
+// 鏄惁鍚敤DSP
 bool audio_processor_impl::is_dsp_enabled() const {
     return dsp_enabled_.load();
 }
 
-// 启用输出设备
+// 鍚敤杈撳嚭璁惧
 void audio_processor_impl::enable_output_device(bool enable) {
     output_enabled_.store(enable);
-    std::cout << "[AudioProcessor] 输出设备: " << (enable ? "启用" : "禁用") << std::endl;
+    std::cout << "[AudioProcessor] 杈撳嚭璁惧: " << (enable ? "鍚敤" : "绂佺敤") << std::endl;
 }
 
-// 是否启用输出设备
+// 鏄惁鍚敤杈撳嚭璁惧
 bool audio_processor_impl::is_output_device_enabled() const {
     return output_enabled_.load();
 }
 
-// 获取统计信息
+// 鑾峰彇缁熻淇℃伅
 audio_processor_stats audio_processor_impl::get_stats() const {
     std::lock_guard<std::mutex> lock(stats_mutex_);
     return stats_;
 }
 
-// 重置统计信息
+// 閲嶇疆缁熻淇℃伅
 void audio_processor_impl::reset_stats() {
     std::lock_guard<std::mutex> lock(stats_mutex_);
     
@@ -484,68 +484,68 @@ void audio_processor_impl::reset_stats() {
     stats_.dropout_count = 0;
     stats_.error_count = 0;
     
-    std::cout << "[AudioProcessor] 统计信息已重置" << std::endl;
+    std::cout << "[AudioProcessor] 缁熻淇℃伅宸查噸缃? << std::endl;
 }
 
-// 获取状态报告
+// 鑾峰彇鐘舵€佹姤鍛?
 std::string audio_processor_impl::get_status_report() const {
     std::stringstream report;
-    report << "音频处理器状态报告\n";
+    report << "闊抽澶勭悊鍣ㄧ姸鎬佹姤鍛奬n";
     report << "====================\n\n";
     
-    // 基本状态
-    report << "基本状态:\n";
-    report << "  初始化状态: " << (is_initialized_.load() ? "已初始化" : "未初始化") << "\n";
-    report << "  处理状态: " << (is_processing_.load() ? "处理中" : "空闲") << "\n";
-    report << "  DSP状态: " << (dsp_enabled_.load() ? "启用" : "禁用") << "\n";
-    report << "  输出设备状态: " << (output_enabled_.load() ? "启用" : "禁用") << "\n";
-    report << "  静音状态: " << (is_muted_.load() ? "静音" : "正常") << "\n";
-    report << "  音量: " << std::fixed << std::setprecision(2) << volume_.load() << "\n";
-    report << "  处理模式: " << (processing_mode_.load() == processing_mode::realtime ? "实时" : "高保真") << "\n\n";
+    // 鍩烘湰鐘舵€?
+    report << "鍩烘湰鐘舵€?\n";
+    report << "  鍒濆鍖栫姸鎬? " << (is_initialized_.load() ? "宸插垵濮嬪寲" : "鏈垵濮嬪寲") << "\n";
+    report << "  澶勭悊鐘舵€? " << (is_processing_.load() ? "澶勭悊涓? : "绌洪棽") << "\n";
+    report << "  DSP鐘舵€? " << (dsp_enabled_.load() ? "鍚敤" : "绂佺敤") << "\n";
+    report << "  杈撳嚭璁惧鐘舵€? " << (output_enabled_.load() ? "鍚敤" : "绂佺敤") << "\n";
+    report << "  闈欓煶鐘舵€? " << (is_muted_.load() ? "闈欓煶" : "姝ｅ父") << "\n";
+    report << "  闊抽噺: " << std::fixed << std::setprecision(2) << volume_.load() << "\n";
+    report << "  澶勭悊妯″紡: " << (processing_mode_.load() == processing_mode::realtime ? "瀹炴椂" : "楂樹繚鐪?) << "\n\n";
     
-    // 音频格式
-    report << "音频格式:\n";
-    report << "  采样率: " << current_format_.sample_rate << "Hz\n";
-    report << "  声道数: " << current_format_.channels << "\n";
-    report << "  位深度: " << current_format_.bits_per_sample << "bit\n";
-    report << "  格式: " << (current_format_.format == sample_format::float32 ? "float32" : "int16") << "\n\n";
+    // 闊抽鏍煎紡
+    report << "闊抽鏍煎紡:\n";
+    report << "  閲囨牱鐜? " << current_format_.sample_rate << "Hz\n";
+    report << "  澹伴亾鏁? " << current_format_.channels << "\n";
+    report << "  浣嶆繁搴? " << current_format_.bits_per_sample << "bit\n";
+    report << "  鏍煎紡: " << (current_format_.format == sample_format::float32 ? "float32" : "int16") << "\n\n";
     
-    // 性能统计
-    report << "性能统计:\n";
+    // 鎬ц兘缁熻
+    report << "鎬ц兘缁熻:\n";
     {
         std::lock_guard<std::mutex> lock(stats_mutex_);
-        report << "  总采样数: " << stats_.total_samples_processed << "\n";
-        report << "  总处理时间: " << std::fixed << std::setprecision(3) << stats_.total_processing_time_ms << "ms\n";
-        report << "  平均处理时间: " << stats_.average_processing_time_ms << "ms\n";
-        report << "  当前CPU占用: " << std::fixed << std::setprecision(1) << stats_.current_cpu_usage << "%\n";
-        report << "  峰值CPU占用: " << stats_.peak_cpu_usage << "%\n";
-        report << "  延迟: " << std::fixed << std::setprecision(2) << stats_.latency_ms << "ms\n";
-        report << "  丢包数: " << stats_.dropout_count << "\n";
-        report << "  错误数: " << stats_.error_count << "\n\n";
+        report << "  鎬婚噰鏍锋暟: " << stats_.total_samples_processed << "\n";
+        report << "  鎬诲鐞嗘椂闂? " << std::fixed << std::setprecision(3) << stats_.total_processing_time_ms << "ms\n";
+        report << "  骞冲潎澶勭悊鏃堕棿: " << stats_.average_processing_time_ms << "ms\n";
+        report << "  褰撳墠CPU鍗犵敤: " << std::fixed << std::setprecision(1) << stats_.current_cpu_usage << "%\n";
+        report << "  宄板€糃PU鍗犵敤: " << stats_.peak_cpu_usage << "%\n";
+        report << "  寤惰繜: " << std::fixed << std::setprecision(2) << stats_.latency_ms << "ms\n";
+        report << "  涓㈠寘鏁? " << stats_.dropout_count << "\n";
+        report << "  閿欒鏁? " << stats_.error_count << "\n\n";
     }
     
-    // DSP报告
+    // DSP鎶ュ憡
     report << generate_dsp_report();
     
-    // 插件报告
+    // 鎻掍欢鎶ュ憡
     report << generate_plugin_report();
     
-    // 性能报告
+    // 鎬ц兘鎶ュ憡
     report << generate_performance_report();
     
     return report.str();
 }
 
-// 设置处理模式
+// 璁剧疆澶勭悊妯″紡
 bool audio_processor_impl::set_processing_mode(processing_mode mode) {
     if(is_processing_.load()) {
-        std::cerr << "[AudioProcessor] 无法在运行中更改处理模式" << std::endl;
+        std::cerr << "[AudioProcessor] 鏃犳硶鍦ㄨ繍琛屼腑鏇存敼澶勭悊妯″紡" << std::endl;
         return false;
     }
     
     processing_mode_.store(mode);
     
-    // 更新DSP管理器配置
+    // 鏇存柊DSP绠＄悊鍣ㄩ厤缃?
     if(dsp_manager_) {
         dsp_config dsp_config;
         dsp_config.enable_multithreading = (mode == processing_mode::high_fidelity);
@@ -553,73 +553,73 @@ bool audio_processor_impl::set_processing_mode(processing_mode mode) {
         dsp_manager_->update_config(dsp_config);
     }
     
-    std::cout << "[AudioProcessor] 处理模式设置为: " << (mode == processing_mode::realtime ? "实时" : "高保真") << std::endl;
+    std::cout << "[AudioProcessor] 澶勭悊妯″紡璁剧疆涓? " << (mode == processing_mode::realtime ? "瀹炴椂" : "楂樹繚鐪?) << std::endl;
     return true;
 }
 
-// 获取处理模式
+// 鑾峰彇澶勭悊妯″紡
 processing_mode audio_processor_impl::get_processing_mode() const {
     return processing_mode_.load();
 }
 
-// 设置延迟目标
+// 璁剧疆寤惰繜鐩爣
 void audio_processor_impl::set_latency_target(double milliseconds) {
     latency_target_ms_.store(std::max(1.0, std::min(1000.0, milliseconds)));
-    std::cout << "[AudioProcessor] 延迟目标设置为: " << latency_target_ms_.load() << "ms" << std::endl;
+    std::cout << "[AudioProcessor] 寤惰繜鐩爣璁剧疆涓? " << latency_target_ms_.load() << "ms" << std::endl;
 }
 
-// 获取延迟目标
+// 鑾峰彇寤惰繜鐩爣
 double audio_processor_impl::get_latency_target() const {
     return latency_target_ms_.load();
 }
 
-// 启用性能监控
+// 鍚敤鎬ц兘鐩戞帶
 void audio_processor_impl::enable_performance_monitoring(bool enable) {
     performance_monitoring_enabled_.store(enable);
-    std::cout << "[AudioProcessor] 性能监控: " << (enable ? "启用" : "禁用") << std::endl;
+    std::cout << "[AudioProcessor] 鎬ц兘鐩戞帶: " << (enable ? "鍚敤" : "绂佺敤") << std::endl;
 }
 
-// 是否启用性能监控
+// 鏄惁鍚敤鎬ц兘鐩戞帶
 bool audio_processor_impl::is_performance_monitoring_enabled() const {
     return performance_monitoring_enabled_.load();
 }
 
-// 设置CPU使用限制
+// 璁剧疆CPU浣跨敤闄愬埗
 void audio_processor_impl::set_cpu_usage_limit(float percent) {
     cpu_usage_limit_.store(std::max(1.0f, std::min(100.0f, percent)));
-    std::cout << "[AudioProcessor] CPU使用限制设置为: " << cpu_usage_limit_.load() << "%" << std::endl;
+    std::cout << "[AudioProcessor] CPU浣跨敤闄愬埗璁剧疆涓? " << cpu_usage_limit_.load() << "%" << std::endl;
 }
 
-// 获取CPU使用限制
+// 鑾峰彇CPU浣跨敤闄愬埗
 float audio_processor_impl::get_cpu_usage_limit() const {
     return cpu_usage_limit_.load();
 }
 
-// 加载插件
+// 鍔犺浇鎻掍欢
 bool audio_processor_impl::load_plugin(const std::string& plugin_path) {
     std::lock_guard<std::mutex> lock(plugin_mutex_);
     
-    // 这里应该实现插件加载逻辑
-    // 目前返回false表示未实现
-    std::cerr << "[AudioProcessor] 插件加载功能未实现" << std::endl;
+    // 杩欓噷搴旇瀹炵幇鎻掍欢鍔犺浇閫昏緫
+    // 鐩墠杩斿洖false琛ㄧず鏈疄鐜?
+    std::cerr << "[AudioProcessor] 鎻掍欢鍔犺浇鍔熻兘鏈疄鐜? << std::endl;
     return false;
 }
 
-// 卸载插件
+// 鍗歌浇鎻掍欢
 bool audio_processor_impl::unload_plugin(const std::string& plugin_name) {
     std::lock_guard<std::mutex> lock(plugin_mutex_);
     
     auto it = loaded_plugins_.find(plugin_name);
     if(it != loaded_plugins_.end()) {
         loaded_plugins_.erase(it);
-        std::cout << "[AudioProcessor] 卸载插件: " << plugin_name << std::endl;
+        std::cout << "[AudioProcessor] 鍗歌浇鎻掍欢: " << plugin_name << std::endl;
         return true;
     }
     
     return false;
 }
 
-// 获取已加载插件信息
+// 鑾峰彇宸插姞杞芥彃浠朵俊鎭?
 std::vector<plugin_info> audio_processor_impl::get_loaded_plugins() const {
     std::lock_guard<std::mutex> lock(plugin_mutex_);
     
@@ -638,38 +638,38 @@ std::vector<plugin_info> audio_processor_impl::get_loaded_plugins() const {
     return plugins;
 }
 
-// 保存配置
+// 淇濆瓨閰嶇疆
 bool audio_processor_impl::save_configuration(const std::string& config_file) {
-    // 这里应该实现配置保存逻辑
-    std::cout << "[AudioProcessor] 保存配置到: " << config_file << std::endl;
+    // 杩欓噷搴旇瀹炵幇閰嶇疆淇濆瓨閫昏緫
+    std::cout << "[AudioProcessor] 淇濆瓨閰嶇疆鍒? " << config_file << std::endl;
     return true;
 }
 
-// 加载配置
+// 鍔犺浇閰嶇疆
 bool audio_processor_impl::load_configuration(const std::string& config_file) {
-    // 这里应该实现配置加载逻辑
-    std::cout << "[AudioProcessor] 从文件加载配置: " << config_file << std::endl;
+    // 杩欓噷搴旇瀹炵幇閰嶇疆鍔犺浇閫昏緫
+    std::cout << "[AudioProcessor] 浠庢枃浠跺姞杞介厤缃? " << config_file << std::endl;
     return true;
 }
 
-// 设置实时参数
+// 璁剧疆瀹炴椂鍙傛暟
 void audio_processor_impl::set_realtime_parameter(const std::string& effect_name, const std::string& param_name, float value) {
     std::lock_guard<std::mutex> lock(param_mutex_);
     realtime_parameters_[effect_name][param_name] = value;
     
-    // 更新效果器参数
+    // 鏇存柊鏁堟灉鍣ㄥ弬鏁?
     if(dsp_manager_) {
         for(size_t i = 0; i < dsp_manager_->get_effect_count(); ++i) {
             auto* effect = dsp_manager_->get_effect(i);
             if(effect && effect->get_name() == effect_name) {
-                // 这里应该调用效果器的参数设置方法
+                // 杩欓噷搴旇璋冪敤鏁堟灉鍣ㄧ殑鍙傛暟璁剧疆鏂规硶
                 break;
             }
         }
     }
 }
 
-// 获取实时参数
+// 鑾峰彇瀹炴椂鍙傛暟
 float audio_processor_impl::get_realtime_parameter(const std::string& effect_name, const std::string& param_name) const {
     std::lock_guard<std::mutex> lock(param_mutex_);
     
@@ -681,10 +681,10 @@ float audio_processor_impl::get_realtime_parameter(const std::string& effect_nam
         }
     }
     
-    return 0.0f; // 默认值
+    return 0.0f; // 榛樿鍊?
 }
 
-// 获取实时参数信息
+// 鑾峰彇瀹炴椂鍙傛暟淇℃伅
 std::vector<parameter_info> audio_processor_impl::get_realtime_parameters(const std::string& effect_name) const {
     std::lock_guard<std::mutex> lock(param_mutex_);
     
@@ -696,7 +696,7 @@ std::vector<parameter_info> audio_processor_impl::get_realtime_parameters(const 
             parameter_info info;
             info.name = param_name;
             info.value = value;
-            info.min_value = 0.0f;  // 默认值，实际应该从效果器获取
+            info.min_value = 0.0f;  // 榛樿鍊硷紝瀹為檯搴旇浠庢晥鏋滃櫒鑾峰彇
             info.max_value = 1.0f;
             info.default_value = 0.5f;
             params.push_back(info);
@@ -706,7 +706,7 @@ std::vector<parameter_info> audio_processor_impl::get_realtime_parameters(const 
     return params;
 }
 
-// 初始化DSP管理器
+// 鍒濆鍖朌SP绠＄悊鍣?
 bool audio_processor_impl::initialize_dsp_manager() {
     dsp_manager_ = std::make_unique<dsp_manager>();
     
@@ -715,78 +715,78 @@ bool audio_processor_impl::initialize_dsp_manager() {
     dsp_config.enable_performance_monitoring = performance_monitoring_enabled_.load();
     dsp_config.max_effects = config_.max_dsp_effects;
     dsp_config.target_cpu_usage = cpu_usage_limit_.load();
-    dsp_config.memory_pool_size = config_.buffer_size * 4 * 1024; // 估算内存池大小
+    dsp_config.memory_pool_size = config_.buffer_size * 4 * 1024; // 浼扮畻鍐呭瓨姹犲ぇ灏?
     dsp_config.max_latency_ms = latency_target_ms_.load();
     dsp_config.enable_standard_effects = true;
     
     if(!dsp_manager_->initialize(dsp_config)) {
-        std::cerr << "[AudioProcessor] DSP管理器初始化失败" << std::endl;
+        std::cerr << "[AudioProcessor] DSP绠＄悊鍣ㄥ垵濮嬪寲澶辫触" << std::endl;
         return false;
     }
     
-    std::cout << "[AudioProcessor] DSP管理器初始化成功" << std::endl;
+    std::cout << "[AudioProcessor] DSP绠＄悊鍣ㄥ垵濮嬪寲鎴愬姛" << std::endl;
     return true;
 }
 
-// 初始化输出设备
+// 鍒濆鍖栬緭鍑鸿澶?
 bool audio_processor_impl::initialize_output_device() {
     if(!output_device_) {
-        std::cerr << "[AudioProcessor] 未设置输出设备" << std::endl;
+        std::cerr << "[AudioProcessor] 鏈缃緭鍑鸿澶? << std::endl;
         return false;
     }
     
-    // 这里应该初始化输出设备
-    std::cout << "[AudioProcessor] 输出设备初始化成功" << std::endl;
+    // 杩欓噷搴旇鍒濆鍖栬緭鍑鸿澶?
+    std::cout << "[AudioProcessor] 杈撳嚭璁惧鍒濆鍖栨垚鍔? << std::endl;
     return true;
 }
 
-// 初始化缓冲区
+// 鍒濆鍖栫紦鍐插尯
 bool audio_processor_impl::initialize_buffers() {
     size_t buffer_size = config_.buffer_size * current_format_.channels;
     
-    input_buffer_ = std::make_unique<ring_buffer>(buffer_size * 4); // 4倍缓冲
+    input_buffer_ = std::make_unique<ring_buffer>(buffer_size * 4); // 4鍊嶇紦鍐?
     output_buffer_ = std::make_unique<ring_buffer>(buffer_size * 4);
     dsp_buffer_ = std::make_unique<ring_buffer>(buffer_size * 2);
     
-    std::cout << "[AudioProcessor] 缓冲区初始化成功，大小: " << buffer_size << "样本" << std::endl;
+    std::cout << "[AudioProcessor] 缂撳啿鍖哄垵濮嬪寲鎴愬姛锛屽ぇ灏? " << buffer_size << "鏍锋湰" << std::endl;
     return true;
 }
 
-// 初始化处理线程
+// 鍒濆鍖栧鐞嗙嚎绋?
 bool audio_processor_impl::initialize_processing_thread() {
     processing_thread_running_.store(true);
     processing_thread_ = std::thread(&audio_processor_impl::processing_thread_func, this);
     
-    std::cout << "[AudioProcessor] 处理线程初始化成功" << std::endl;
+    std::cout << "[AudioProcessor] 澶勭悊绾跨▼鍒濆鍖栨垚鍔? << std::endl;
     return true;
 }
 
-// 关闭DSP管理器
+// 鍏抽棴DSP绠＄悊鍣?
 void audio_processor_impl::shutdown_dsp_manager() {
     if(dsp_manager_) {
         dsp_manager_->shutdown();
         dsp_manager_.reset();
-        std::cout << "[AudioProcessor] DSP管理器已关闭" << std::endl;
+        std::cout << "[AudioProcessor] DSP绠＄悊鍣ㄥ凡鍏抽棴" << std::endl;
     }
 }
 
-// 关闭输出设备
+// 鍏抽棴杈撳嚭璁惧
 void audio_processor_impl::shutdown_output_device() {
     if(output_device_) {
-        // 这里应该关闭输出设备
-        std::cout << "[AudioProcessor] 输出设备已关闭" << std::endl;
+        // 杩欓噷搴旇鍏抽棴杈撳嚭璁惧
+        std::cout << "[AudioProcessor] 杈撳嚭璁惧宸插叧闂? << std::endl;
     }
 }
 
-// 关闭缓冲区
+// 鍏抽棴缂撳啿鍖?
 void audio_processor_impl::shutdown_buffers() {
     input_buffer_.reset();
     output_buffer_.reset();
     dsp_buffer_.reset();
-    std::cout << "[AudioProcessor] 缓冲区已关闭" << std::endl;
+    std::cout << "[AudioProcessor] 缂撳啿鍖哄凡鍏抽棴" << std::endl;
 }
 
-// 关闭处理线程
+// 鍏抽棴澶勭悊绾跨▼
 void audio_processor_impl::shutdown_processing_thread() {
     should_stop_.store(true);
     processing_cv_.notify_all();
@@ -796,20 +796,20 @@ void audio_processor_impl::shutdown_processing_thread() {
     }
     
     processing_thread_running_.store(false);
-    std::cout << "[AudioProcessor] 处理线程已关闭" << std::endl;
+    std::cout << "[AudioProcessor] 澶勭悊绾跨▼宸插叧闂? << std::endl;
 }
 
-// 处理线程函数
+// 澶勭悊绾跨▼鍑芥暟
 void audio_processor_impl::processing_thread_func() {
-    std::cout << "[AudioProcessor] 处理线程启动" << std::endl;
+    std::cout << "[AudioProcessor] 澶勭悊绾跨▼鍚姩" << std::endl;
     
-    // 提升线程优先级
+    // 鎻愬崌绾跨▼浼樺厛绾?
     set_thread_priority_high();
     
     while(processing_thread_running_.load() && !should_stop_.load()) {
         std::unique_lock<std::mutex> lock(processing_mutex_);
         
-        // 等待处理信号
+        // 绛夊緟澶勭悊淇″彿
         processing_cv_.wait_for(lock, std::chrono::milliseconds(1), [this] {
             return !processing_thread_running_.load() || should_stop_.load();
         });
@@ -818,41 +818,41 @@ void audio_processor_impl::processing_thread_func() {
             break;
         }
         
-        // 这里应该实现后台处理逻辑
-        // 目前只是简单的循环
+        // 杩欓噷搴旇瀹炵幇鍚庡彴澶勭悊閫昏緫
+        // 鐩墠鍙槸绠€鍗曠殑寰幆
         
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
     
-    std::cout << "[AudioProcessor] 处理线程停止" << std::endl;
+    std::cout << "[AudioProcessor] 澶勭悊绾跨▼鍋滄" << std::endl;
 }
 
-// 内部音频处理
+// 鍐呴儴闊抽澶勭悊
 bool audio_processor_impl::process_audio_internal(const audio_chunk& input, audio_chunk& output, abort_callback& abort) {
     if(abort.is_aborting()) {
         return false;
     }
     
-    // 复制输入数据
+    // 澶嶅埗杈撳叆鏁版嵁
     output.copy(input);
     
-    // 应用静音
+    // 搴旂敤闈欓煶
     if(is_muted_.load()) {
         apply_mute(output);
         return true;
     }
     
-    // DSP处理
+    // DSP澶勭悊
     if(dsp_enabled_.load() && dsp_manager_) {
         if(!process_dsp_chain(output, abort)) {
             return false;
         }
     }
     
-    // 应用音量
+    // 搴旂敤闊抽噺
     apply_volume(output);
     
-    // 输出设备处理
+    // 杈撳嚭璁惧澶勭悊
     if(output_enabled_.load() && output_device_) {
         if(!process_output_device(output, abort)) {
             return false;
@@ -862,7 +862,7 @@ bool audio_processor_impl::process_audio_internal(const audio_chunk& input, audi
     return true;
 }
 
-// 处理DSP链
+// 澶勭悊DSP閾?
 bool audio_processor_impl::process_dsp_chain(audio_chunk& chunk, abort_callback& abort) {
     if(!dsp_manager_) {
         return true;
@@ -871,31 +871,31 @@ bool audio_processor_impl::process_dsp_chain(audio_chunk& chunk, abort_callback&
     return dsp_manager_->process_chain(chunk, abort);
 }
 
-// 处理输出设备
+// 澶勭悊杈撳嚭璁惧
 bool audio_processor_impl::process_output_device(audio_chunk& chunk, abort_callback& abort) {
     if(!output_device_) {
         return true;
     }
     
-    // 这里应该实现输出设备处理逻辑
-    // 目前只是返回成功
+    // 杩欓噷搴旇瀹炵幇杈撳嚭璁惧澶勭悊閫昏緫
+    // 鐩墠鍙槸杩斿洖鎴愬姛
     return true;
 }
 
-// 更新统计信息
+// 鏇存柊缁熻淇℃伅
 void audio_processor_impl::update_stats(const audio_chunk& chunk, double processing_time) {
     std::lock_guard<std::mutex> lock(stats_mutex_);
     
     stats_.total_samples_processed += chunk.get_sample_count() * chunk.get_channels();
     stats_.total_processing_time_ms += processing_time;
     
-    // 计算平均处理时间
+    // 璁＄畻骞冲潎澶勭悊鏃堕棿
     if(stats_.total_samples_processed > 0) {
-        stats_.average_processing_time_ms = stats_.total_processing_time_ms / (stats_.total_samples_processed / 44100.0); // 假设44.1kHz
+        stats_.average_processing_time_ms = stats_.total_processing_time_ms / (stats_.total_samples_processed / 44100.0); // 鍋囪44.1kHz
     }
     
-    // 更新CPU占用（简化计算）
-    stats_.current_cpu_usage = static_cast<float>(processing_time / 10.0 * 100.0); // 假设10ms是100%占用
+    // 鏇存柊CPU鍗犵敤锛堢畝鍖栬绠楋級
+    stats_.current_cpu_usage = static_cast<float>(processing_time / 10.0 * 100.0); // 鍋囪10ms鏄?00%鍗犵敤
     if(stats_.current_cpu_usage > stats_.peak_cpu_usage) {
         stats_.peak_cpu_usage = stats_.current_cpu_usage;
     }
@@ -904,18 +904,18 @@ void audio_processor_impl::update_stats(const audio_chunk& chunk, double process
     stats_.processing_mode = processing_mode_.load();
 }
 
-// 检查性能限制
+// 妫€鏌ユ€ц兘闄愬埗
 void audio_processor_impl::check_performance_limits() {
     if(stats_.current_cpu_usage > cpu_usage_limit_.load()) {
-        // CPU使用率超过限制
-        std::cerr << "[AudioProcessor] CPU使用率超过限制: " << stats_.current_cpu_usage 
+        // CPU浣跨敤鐜囪秴杩囬檺鍒?
+        std::cerr << "[AudioProcessor] CPU浣跨敤鐜囪秴杩囬檺鍒? " << stats_.current_cpu_usage 
                   << "% > " << cpu_usage_limit_.load() << "%" << std::endl;
     }
 }
 
-// 处理错误
+// 澶勭悊閿欒
 void audio_processor_impl::handle_error(const std::string& operation, const std::string& error) {
-    std::cerr << "[AudioProcessor] " << operation << " 错误: " << error << std::endl;
+    std::cerr << "[AudioProcessor] " << operation << " 閿欒: " << error << std::endl;
     
     {
         std::lock_guard<std::mutex> lock(stats_mutex_);
@@ -923,7 +923,7 @@ void audio_processor_impl::handle_error(const std::string& operation, const std:
     }
 }
 
-// 验证音频格式
+// 楠岃瘉闊抽鏍煎紡
 bool audio_processor_impl::validate_audio_format(const audio_chunk& chunk) const {
     if(chunk.get_sample_count() == 0) {
         return false;
@@ -940,11 +940,11 @@ bool audio_processor_impl::validate_audio_format(const audio_chunk& chunk) const
     return true;
 }
 
-// 应用音量
+// 搴旂敤闊抽噺
 void audio_processor_impl::apply_volume(audio_chunk& chunk) {
     float vol = volume_.load();
     if(vol == 1.0f) {
-        return; // 无需处理
+        return; // 鏃犻渶澶勭悊
     }
     
     float* data = chunk.get_data();
@@ -955,7 +955,7 @@ void audio_processor_impl::apply_volume(audio_chunk& chunk) {
     }
 }
 
-// 应用静音
+// 搴旂敤闈欓煶
 void audio_processor_impl::apply_mute(audio_chunk& chunk) {
     float* data = chunk.get_data();
     size_t total_samples = chunk.get_sample_count() * chunk.get_channels();
@@ -963,20 +963,20 @@ void audio_processor_impl::apply_mute(audio_chunk& chunk) {
     std::fill(data, data + total_samples, 0.0f);
 }
 
-// 生成插件报告
+// 鐢熸垚鎻掍欢鎶ュ憡
 std::string audio_processor_impl::generate_plugin_report() const {
     std::stringstream report;
-    report << "插件信息:\n";
+    report << "鎻掍欢淇℃伅:\n";
     
     std::lock_guard<std::mutex> lock(plugin_mutex_);
     
     if(loaded_plugins_.empty()) {
-        report << "  无已加载插件\n";
+        report << "  鏃犲凡鍔犺浇鎻掍欢\n";
     } else {
         for(const auto& [name, plugin] : loaded_plugins_) {
             if(plugin) {
                 report << "  - " << name << " v" << plugin->get_version() 
-                       << " (" << (plugin->is_enabled() ? "启用" : "禁用") << ")\n";
+                       << " (" << (plugin->is_enabled() ? "鍚敤" : "绂佺敤") << ")\n";
             }
         }
     }
@@ -985,57 +985,57 @@ std::string audio_processor_impl::generate_plugin_report() const {
     return report.str();
 }
 
-// 生成DSP报告
+// 鐢熸垚DSP鎶ュ憡
 std::string audio_processor_impl::generate_dsp_report() const {
     std::stringstream report;
-    report << "DSP信息:\n";
+    report << "DSP淇℃伅:\n";
     
     if(dsp_manager_) {
         report << dsp_manager_->generate_dsp_report();
     } else {
-        report << "  DSP管理器未初始化\n";
+        report << "  DSP绠＄悊鍣ㄦ湭鍒濆鍖朶n";
     }
     
     report << "\n";
     return report.str();
 }
 
-// 生成性能报告
+// 鐢熸垚鎬ц兘鎶ュ憡
 std::string audio_processor_impl::generate_performance_report() const {
     std::stringstream report;
-    report << "性能报告:\n";
+    report << "鎬ц兘鎶ュ憡:\n";
     
     {
         std::lock_guard<std::mutex> lock(stats_mutex_);
         
-        // CPU使用率分析
-        report << "  CPU使用率:\n";
-        report << "    当前: " << std::fixed << std::setprecision(1) << stats_.current_cpu_usage << "%\n";
-        report << "    峰值: " << stats_.peak_cpu_usage << "%\n";
-        report << "    限制: " << cpu_usage_limit_.load() << "%\n";
+        // CPU浣跨敤鐜囧垎鏋?
+        report << "  CPU浣跨敤鐜?\n";
+        report << "    褰撳墠: " << std::fixed << std::setprecision(1) << stats_.current_cpu_usage << "%\n";
+        report << "    宄板€? " << stats_.peak_cpu_usage << "%\n";
+        report << "    闄愬埗: " << cpu_usage_limit_.load() << "%\n";
         
-        // 延迟分析
-        report << "  延迟性能:\n";
-        report << "    当前延迟: " << std::fixed << std::setprecision(2) << stats_.latency_ms << "ms\n";
-        report << "    目标延迟: " << latency_target_ms_.load() << "ms\n";
-        report << "    平均处理时间: " << stats_.average_processing_time_ms << "ms\n";
+        // 寤惰繜鍒嗘瀽
+        report << "  寤惰繜鎬ц兘:\n";
+        report << "    褰撳墠寤惰繜: " << std::fixed << std::setprecision(2) << stats_.latency_ms << "ms\n";
+        report << "    鐩爣寤惰繜: " << latency_target_ms_.load() << "ms\n";
+        report << "    骞冲潎澶勭悊鏃堕棿: " << stats_.average_processing_time_ms << "ms\n";
         
-        // 错误统计
-        report << "  错误统计:\n";
-        report << "    总错误数: " << stats_.error_count << "\n";
-        report << "    丢包数: " << stats_.dropout_count << "\n";
+        // 閿欒缁熻
+        report << "  閿欒缁熻:\n";
+        report << "    鎬婚敊璇暟: " << stats_.error_count << "\n";
+        report << "    涓㈠寘鏁? " << stats_.dropout_count << "\n";
         
-        // 性能建议
+        // 鎬ц兘寤鸿
         if(stats_.current_cpu_usage > cpu_usage_limit_.load() * 0.9f) {
-            report << "  性能警告: CPU使用率接近限制\n";
+            report << "  鎬ц兘璀﹀憡: CPU浣跨敤鐜囨帴杩戦檺鍒禱n";
         }
         
         if(stats_.latency_ms > latency_target_ms_.load() * 1.5f) {
-            report << "  性能警告: 延迟超过目标值\n";
+            report << "  鎬ц兘璀﹀憡: 寤惰繜瓒呰繃鐩爣鍊糪n";
         }
         
         if(stats_.error_count > 0) {
-            report << "  性能警告: 存在处理错误\n";
+            report << "  鎬ц兘璀﹀憡: 瀛樺湪澶勭悊閿欒\n";
         }
     }
     
@@ -1043,7 +1043,7 @@ std::string audio_processor_impl::generate_performance_report() const {
     return report.str();
 }
 
-// 创建音频处理器
+// 鍒涘缓闊抽澶勭悊鍣?
 std::unique_ptr<audio_processor_advanced> create_audio_processor() {
     return std::make_unique<audio_processor_impl>();
 }

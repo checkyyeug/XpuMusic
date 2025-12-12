@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file improved_sample_rate_converter.h
  * @brief Improved sample rate converter with quality options
  * @date 2025-12-10

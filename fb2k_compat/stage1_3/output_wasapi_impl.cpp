@@ -1,4 +1,4 @@
-#include "output_wasapi.h"
+﻿#include "output_wasapi.h"
 #include <windows.h>
 #include <mmdeviceapi.h>
 #include <audioclient.h>
@@ -19,13 +19,13 @@
 
 namespace fb2k {
 
-// WASAPI输出设备实现
+// WASAPI杈撳嚭璁惧瀹炵幇
 class output_wasapi_impl : public output_wasapi {
 public:
     output_wasapi_impl();
     ~output_wasapi_impl();
 
-    // output接口实现
+    // output鎺ュ彛瀹炵幇
     void open(t_uint32 sample_rate, t_uint32 channels, t_uint32 flags, abort_callback& p_abort) override;
     void close(abort_callback& p_abort) override;
     t_uint32 get_latency() override;
@@ -51,7 +51,7 @@ public:
     void get_latency_ex3(t_uint32& p_samples, t_uint32& p_samples_total, t_uint32& p_samples_in_buffer) override;
     void get_latency_ex4(t_uint32& p_samples, t_uint32& p_samples_total, t_uint32& p_samples_in_buffer, t_uint32& p_samples_in_device_buffer) override;
 
-    // output_wasapi接口实现
+    // output_wasapi鎺ュ彛瀹炵幇
     void set_device(const char* device_id) override;
     void set_exclusive_mode(bool exclusive) override;
     void set_event_driven(bool event_driven) override;
@@ -70,7 +70,7 @@ public:
     void get_device_info(const char* device_id, device_info& info) override;
 
 private:
-    // WASAPI接口
+    // WASAPI鎺ュ彛
     IMMDeviceEnumerator* device_enumerator_;
     IMMDevice* audio_device_;
     IAudioClient* audio_client_;
@@ -78,7 +78,7 @@ private:
     IAudioClock* audio_clock_;
     IAudioStreamVolume* stream_volume_;
     
-    // 音频格式
+    // 闊抽鏍煎紡
     WAVEFORMATEXTENSIBLE format_;
     t_uint32 sample_rate_;
     t_uint32 channels_;
@@ -86,7 +86,7 @@ private:
     t_uint32 bytes_per_sample_;
     t_uint32 buffer_size_;
     
-    // 状态管理
+    // 鐘舵€佺鐞?
     std::atomic<bool> is_playing_;
     std::atomic<bool> is_paused_;
     std::atomic<bool> is_initialized_;
@@ -94,37 +94,37 @@ private:
     std::atomic<bool> is_event_driven_;
     std::atomic<bool> should_stop_;
     
-    // 缓冲管理
+    // 缂撳啿绠＄悊
     std::vector<uint8_t> output_buffer_;
     t_uint32 buffer_frame_count_;
     t_uint32 actual_buffer_duration_ms_;
     
-    // 线程管理
+    // 绾跨▼绠＄悊
     std::thread render_thread_;
     std::atomic<bool> render_thread_running_;
     std::condition_variable render_cv_;
     std::mutex render_mutex_;
     
-    // 音量控制
+    // 闊抽噺鎺у埗
     std::atomic<float> volume_;
     float last_set_volume_;
     
-    // 性能监控
+    // 鎬ц兘鐩戞帶
     std::chrono::steady_clock::time_point start_time_;
     t_uint64 total_samples_written_;
     t_uint64 total_samples_played_;
     
-    // 配置参数
+    // 閰嶇疆鍙傛暟
     std::string device_id_;
     ERole device_role_;
     EAudioSessionCategory stream_category_;
     t_uint32 requested_buffer_duration_ms_;
     t_uint32 stream_options_;
     
-    // 设备信息
+    // 璁惧淇℃伅
     device_info current_device_info_;
     
-    // 私有方法
+    // 绉佹湁鏂规硶
     HRESULT initialize_wasapi();
     HRESULT create_audio_client();
     HRESULT get_mix_format();
@@ -156,7 +156,7 @@ private:
     void log_device_info();
 };
 
-// 构造函数
+// 鏋勯€犲嚱鏁?
 output_wasapi_impl::output_wasapi_impl()
     : device_enumerator_(nullptr),
       audio_device_(nullptr),
@@ -187,18 +187,18 @@ output_wasapi_impl::output_wasapi_impl()
       total_samples_written_(0),
       total_samples_played_(0) {
     
-    // 初始化WASAPI
+    // 鍒濆鍖朩ASAPI
     HRESULT hr = initialize_wasapi();
     if(FAILED(hr)) {
-        std::cerr << "[WASAPI] 初始化失败: 0x" << std::hex << hr << std::dec << std::endl;
+        std::cerr << "[WASAPI] 鍒濆鍖栧け璐? 0x" << std::hex << hr << std::dec << std::endl;
     }
 }
 
-// 析构函数
+// 鏋愭瀯鍑芥暟
 output_wasapi_impl::~output_wasapi_impl() {
-    std::cout << "[WASAPI] 销毁输出设备..." << std::endl;
+    std::cout << "[WASAPI] 閿€姣佽緭鍑鸿澶?.." << std::endl;
     
-    // 确保停止播放
+    // 纭繚鍋滄鎾斁
     if(is_playing_.load()) {
         abort_callback_dummy abort;
         close(abort);
@@ -207,7 +207,7 @@ output_wasapi_impl::~output_wasapi_impl() {
     cleanup_wasapi();
 }
 
-// 初始化WASAPI
+// 鍒濆鍖朩ASAPI
 HRESULT output_wasapi_impl::initialize_wasapi() {
     HRESULT hr = CoCreateInstance(
         __uuidof(MMDeviceEnumerator),
@@ -222,29 +222,29 @@ HRESULT output_wasapi_impl::initialize_wasapi() {
         return hr;
     }
     
-    std::cout << "[WASAPI] 设备枚举器创建成功" << std::endl;
+    std::cout << "[WASAPI] 璁惧鏋氫妇鍣ㄥ垱寤烘垚鍔? << std::endl;
     return S_OK;
 }
 
-// 打开输出设备
+// 鎵撳紑杈撳嚭璁惧
 void output_wasapi_impl::open(t_uint32 sample_rate, t_uint32 channels, t_uint32 flags, abort_callback& p_abort) {
-    std::cout << "[WASAPI] 打开输出设备 - " << sample_rate << "Hz, " << channels << "ch" << std::endl;
+    std::cout << "[WASAPI] 鎵撳紑杈撳嚭璁惧 - " << sample_rate << "Hz, " << channels << "ch" << std::endl;
     
     if(is_initialized_.load()) {
-        std::cerr << "[WASAPI] 设备已经打开" << std::endl;
+        std::cerr << "[WASAPI] 璁惧宸茬粡鎵撳紑" << std::endl;
         return;
     }
     
     p_abort.check();
     
     try {
-        // 保存音频格式
+        // 淇濆瓨闊抽鏍煎紡
         sample_rate_ = sample_rate;
         channels_ = channels;
-        bits_per_sample_ = 32; // 使用32位浮点数
+        bits_per_sample_ = 32; // 浣跨敤32浣嶆诞鐐规暟
         bytes_per_sample_ = bits_per_sample_ / 8;
         
-        // 设置音频格式
+        // 璁剧疆闊抽鏍煎紡
         memset(&format_, 0, sizeof(format_));
         format_.Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
         format_.Format.nChannels = channels;
@@ -258,39 +258,39 @@ void output_wasapi_impl::open(t_uint32 sample_rate, t_uint32 channels, t_uint32 
         format_.dwChannelMask = channels == 2 ? SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT : SPEAKER_FRONT_CENTER;
         format_.SubFormat = KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
         
-        // 创建音频客户端
+        // 鍒涘缓闊抽瀹㈡埛绔?
         HRESULT hr = create_audio_client();
         if(FAILED(hr)) {
-            throw std::runtime_error("创建音频客户端失败");
+            throw std::runtime_error("鍒涘缓闊抽瀹㈡埛绔け璐?);
         }
         
-        // 初始化音频客户端
+        // 鍒濆鍖栭煶棰戝鎴风
         hr = initialize_audio_client();
         if(FAILED(hr)) {
-            throw std::runtime_error("初始化音频客户端失败");
+            throw std::runtime_error("鍒濆鍖栭煶棰戝鎴风澶辫触");
         }
         
-        // 获取渲染客户端
+        // 鑾峰彇娓叉煋瀹㈡埛绔?
         hr = get_render_client();
         if(FAILED(hr)) {
-            throw std::runtime_error("获取渲染客户端失败");
+            throw std::runtime_error("鑾峰彇娓叉煋瀹㈡埛绔け璐?);
         }
         
-        // 获取音频时钟
+        // 鑾峰彇闊抽鏃堕挓
         hr = audio_client_->GetService(__uuidof(IAudioClock), (void**)&audio_clock_);
         if(FAILED(hr)) {
-            std::cerr << "[WASAPI] 获取音频时钟失败: 0x" << std::hex << hr << std::dec << std::endl;
-            audio_clock_ = nullptr; // 非关键组件
+            std::cerr << "[WASAPI] 鑾峰彇闊抽鏃堕挓澶辫触: 0x" << std::hex << hr << std::dec << std::endl;
+            audio_clock_ = nullptr; // 闈炲叧閿粍浠?
         }
         
-        // 获取流音量控制
+        // 鑾峰彇娴侀煶閲忔帶鍒?
         hr = audio_client_->GetService(__uuidof(IAudioStreamVolume), (void**)&stream_volume_);
         if(FAILED(hr)) {
-            std::cerr << "[WASAPI] 获取流音量控制失败: 0x" << std::hex << hr << std::dec << std::endl;
-            stream_volume_ = nullptr; // 非关键组件
+            std::cerr << "[WASAPI] 鑾峰彇娴侀煶閲忔帶鍒跺け璐? 0x" << std::hex << hr << std::dec << std::endl;
+            stream_volume_ = nullptr; // 闈炲叧閿粍浠?
         }
         
-        // 设置音量
+        // 璁剧疆闊抽噺
         if(stream_volume_) {
             float* volumes = new float[channels_];
             std::fill(volumes, volumes + channels_, volume_.load());
@@ -299,19 +299,19 @@ void output_wasapi_impl::open(t_uint32 sample_rate, t_uint32 channels, t_uint32 
         }
         
         is_initialized_.store(true);
-        std::cout << "[WASAPI] 输出设备打开成功" << std::endl;
+        std::cout << "[WASAPI] 杈撳嚭璁惧鎵撳紑鎴愬姛" << std::endl;
         log_device_info();
         
     } catch(const std::exception& e) {
-        std::cerr << "[WASAPI] 打开设备失败: " << e.what() << std::endl;
+        std::cerr << "[WASAPI] 鎵撳紑璁惧澶辫触: " << e.what() << std::endl;
         cleanup_wasapi();
         throw;
     }
 }
 
-// 关闭输出设备
+// 鍏抽棴杈撳嚭璁惧
 void output_wasapi_impl::close(abort_callback& p_abort) {
-    std::cout << "[WASAPI] 关闭输出设备" << std::endl;
+    std::cout << "[WASAPI] 鍏抽棴杈撳嚭璁惧" << std::endl;
     
     if(!is_initialized_.load()) {
         return;
@@ -319,7 +319,7 @@ void output_wasapi_impl::close(abort_callback& p_abort) {
     
     should_stop_.store(true);
     
-    // 停止渲染线程
+    // 鍋滄娓叉煋绾跨▼
     if(render_thread_running_.load()) {
         render_cv_.notify_all();
         if(render_thread_.joinable()) {
@@ -328,25 +328,25 @@ void output_wasapi_impl::close(abort_callback& p_abort) {
         render_thread_running_.store(false);
     }
     
-    // 停止音频流
+    // 鍋滄闊抽娴?
     stop_streaming();
     
-    // 清理资源
+    // 娓呯悊璧勬簮
     cleanup_wasapi();
     
     is_initialized_.store(false);
     is_playing_.store(false);
     is_paused_.store(false);
     
-    std::cout << "[WASAPI] 输出设备已关闭" << std::endl;
+    std::cout << "[WASAPI] 杈撳嚭璁惧宸插叧闂? << std::endl;
 }
 
-// 获取延迟
+// 鑾峰彇寤惰繜
 t_uint32 output_wasapi_impl::get_latency() {
     return static_cast<t_uint32>(actual_buffer_duration_ms_);
 }
 
-// 写入音频数据
+// 鍐欏叆闊抽鏁版嵁
 void output_wasapi_impl::write(const void* buffer, t_size bytes, abort_callback& p_abort) {
     if(!is_initialized_.load() || !is_playing_.load()) {
         return;
@@ -358,22 +358,22 @@ void output_wasapi_impl::write(const void* buffer, t_size bytes, abort_callback&
     t_size bytes_written = 0;
     
     while(bytes_written < bytes && !p_abort.is_aborting()) {
-        // 检查是否有足够的空间
+        // 妫€鏌ユ槸鍚︽湁瓒冲鐨勭┖闂?
         t_uint32 available_frames = get_available_frames();
         if(available_frames == 0) {
-            // 等待空间可用
+            // 绛夊緟绌洪棿鍙敤
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             continue;
         }
         
-        // 计算可以写入的帧数
+        // 璁＄畻鍙互鍐欏叆鐨勫抚鏁?
         t_uint32 frames_to_write = std::min(available_frames, 
                                            static_cast<t_uint32>(bytes / format_.Format.nBlockAlign));
         if(frames_to_write == 0) {
             continue;
         }
         
-        // 写入数据
+        // 鍐欏叆鏁版嵁
         t_size bytes_to_write = frames_to_write * format_.Format.nBlockAlign;
         if(bytes_to_write > bytes - bytes_written) {
             bytes_to_write = bytes - bytes_written;
@@ -382,7 +382,7 @@ void output_wasapi_impl::write(const void* buffer, t_size bytes, abort_callback&
         
         HRESULT hr = write_to_device(data + bytes_written, frames_to_write);
         if(FAILED(hr)) {
-            handle_error("写入音频数据", hr);
+            handle_error("鍐欏叆闊抽鏁版嵁", hr);
             break;
         }
         
@@ -391,7 +391,7 @@ void output_wasapi_impl::write(const void* buffer, t_size bytes, abort_callback&
     }
 }
 
-// 暂停/恢复
+// 鏆傚仠/鎭㈠
 void output_wasapi_impl::pause(bool state) {
     if(!is_initialized_.load() || !is_playing_.load()) {
         return;
@@ -403,21 +403,21 @@ void output_wasapi_impl::pause(bool state) {
         HRESULT hr;
         if(state) {
             hr = audio_client_->Stop();
-            std::cout << "[WASAPI] 暂停音频流" << std::endl;
+            std::cout << "[WASAPI] 鏆傚仠闊抽娴? << std::endl;
         } else {
             hr = audio_client_->Start();
-            std::cout << "[WASAPI] 恢复音频流" << std::endl;
+            std::cout << "[WASAPI] 鎭㈠闊抽娴? << std::endl;
         }
         
         if(FAILED(hr)) {
-            handle_error("暂停/恢复音频流", hr);
+            handle_error("鏆傚仠/鎭㈠闊抽娴?, hr);
         }
     }
 }
 
-// 清空缓冲区
+// 娓呯┖缂撳啿鍖?
 void output_wasapi_impl::flush(abort_callback& p_abort) {
-    std::cout << "[WASAPI] 清空缓冲区" << std::endl;
+    std::cout << "[WASAPI] 娓呯┖缂撳啿鍖? << std::endl;
     
     if(!is_initialized_.load() || !audio_client_) {
         return;
@@ -425,14 +425,14 @@ void output_wasapi_impl::flush(abort_callback& p_abort) {
     
     p_abort.check();
     
-    // 重置音频客户端
+    // 閲嶇疆闊抽瀹㈡埛绔?
     HRESULT hr = audio_client_->Reset();
     if(FAILED(hr)) {
-        handle_error("重置音频客户端", hr);
+        handle_error("閲嶇疆闊抽瀹㈡埛绔?, hr);
     }
 }
 
-// 设置音量
+// 璁剧疆闊抽噺
 void output_wasapi_impl::volume_set(float volume) {
     volume_.store(volume);
     last_set_volume_ = volume;
@@ -443,19 +443,19 @@ void output_wasapi_impl::volume_set(float volume) {
         
         HRESULT hr = stream_volume_->SetAllVolumes(channels_, volumes);
         if(FAILED(hr)) {
-            handle_error("设置音量", hr);
+            handle_error("璁剧疆闊抽噺", hr);
         }
         
         delete[] volumes;
     }
 }
 
-// 检查是否正在播放
+// 妫€鏌ユ槸鍚︽鍦ㄦ挱鏀?
 bool output_wasapi_impl::is_playing() {
     return is_playing_.load() && !is_paused_.load();
 }
 
-// 检查是否可以写入
+// 妫€鏌ユ槸鍚﹀彲浠ュ啓鍏?
 bool output_wasapi_impl::can_write() {
     if(!is_initialized_.load() || !is_playing_.load()) {
         return false;
@@ -464,28 +464,28 @@ bool output_wasapi_impl::can_write() {
     return get_available_frames() > 0;
 }
 
-// 创建音频客户端
+// 鍒涘缓闊抽瀹㈡埛绔?
 HRESULT output_wasapi_impl::create_audio_client() {
     HRESULT hr = S_OK;
     
-    // 如果已选择特定设备，使用它；否则使用默认设备
+    // 濡傛灉宸查€夋嫨鐗瑰畾璁惧锛屼娇鐢ㄥ畠锛涘惁鍒欎娇鐢ㄩ粯璁よ澶?
     if(!device_id_.empty()) {
         hr = select_device(device_id_);
         if(FAILED(hr)) {
-            std::cerr << "[WASAPI] 选择指定设备失败，尝试默认设备" << std::endl;
+            std::cerr << "[WASAPI] 閫夋嫨鎸囧畾璁惧澶辫触锛屽皾璇曢粯璁よ澶? << std::endl;
         }
     }
     
     if(FAILED(hr) || device_id_.empty()) {
-        // 使用默认设备
+        // 浣跨敤榛樿璁惧
         hr = device_enumerator_->GetDefaultAudioEndpoint(eRender, device_role_, &audio_device_);
         if(FAILED(hr)) {
-            handle_error("获取默认音频端点", hr);
+            handle_error("鑾峰彇榛樿闊抽绔偣", hr);
             return hr;
         }
     }
     
-    // 获取音频客户端
+    // 鑾峰彇闊抽瀹㈡埛绔?
     hr = audio_device_->Activate(
         __uuidof(IAudioClient),
         CLSCTX_ALL,
@@ -494,66 +494,66 @@ HRESULT output_wasapi_impl::create_audio_client() {
     );
     
     if(FAILED(hr)) {
-        handle_error("激活音频客户端", hr);
+        handle_error("婵€娲婚煶棰戝鎴风", hr);
         return hr;
     }
     
-    std::cout << "[WASAPI] 音频客户端创建成功" << std::endl;
+    std::cout << "[WASAPI] 闊抽瀹㈡埛绔垱寤烘垚鍔? << std::endl;
     return S_OK;
 }
 
-// 获取混合格式
+// 鑾峰彇娣峰悎鏍煎紡
 HRESULT output_wasapi_impl::get_mix_format() {
     WAVEFORMATEX* device_format = nullptr;
     HRESULT hr = audio_client_->GetMixFormat(&device_format);
     
     if(FAILED(hr)) {
-        handle_error("获取混合格式", hr);
+        handle_error("鑾峰彇娣峰悎鏍煎紡", hr);
         return hr;
     }
     
-    std::cout << "[WASAPI] 设备混合格式:" << std::endl;
-    std::cout << "  - 采样率: " << device_format->nSamplesPerSec << "Hz" << std::endl;
-    std::cout << "  - 声道数: " << device_format->nChannels << std::endl;
-    std::cout << "  - 位深度: " << device_format->wBitsPerSample << "bit" << std::endl;
+    std::cout << "[WASAPI] 璁惧娣峰悎鏍煎紡:" << std::endl;
+    std::cout << "  - 閲囨牱鐜? " << device_format->nSamplesPerSec << "Hz" << std::endl;
+    std::cout << "  - 澹伴亾鏁? " << device_format->nChannels << std::endl;
+    std::cout << "  - 浣嶆繁搴? " << device_format->wBitsPerSample << "bit" << std::endl;
     
     CoTaskMemFree(device_format);
     return S_OK;
 }
 
-// 初始化音频客户端
+// 鍒濆鍖栭煶棰戝鎴风
 HRESULT output_wasapi_impl::initialize_audio_client() {
     HRESULT hr;
     
     if(is_exclusive_mode_.load()) {
-        // 独占模式
+        // 鐙崰妯″紡
         WAVEFORMATEXTENSIBLE exclusive_format;
         hr = convert_to_exclusive_format(&format_.Format, exclusive_format);
         if(FAILED(hr)) {
-            std::cerr << "[WASAPI] 转换到独占格式失败，尝试共享模式" << std::endl;
+            std::cerr << "[WASAPI] 杞崲鍒扮嫭鍗犳牸寮忓け璐ワ紝灏濊瘯鍏变韩妯″紡" << std::endl;
             is_exclusive_mode_.store(false);
         } else {
             hr = audio_client_->Initialize(
                 AUDCLNT_SHAREMODE_EXCLUSIVE,
                 AUDCLNT_STREAMFLAGS_EVENTCALLBACK | AUDCLNT_STREAMFLAGS_NOPERSIST,
-                requested_buffer_duration_ms_ * 10000, // 100纳秒单位
+                requested_buffer_duration_ms_ * 10000, // 100绾崇鍗曚綅
                 0,
                 (WAVEFORMATEX*)&exclusive_format,
                 nullptr
             );
             
             if(FAILED(hr)) {
-                std::cerr << "[WASAPI] 独占模式初始化失败，尝试共享模式" << std::endl;
+                std::cerr << "[WASAPI] 鐙崰妯″紡鍒濆鍖栧け璐ワ紝灏濊瘯鍏变韩妯″紡" << std::endl;
                 is_exclusive_mode_.store(false);
             } else {
-                std::cout << "[WASAPI] 使用独占模式" << std::endl;
+                std::cout << "[WASAPI] 浣跨敤鐙崰妯″紡" << std::endl;
             }
         }
     }
     
     if(!is_exclusive_mode_.load()) {
-        // 共享模式
-        REFERENCE_TIME buffer_duration = requested_buffer_duration_ms_ * 10000; // 100纳秒单位
+        // 鍏变韩妯″紡
+        REFERENCE_TIME buffer_duration = requested_buffer_duration_ms_ * 10000; // 100绾崇鍗曚綅
         
         hr = audio_client_->Initialize(
             AUDCLNT_SHAREMODE_SHARED,
@@ -565,30 +565,30 @@ HRESULT output_wasapi_impl::initialize_audio_client() {
         );
         
         if(FAILED(hr)) {
-            handle_error("初始化音频客户端（共享模式）", hr);
+            handle_error("鍒濆鍖栭煶棰戝鎴风锛堝叡浜ā寮忥級", hr);
             return hr;
         }
         
-        std::cout << "[WASAPI] 使用共享模式" << std::endl;
+        std::cout << "[WASAPI] 浣跨敤鍏变韩妯″紡" << std::endl;
     }
     
-    // 获取实际缓冲区大小
+    // 鑾峰彇瀹為檯缂撳啿鍖哄ぇ灏?
     hr = audio_client_->GetBufferSize(&buffer_frame_count_);
     if(FAILED(hr)) {
-        handle_error("获取缓冲区大小", hr);
+        handle_error("鑾峰彇缂撳啿鍖哄ぇ灏?, hr);
         return hr;
     }
     
     actual_buffer_duration_ms_ = (buffer_frame_count_ * 1000) / sample_rate_;
     
-    std::cout << "[WASAPI] 缓冲区设置:" << std::endl;
-    std::cout << "  - 帧数: " << buffer_frame_count_ << std::endl;
-    std::cout << "  - 持续时间: " << actual_buffer_duration_ms_ << "ms" << std::endl;
+    std::cout << "[WASAPI] 缂撳啿鍖鸿缃?" << std::endl;
+    std::cout << "  - 甯ф暟: " << buffer_frame_count_ << std::endl;
+    std::cout << "  - 鎸佺画鏃堕棿: " << actual_buffer_duration_ms_ << "ms" << std::endl;
     
     return S_OK;
 }
 
-// 获取渲染客户端
+// 鑾峰彇娓叉煋瀹㈡埛绔?
 HRESULT output_wasapi_impl::get_render_client() {
     HRESULT hr = audio_client_->GetService(
         __uuidof(IAudioRenderClient),
@@ -596,21 +596,21 @@ HRESULT output_wasapi_impl::get_render_client() {
     );
     
     if(FAILED(hr)) {
-        handle_error("获取渲染客户端", hr);
+        handle_error("鑾峰彇娓叉煋瀹㈡埛绔?, hr);
         return hr;
     }
     
-    std::cout << "[WASAPI] 渲染客户端获取成功" << std::endl;
+    std::cout << "[WASAPI] 娓叉煋瀹㈡埛绔幏鍙栨垚鍔? << std::endl;
     return S_OK;
 }
 
-// 开始流式传输
+// 寮€濮嬫祦寮忎紶杈?
 HRESULT output_wasapi_impl::start_streaming() {
     if(!audio_client_) {
         return E_FAIL;
     }
     
-    // 如果事件驱动，创建事件
+    // 濡傛灉浜嬩欢椹卞姩锛屽垱寤轰簨浠?
     HANDLE event_handle = nullptr;
     if(is_event_driven_.load()) {
         event_handle = CreateEvent(nullptr, FALSE, FALSE, nullptr);
@@ -625,28 +625,28 @@ HRESULT output_wasapi_impl::start_streaming() {
         }
     }
     
-    // 开始音频流
+    // 寮€濮嬮煶棰戞祦
     HRESULT hr = audio_client_->Start();
     if(FAILED(hr)) {
         if(event_handle) CloseHandle(event_handle);
-        handle_error("开始音频流", hr);
+        handle_error("寮€濮嬮煶棰戞祦", hr);
         return hr;
     }
     
     is_playing_.store(true);
     start_time_ = std::chrono::steady_clock::now();
     
-    // 启动渲染线程（如果需要）
+    // 鍚姩娓叉煋绾跨▼锛堝鏋滈渶瑕侊級
     if(!is_event_driven_.load()) {
         render_thread_running_.store(true);
         render_thread_ = std::thread(&output_wasapi_impl::render_thread_func, this);
     }
     
-    std::cout << "[WASAPI] 音频流开始" << std::endl;
+    std::cout << "[WASAPI] 闊抽娴佸紑濮? << std::endl;
     return S_OK;
 }
 
-// 停止流式传输
+// 鍋滄娴佸紡浼犺緭
 HRESULT output_wasapi_impl::stop_streaming() {
     if(!audio_client_) {
         return S_OK;
@@ -654,25 +654,25 @@ HRESULT output_wasapi_impl::stop_streaming() {
     
     is_playing_.store(false);
     
-    // 停止音频流
+    // 鍋滄闊抽娴?
     HRESULT hr = audio_client_->Stop();
     if(FAILED(hr)) {
-        handle_error("停止音频流", hr);
+        handle_error("鍋滄闊抽娴?, hr);
     }
     
-    // 重置音频客户端
+    // 閲嶇疆闊抽瀹㈡埛绔?
     hr = audio_client_->Reset();
     if(FAILED(hr)) {
-        handle_error("重置音频客户端", hr);
+        handle_error("閲嶇疆闊抽瀹㈡埛绔?, hr);
     }
     
-    std::cout << "[WASAPI] 音频流停止" << std::endl;
+    std::cout << "[WASAPI] 闊抽娴佸仠姝? << std::endl;
     return S_OK;
 }
 
-// 清理WASAPI
+// 娓呯悊WASAPI
 HRESULT output_wasapi_impl::cleanup_wasapi() {
-    // 释放接口
+    // 閲婃斁鎺ュ彛
     if(render_client_) {
         render_client_->Release();
         render_client_ = nullptr;
@@ -706,7 +706,7 @@ HRESULT output_wasapi_impl::cleanup_wasapi() {
     return S_OK;
 }
 
-// 写入设备
+// 鍐欏叆璁惧
 HRESULT output_wasapi_impl::write_to_device(const void* data, t_uint32 frames) {
     if(!render_client_) {
         return E_FAIL;
@@ -716,7 +716,7 @@ HRESULT output_wasapi_impl::write_to_device(const void* data, t_uint32 frames) {
     BYTE* buffer_pointer = nullptr;
     HRESULT hr;
     
-    // 获取可用缓冲区
+    // 鑾峰彇鍙敤缂撳啿鍖?
     hr = render_client_->GetBuffer(frames, &buffer_pointer);
     if(FAILED(hr)) {
         return hr;
@@ -726,21 +726,21 @@ HRESULT output_wasapi_impl::write_to_device(const void* data, t_uint32 frames) {
         return E_FAIL;
     }
     
-    // 复制数据
+    // 澶嶅埗鏁版嵁
     size_t bytes_to_copy = frames * format_.Format.nBlockAlign;
     memcpy(buffer_pointer, data, bytes_to_copy);
     
-    // 释放缓冲区
+    // 閲婃斁缂撳啿鍖?
     hr = render_client_->ReleaseBuffer(frames, 0);
     if(FAILED(hr)) {
-        handle_error("释放缓冲区", hr);
+        handle_error("閲婃斁缂撳啿鍖?, hr);
         return hr;
     }
     
     return S_OK;
 }
 
-// 获取可用帧数
+// 鑾峰彇鍙敤甯ф暟
 t_uint32 output_wasapi_impl::get_available_frames() {
     if(!audio_client_) {
         return 0;
@@ -755,7 +755,7 @@ t_uint32 output_wasapi_impl::get_available_frames() {
     return buffer_frame_count_ - padding_frames;
 }
 
-// 获取当前位置
+// 鑾峰彇褰撳墠浣嶇疆
 HRESULT output_wasapi_impl::get_current_position(t_uint64& position, t_uint64& qpc_position) {
     if(!audio_clock_) {
         return E_FAIL;
@@ -764,65 +764,65 @@ HRESULT output_wasapi_impl::get_current_position(t_uint64& position, t_uint64& q
     return audio_clock_->GetPosition(&position, &qpc_position);
 }
 
-// 渲染线程函数
+// 娓叉煋绾跨▼鍑芥暟
 void output_wasapi_impl::render_thread_func() {
-    std::cout << "[WASAPI] 渲染线程启动" << std::endl;
+    std::cout << "[WASAPI] 娓叉煋绾跨▼鍚姩" << std::endl;
     
-    // 提升线程优先级
+    // 鎻愬崌绾跨▼浼樺厛绾?
     DWORD task_index = 0;
     HANDLE avrt_handle = AvSetMmThreadCharacteristics(L"Pro Audio", &task_index);
     if(avrt_handle) {
-        std::cout << "[WASAPI] 渲染线程优先级已提升" << std::endl;
+        std::cout << "[WASAPI] 娓叉煋绾跨▼浼樺厛绾у凡鎻愬崌" << std::endl;
     }
     
     while(render_thread_running_.load() && !should_stop_.load()) {
-        // 检查是否需要停止
+        // 妫€鏌ユ槸鍚﹂渶瑕佸仠姝?
         if(should_stop_.load()) {
             break;
         }
         
-        // 渲染音频数据
+        // 娓叉煋闊抽鏁版嵁
         HRESULT hr = render_audio_data();
         if(FAILED(hr)) {
-            std::cerr << "[WASAPI] 渲染音频数据失败: 0x" << std::hex << hr << std::dec << std::endl;
+            std::cerr << "[WASAPI] 娓叉煋闊抽鏁版嵁澶辫触: 0x" << std::hex << hr << std::dec << std::endl;
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
             continue;
         }
         
-        // 更新延迟统计
+        // 鏇存柊寤惰繜缁熻
         update_latency_stats();
         
-        // 小延迟以避免CPU占用过高
+        // 灏忓欢杩熶互閬垮厤CPU鍗犵敤杩囬珮
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
     
-    // 恢复线程优先级
+    // 鎭㈠绾跨▼浼樺厛绾?
     if(avrt_handle) {
         AvRevertMmThreadCharacteristics(avrt_handle);
     }
     
-    std::cout << "[WASAPI] 渲染线程停止" << std::endl;
+    std::cout << "[WASAPI] 娓叉煋绾跨▼鍋滄" << std::endl;
 }
 
-// 渲染音频数据
+// 娓叉煋闊抽鏁版嵁
 HRESULT output_wasapi_impl::render_audio_data() {
     if(!is_playing_.load() || is_paused_.load() || !audio_client_ || !render_client_) {
         return S_OK;
     }
     
-    // 获取可用空间
+    // 鑾峰彇鍙敤绌洪棿
     t_uint32 available_frames = get_available_frames();
     if(available_frames == 0) {
         return S_OK;
     }
     
-    // 这里应该处理实际的音频数据渲染
-    // 目前只是返回成功
+    // 杩欓噷搴旇澶勭悊瀹為檯鐨勯煶棰戞暟鎹覆鏌?
+    // 鐩墠鍙槸杩斿洖鎴愬姛
     
     return S_OK;
 }
 
-// 更新延迟统计
+// 鏇存柊寤惰繜缁熻
 void output_wasapi_impl::update_latency_stats() {
     if(!audio_clock_) {
         return;
@@ -837,7 +837,7 @@ void output_wasapi_impl::update_latency_stats() {
     }
 }
 
-// 获取设备友好名称
+// 鑾峰彇璁惧鍙嬪ソ鍚嶇О
 std::string output_wasapi_impl::get_device_friendly_name(IMMDevice* device) {
     if(!device) {
         return "Unknown Device";
@@ -866,7 +866,7 @@ std::string output_wasapi_impl::get_device_friendly_name(IMMDevice* device) {
     return "Unknown Device";
 }
 
-// 获取设备ID
+// 鑾峰彇璁惧ID
 std::string output_wasapi_impl::get_device_id(IMMDevice* device) {
     if(!device) {
         return "";
@@ -885,7 +885,7 @@ std::string output_wasapi_impl::get_device_id(IMMDevice* device) {
     return result;
 }
 
-// 获取设备信息
+// 鑾峰彇璁惧淇℃伅
 device_info output_wasapi_impl::get_device_info(IMMDevice* device) {
     device_info info;
     
@@ -896,14 +896,14 @@ device_info output_wasapi_impl::get_device_info(IMMDevice* device) {
     info.id = get_device_id(device);
     info.name = get_device_friendly_name(device);
     
-    // 获取其他设备属性
+    // 鑾峰彇鍏朵粬璁惧灞炴€?
     IPropertyStore* property_store = nullptr;
     HRESULT hr = device->OpenPropertyStore(STGM_READ, &property_store);
     if(SUCCEEDED(hr)) {
         PROPVARIANT prop_var;
         PropVariantInit(&prop_var);
         
-        // 获取设备描述
+        // 鑾峰彇璁惧鎻忚堪
         hr = property_store->GetValue(PKEY_Device_DeviceDesc, &prop_var);
         if(SUCCEEDED(hr) && prop_var.vt == VT_LPWSTR) {
             std::wstring ws(prop_var.pwszVal);
@@ -917,23 +917,23 @@ device_info output_wasapi_impl::get_device_info(IMMDevice* device) {
     return info;
 }
 
-// 选择设备
+// 閫夋嫨璁惧
 HRESULT output_wasapi_impl::select_device(const std::string& device_id) {
     if(!device_enumerator_ || device_id.empty()) {
         return E_FAIL;
     }
     
-    // 将设备ID转换为宽字符串
+    // 灏嗚澶嘔D杞崲涓哄瀛楃涓?
     std::wstring ws_device_id(device_id.begin(), device_id.end());
     
     IMMDevice* device = nullptr;
     HRESULT hr = device_enumerator_->GetDevice(ws_device_id.c_str(), &device);
     if(FAILED(hr)) {
-        handle_error("获取指定设备", hr);
+        handle_error("鑾峰彇鎸囧畾璁惧", hr);
         return hr;
     }
     
-    // 释放旧设备
+    // 閲婃斁鏃ц澶?
     if(audio_device_) {
         audio_device_->Release();
     }
@@ -941,15 +941,15 @@ HRESULT output_wasapi_impl::select_device(const std::string& device_id) {
     audio_device_ = device;
     current_device_info_ = get_device_info(device);
     
-    std::cout << "[WASAPI] 选择设备: " << current_device_info_.name << std::endl;
+    std::cout << "[WASAPI] 閫夋嫨璁惧: " << current_device_info_.name << std::endl;
     return S_OK;
 }
 
-// 转换到独占格式
+// 杞崲鍒扮嫭鍗犳牸寮?
 HRESULT output_wasapi_impl::convert_to_exclusive_format(const WAVEFORMATEX* shared_format, 
                                                        WAVEFORMATEXTENSIBLE& exclusive_format) {
-    // 简化的格式转换
-    // 实际实现需要更复杂的格式匹配逻辑
+    // 绠€鍖栫殑鏍煎紡杞崲
+    // 瀹為檯瀹炵幇闇€瑕佹洿澶嶆潅鐨勬牸寮忓尮閰嶉€昏緫
     
     memset(&exclusive_format, 0, sizeof(exclusive_format));
     
@@ -986,161 +986,161 @@ HRESULT output_wasapi_impl::convert_to_exclusive_format(const WAVEFORMATEX* shar
     return S_OK;
 }
 
-// 错误处理
+// 閿欒澶勭悊
 void output_wasapi_impl::handle_error(const std::string& operation, HRESULT hr) {
     std::stringstream ss;
-    ss << "[WASAPI] 操作失败: " << operation << " - ";
+    ss << "[WASAPI] 鎿嶄綔澶辫触: " << operation << " - ";
     
     switch(hr) {
         case AUDCLNT_E_NOT_INITIALIZED:
-            ss << "音频客户端未初始化";
+            ss << "闊抽瀹㈡埛绔湭鍒濆鍖?;
             break;
         case AUDCLNT_E_ALREADY_INITIALIZED:
-            ss << "音频客户端已初始化";
+            ss << "闊抽瀹㈡埛绔凡鍒濆鍖?;
             break;
         case AUDCLNT_E_WRONG_ENDPOINT_TYPE:
-            ss << "错误的端点类型";
+            ss << "閿欒鐨勭鐐圭被鍨?;
             break;
         case AUDCLNT_E_DEVICE_INVALIDATED:
-            ss << "设备无效";
+            ss << "璁惧鏃犳晥";
             break;
         case AUDCLNT_E_NOT_STOPPED:
-            ss << "音频流未停止";
+            ss << "闊抽娴佹湭鍋滄";
             break;
         case AUDCLNT_E_BUFFER_TOO_LARGE:
-            ss << "缓冲区过大";
+            ss << "缂撳啿鍖鸿繃澶?;
             break;
         case AUDCLNT_E_OUT_OF_ORDER:
-            ss << "操作顺序错误";
+            ss << "鎿嶄綔椤哄簭閿欒";
             break;
         case AUDCLNT_E_UNSUPPORTED_FORMAT:
-            ss << "不支持的格式";
+            ss << "涓嶆敮鎸佺殑鏍煎紡";
             break;
         case AUDCLNT_E_INVALID_SIZE:
-            ss << "无效的大小";
+            ss << "鏃犳晥鐨勫ぇ灏?;
             break;
         case AUDCLNT_E_DEVICE_IN_USE:
-            ss << "设备正在使用";
+            ss << "璁惧姝ｅ湪浣跨敤";
             break;
         case AUDCLNT_E_BUFFER_OPERATION_PENDING:
-            ss << "缓冲区操作挂起";
+            ss << "缂撳啿鍖烘搷浣滄寕璧?;
             break;
         case AUDCLNT_E_THREAD_NOT_REGISTERED:
-            ss << "线程未注册";
+            ss << "绾跨▼鏈敞鍐?;
             break;
         case AUDCLNT_E_EXCLUSIVE_MODE_NOT_ALLOWED:
-            ss << "独占模式不允许";
+            ss << "鐙崰妯″紡涓嶅厑璁?;
             break;
         case AUDCLNT_E_ENDPOINT_CREATE_FAILED:
-            ss << "端点创建失败";
+            ss << "绔偣鍒涘缓澶辫触";
             break;
         case AUDCLNT_E_SERVICE_NOT_RUNNING:
-            ss << "服务未运行";
+            ss << "鏈嶅姟鏈繍琛?;
             break;
         case E_POINTER:
-            ss << "空指针";
+            ss << "绌烘寚閽?;
             break;
         case E_INVALIDARG:
-            ss << "无效参数";
+            ss << "鏃犳晥鍙傛暟";
             break;
         case E_OUTOFMEMORY:
-            ss << "内存不足";
+            ss << "鍐呭瓨涓嶈冻";
             break;
         default:
-            ss << "未知错误 (0x" << std::hex << hr << std::dec << ")";
+            ss << "鏈煡閿欒 (0x" << std::hex << hr << std::dec << ")";
             break;
     }
     
     std::cerr << ss.str() << std::endl;
 }
 
-// 记录设备信息
+// 璁板綍璁惧淇℃伅
 void output_wasapi_impl::log_device_info() {
     if(!current_device_info_.name.empty()) {
-        std::cout << "[WASAPI] 当前设备信息:" << std::endl;
-        std::cout << "  - 名称: " << current_device_info_.name << std::endl;
+        std::cout << "[WASAPI] 褰撳墠璁惧淇℃伅:" << std::endl;
+        std::cout << "  - 鍚嶇О: " << current_device_info_.name << std::endl;
         std::cout << "  - ID: " << current_device_info_.id << std::endl;
-        std::cout << "  - 描述: " << current_device_info_.description << std::endl;
+        std::cout << "  - 鎻忚堪: " << current_device_info_.description << std::endl;
     }
 }
 
-// 设置设备
+// 璁剧疆璁惧
 void output_wasapi_impl::set_device(const char* device_id) {
     device_id_ = device_id ? device_id : "";
-    std::cout << "[WASAPI] 设置设备: " << (device_id ? device_id : "默认") << std::endl;
+    std::cout << "[WASAPI] 璁剧疆璁惧: " << (device_id ? device_id : "榛樿") << std::endl;
 }
 
-// 设置独占模式
+// 璁剧疆鐙崰妯″紡
 void output_wasapi_impl::set_exclusive_mode(bool exclusive) {
     is_exclusive_mode_.store(exclusive);
-    std::cout << "[WASAPI] 设置独占模式: " << (exclusive ? "启用" : "禁用") << std::endl;
+    std::cout << "[WASAPI] 璁剧疆鐙崰妯″紡: " << (exclusive ? "鍚敤" : "绂佺敤") << std::endl;
 }
 
-// 设置事件驱动
+// 璁剧疆浜嬩欢椹卞姩
 void output_wasapi_impl::set_event_driven(bool event_driven) {
     is_event_driven_.store(event_driven);
-    std::cout << "[WASAPI] 设置事件驱动: " << (event_driven ? "启用" : "禁用") << std::endl;
+    std::cout << "[WASAPI] 璁剧疆浜嬩欢椹卞姩: " << (event_driven ? "鍚敤" : "绂佺敤") << std::endl;
 }
 
-// 设置缓冲区持续时间
+// 璁剧疆缂撳啿鍖烘寔缁椂闂?
 void output_wasapi_impl::set_buffer_duration(t_uint32 milliseconds) {
     requested_buffer_duration_ms_ = milliseconds;
-    std::cout << "[WASAPI] 设置缓冲区持续时间: " << milliseconds << "ms" << std::endl;
+    std::cout << "[WASAPI] 璁剧疆缂撳啿鍖烘寔缁椂闂? " << milliseconds << "ms" << std::endl;
 }
 
-// 设置设备角色
+// 璁剧疆璁惧瑙掕壊
 void output_wasapi_impl::set_device_role(ERole role) {
     device_role_ = role;
-    std::cout << "[WASAPI] 设置设备角色: " << static_cast<int>(role) << std::endl;
+    std::cout << "[WASAPI] 璁剧疆璁惧瑙掕壊: " << static_cast<int>(role) << std::endl;
 }
 
-// 设置流类别
+// 璁剧疆娴佺被鍒?
 void output_wasapi_impl::set_stream_category(EAudioSessionCategory category) {
     stream_category_ = category;
-    std::cout << "[WASAPI] 设置流类别: " << static_cast<int>(category) << std::endl;
+    std::cout << "[WASAPI] 璁剧疆娴佺被鍒? " << static_cast<int>(category) << std::endl;
 }
 
-// 设置流选项
+// 璁剧疆娴侀€夐」
 void output_wasapi_impl::set_stream_option(t_uint32 option) {
     stream_options_ = option;
 }
 
-// 获取独占模式状态
+// 鑾峰彇鐙崰妯″紡鐘舵€?
 bool output_wasapi_impl::is_exclusive_mode() const {
     return is_exclusive_mode_.load();
 }
 
-// 获取事件驱动状态
+// 鑾峰彇浜嬩欢椹卞姩鐘舵€?
 bool output_wasapi_impl::is_event_driven() const {
     return is_event_driven_.load();
 }
 
-// 获取缓冲区持续时间
+// 鑾峰彇缂撳啿鍖烘寔缁椂闂?
 t_uint32 output_wasapi_impl::get_buffer_duration() const {
     return requested_buffer_duration_ms_;
 }
 
-// 获取设备角色
+// 鑾峰彇璁惧瑙掕壊
 ERole output_wasapi_impl::get_device_role() const {
     return device_role_;
 }
 
-// 获取流类别
+// 鑾峰彇娴佺被鍒?
 EAudioSessionCategory output_wasapi_impl::get_stream_category() const {
     return stream_category_;
 }
 
-// 获取流选项
+// 鑾峰彇娴侀€夐」
 t_uint32 output_wasapi_impl::get_stream_option() const {
     return stream_options_;
 }
 
-// 获取当前设备
+// 鑾峰彇褰撳墠璁惧
 void output_wasapi_impl::get_current_device(pfc::string_base& out) {
     out = current_device_info_.name.c_str();
 }
 
-// 枚举设备
+// 鏋氫妇璁惧
 void output_wasapi_impl::enumerate_devices(pfc::string_list_impl& out) {
     if(!device_enumerator_) {
         return;
@@ -1149,7 +1149,7 @@ void output_wasapi_impl::enumerate_devices(pfc::string_list_impl& out) {
     IMMDeviceCollection* device_collection = nullptr;
     HRESULT hr = device_enumerator_->EnumAudioEndpoints(eRender, DEVICE_STATE_ACTIVE, &device_collection);
     if(FAILED(hr)) {
-        handle_error("枚举音频端点", hr);
+        handle_error("鏋氫妇闊抽绔偣", hr);
         return;
     }
     
@@ -1176,7 +1176,7 @@ void output_wasapi_impl::enumerate_devices(pfc::string_list_impl& out) {
     device_collection->Release();
 }
 
-// 获取设备信息
+// 鑾峰彇璁惧淇℃伅
 void output_wasapi_impl::get_device_info(const char* device_id, device_info& info) {
     if(!device_enumerator_ || !device_id) {
         return;
@@ -1194,76 +1194,76 @@ void output_wasapi_impl::get_device_info(const char* device_id, device_info& inf
     device->Release();
 }
 
-// 获取设备名称
+// 鑾峰彇璁惧鍚嶇О
 void output_wasapi_impl::get_device_name(pfc::string_base& out) {
     out = current_device_info_.name.c_str();
 }
 
-// 获取设备描述
+// 鑾峰彇璁惧鎻忚堪
 void output_wasapi_impl::get_device_desc(pfc::string_base& out) {
     out = current_device_info_.description.c_str();
 }
 
-// 获取设备ID
+// 鑾峰彇璁惧ID
 t_uint32 output_wasapi_impl::get_device_id() {
     return static_cast<t_uint32>(std::hash<std::string>{}(current_device_info_.id));
 }
 
-// 估计延迟
+// 浼拌寤惰繜
 void output_wasapi_impl::estimate_latency(double& latency_seconds, t_uint32 sample_rate, t_uint32 channels) {
     latency_seconds = actual_buffer_duration_ms_ / 1000.0;
 }
 
-// 更新设备列表
+// 鏇存柊璁惧鍒楄〃
 void output_wasapi_impl::update_device_list() {
     get_device_list();
 }
 
-// 是否实时
+// 鏄惁瀹炴椂
 bool output_wasapi_impl::is_realtime() {
     return true;
 }
 
-// 空闲处理
+// 绌洪棽澶勭悊
 void output_wasapi_impl::on_idle() {
-    // 可以在这里处理设备状态更新
+    // 鍙互鍦ㄨ繖閲屽鐞嗚澶囩姸鎬佹洿鏂?
 }
 
-// 处理采样
+// 澶勭悊閲囨牱
 void output_wasapi_impl::process_samples(const audio_chunk* p_chunk, t_uint32 p_samples_written, t_uint32 p_samples_total, abort_callback& p_abort) {
-    // 这里可以处理采样级别的操作
+    // 杩欓噷鍙互澶勭悊閲囨牱绾у埆鐨勬搷浣?
 }
 
-// 暂停扩展
+// 鏆傚仠鎵╁睍
 void output_wasapi_impl::pause_ex(bool p_state, t_uint32 p_samples_written) {
     pause(p_state);
 }
 
-// 设置音量扩展
+// 璁剧疆闊抽噺鎵╁睍
 void output_wasapi_impl::set_volume_ex(float p_volume, t_uint32 p_samples_written) {
     volume_set(p_volume);
 }
 
-// 获取延迟扩展
+// 鑾峰彇寤惰繜鎵╁睍
 void output_wasapi_impl::get_latency_ex2(t_uint32& p_samples, t_uint32& p_samples_total) {
     p_samples = 0;
     p_samples_total = buffer_frame_count_;
 }
 
-// 获取延迟扩展3
+// 鑾峰彇寤惰繜鎵╁睍3
 void output_wasapi_impl::get_latency_ex3(t_uint32& p_samples, t_uint32& p_samples_total, t_uint32& p_samples_in_buffer) {
     p_samples = 0;
     p_samples_total = buffer_frame_count_;
     p_samples_in_buffer = get_padding_frames();
 }
 
-// 获取延迟扩展4
+// 鑾峰彇寤惰繜鎵╁睍4
 void output_wasapi_impl::get_latency_ex4(t_uint32& p_samples, t_uint32& p_samples_total, t_uint32& p_samples_in_buffer, t_uint32& p_samples_in_device_buffer) {
     get_latency_ex3(p_samples, p_samples_total, p_samples_in_buffer);
     p_samples_in_device_buffer = p_samples_in_buffer;
 }
 
-// 获取填充帧数
+// 鑾峰彇濉厖甯ф暟
 t_uint32 output_wasapi_impl::get_padding_frames() {
     if(!audio_client_) {
         return 0;
@@ -1278,7 +1278,7 @@ t_uint32 output_wasapi_impl::get_padding_frames() {
     return padding;
 }
 
-// 获取设备列表
+// 鑾峰彇璁惧鍒楄〃
 HRESULT output_wasapi_impl::get_device_list() {
     if(!device_enumerator_) {
         return E_FAIL;
@@ -1287,7 +1287,7 @@ HRESULT output_wasapi_impl::get_device_list() {
     IMMDeviceCollection* device_collection = nullptr;
     HRESULT hr = device_enumerator_->EnumAudioEndpoints(eRender, DEVICE_STATE_ACTIVE, &device_collection);
     if(FAILED(hr)) {
-        handle_error("枚举音频端点", hr);
+        handle_error("鏋氫妇闊抽绔偣", hr);
         return hr;
     }
     
@@ -1298,7 +1298,7 @@ HRESULT output_wasapi_impl::get_device_list() {
         return hr;
     }
     
-    std::cout << "[WASAPI] 发现 " << device_count << " 个音频设备" << std::endl;
+    std::cout << "[WASAPI] 鍙戠幇 " << device_count << " 涓煶棰戣澶? << std::endl;
     
     for(UINT32 i = 0; i < device_count; i++) {
         IMMDevice* device = nullptr;
@@ -1317,17 +1317,17 @@ HRESULT output_wasapi_impl::get_device_list() {
     return S_OK;
 }
 
-// 是否要求扩展规范
+// 鏄惁瑕佹眰鎵╁睍瑙勮寖
 bool output_wasapi_impl::requires_spec_ex() {
     return true;
 }
 
-// 获取延迟扩展
+// 鑾峰彇寤惰繜鎵╁睍
 t_uint32 output_wasapi_impl::get_latency_ex() {
     return get_latency();
 }
 
-// 创建WASAPI输出设备
+// 鍒涘缓WASAPI杈撳嚭璁惧
 std::unique_ptr<output_wasapi> create_wasapi_output() {
     return std::make_unique<output_wasapi_impl>();
 }

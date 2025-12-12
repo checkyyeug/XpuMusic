@@ -1,4 +1,4 @@
-#include "mp_plugin.h"
+﻿#include "mp_plugin.h"
 #include "mp_decoder.h"
 
 #define MINIMP3_FLOAT_OUTPUT  // We want float output for DSP processing

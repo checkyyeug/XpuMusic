@@ -1,4 +1,4 @@
-#include "test_framework.h"
+﻿#include "test_framework.h"
 #include "foobar_compat_manager.h"
 #include "logging.h"
 #include "migration/data_migration_manager.h"

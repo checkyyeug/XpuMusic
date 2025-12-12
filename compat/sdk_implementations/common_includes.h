@@ -1,12 +1,11 @@
-/**
+﻿/**
  * @file common_includes.h
- * @brief 公共头文件包含
- * @date 2025-12-09
+ * @brief 鍏叡澶存枃浠跺寘鍚? * @date 2025-12-09
  */
 
 #pragma once
 
-// 标准库头文件
+// 鏍囧噯搴撳ご鏂囦欢
 #include <mutex>
 #include <atomic>
 #include <vector>
@@ -18,14 +17,13 @@
 #include <cmath>
 #include <cstring>
 
-// XpuMusic SDK 头文件
-#include "../xpumusic_sdk/foobar2000_sdk.h"
+// XpuMusic SDK 澶存枃浠?#include "../xpumusic_sdk/foobar2000_sdk.h"
 
-// 本地类型定义
+// 鏈湴绫诲瀷瀹氫箟
 #include "audio_sample.h"
 #include "file_info_types.h"
 
-// Result 类型定义
+// Result 绫诲瀷瀹氫箟
 namespace xpumusic_sdk {
 enum class Result {
     Success = 0,

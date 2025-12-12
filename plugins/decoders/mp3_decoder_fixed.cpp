@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file mp3_decoder_fixed.cpp
  * @brief Fixed MP3 decoder plugin using minimp3
  * @date 2025-12-11

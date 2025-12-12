@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file foobar2000.cpp
  * @brief foobar2000 SDK compatibility implementations
  * @date 2025-12-10

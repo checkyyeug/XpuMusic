@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <memory>
 #include <vector>
 #include <chrono>
@@ -7,7 +7,7 @@
 #include <cmath>
 #include <fstream>
 
-// 包含所有阶段1.4的头文件
+// 鍖呭惈鎵€鏈夐樁娈?.4鐨勫ご鏂囦欢
 #include "fb2k_com_base.h"
 #include "fb2k_component_system.h"
 #include "output_asio.h"
@@ -20,7 +20,7 @@
 
 namespace fb2k {
 
-// 测试配置
+// 娴嬭瘯閰嶇疆
 struct test_config {
     bool test_com_system = true;
     bool test_component_loading = true;
@@ -30,32 +30,32 @@ struct test_config {
     bool test_integration = true;
     bool verbose = true;
     int test_duration_seconds = 5;
-    std::string vst_plugin_path = ""; // 可选VST插件路径
+    std::string vst_plugin_path = ""; // 鍙€塚ST鎻掍欢璺緞
 };
 
-// 测试辅助类
+// 娴嬭瘯杈呭姪绫?
 class test_helper {
 public:
     static void print_test_header(const std::string& test_name) {
         std::cout << "\n" << std::string(60, '=') << std::endl;
-        std::cout << "测试: " << test_name << std::endl;
+        std::cout << "娴嬭瘯: " << test_name << std::endl;
         std::cout << std::string(60, '-') << std::endl;
     }
     
     static void print_test_result(bool success, const std::string& message) {
-        std::cout << "结果: " << (success ? "✓ 通过" : "✗ 失败") << " - " << message << std::endl;
+        std::cout << "缁撴灉: " << (success ? "鉁?閫氳繃" : "鉁?澶辫触") << " - " << message << std::endl;
     }
     
     static void print_performance_stats(const audio_processor_stats& stats) {
-        std::cout << "\n性能统计:" << std::endl;
-        std::cout << "  总采样数: " << stats.total_samples_processed << std::endl;
-        std::cout << "  总处理时间: " << std::fixed << std::setprecision(3) 
+        std::cout << "\n鎬ц兘缁熻:" << std::endl;
+        std::cout << "  鎬婚噰鏍锋暟: " << stats.total_samples_processed << std::endl;
+        std::cout << "  鎬诲鐞嗘椂闂? " << std::fixed << std::setprecision(3) 
                   << stats.total_processing_time_ms << "ms" << std::endl;
-        std::cout << "  平均处理时间: " << stats.average_processing_time_ms << "ms" << std::endl;
-        std::cout << "  当前CPU占用: " << std::fixed << std::setprecision(1) 
+        std::cout << "  骞冲潎澶勭悊鏃堕棿: " << stats.average_processing_time_ms << "ms" << std::endl;
+        std::cout << "  褰撳墠CPU鍗犵敤: " << std::fixed << std::setprecision(1) 
                   << stats.current_cpu_usage << "%" << std::endl;
-        std::cout << "  峰值CPU占用: " << stats.peak_cpu_usage << "%" << std::endl;
-        std::cout << "  延迟: " << std::fixed << std::setprecision(2) 
+        std::cout << "  宄板€糃PU鍗犵敤: " << stats.peak_cpu_usage << "%" << std::endl;
+        std::cout << "  寤惰繜: " << std::fixed << std::setprecision(2) 
                   << stats.latency_ms << "ms" << std::endl;
     }
     
@@ -91,126 +91,126 @@ public:
     }
 };
 
-// 测试1: COM系统测试
+// 娴嬭瘯1: COM绯荤粺娴嬭瘯
 bool test_com_system(const test_config& config) {
-    test_helper::print_test_header("COM系统测试");
+    test_helper::print_test_header("COM绯荤粺娴嬭瘯");
     
     bool all_passed = true;
     
     try {
-        // 测试1.1: 初始化COM系统
+        // 娴嬭瘯1.1: 鍒濆鍖朇OM绯荤粺
         initialize_fb2k_core_services();
-        test_helper::print_test_result(true, "COM系统初始化成功");
+        test_helper::print_test_result(true, "COM绯荤粺鍒濆鍖栨垚鍔?);
         
-        // 测试1.2: 获取核心服务
+        // 娴嬭瘯1.2: 鑾峰彇鏍稿績鏈嶅姟
         auto* core = fb2k_core();
         if(core) {
-            test_helper::print_test_result(true, "获取核心服务成功");
+            test_helper::print_test_result(true, "鑾峰彇鏍稿績鏈嶅姟鎴愬姛");
             
-            // 测试服务基本功能
+            // 娴嬭瘯鏈嶅姟鍩烘湰鍔熻兘
             const char* app_name = nullptr;
             if(SUCCEEDED(core->GetAppName(&app_name)) && app_name) {
-                test_helper::print_test_result(true, std::string("应用名称: ") + app_name);
+                test_helper::print_test_result(true, std::string("搴旂敤鍚嶇О: ") + app_name);
             } else {
-                test_helper::print_test_result(false, "无法获取应用名称");
+                test_helper::print_test_result(false, "鏃犳硶鑾峰彇搴旂敤鍚嶇О");
                 all_passed = false;
             }
         } else {
-            test_helper::print_test_result(false, "无法获取核心服务");
+            test_helper::print_test_result(false, "鏃犳硶鑾峰彇鏍稿績鏈嶅姟");
             all_passed = false;
         }
         
-        // 测试1.3: 播放控制服务
+        // 娴嬭瘯1.3: 鎾斁鎺у埗鏈嶅姟
         auto* playback = fb2k_playback_control();
         if(playback) {
-            test_helper::print_test_result(true, "获取播放控制服务成功");
+            test_helper::print_test_result(true, "鑾峰彇鎾斁鎺у埗鏈嶅姟鎴愬姛");
             
-            // 测试播放控制功能
+            // 娴嬭瘯鎾斁鎺у埗鍔熻兘
             DWORD state = 0;
             if(SUCCEEDED(playback->GetPlaybackState(&state))) {
-                test_helper::print_test_result(true, "播放状态查询成功");
+                test_helper::print_test_result(true, "鎾斁鐘舵€佹煡璇㈡垚鍔?);
             } else {
-                test_helper::print_test_result(false, "播放状态查询失败");
+                test_helper::print_test_result(false, "鎾斁鐘舵€佹煡璇㈠け璐?);
                 all_passed = false;
             }
         } else {
-            test_helper::print_test_result(false, "无法获取播放控制服务");
+            test_helper::print_test_result(false, "鏃犳硶鑾峰彇鎾斁鎺у埗鏈嶅姟");
             all_passed = false;
         }
         
-        // 测试1.4: 元数据库服务
+        // 娴嬭瘯1.4: 鍏冩暟鎹簱鏈嶅姟
         auto* metadb = fb2k_metadb();
         if(metadb) {
-            test_helper::print_test_result(true, "获取元数据库服务成功");
+            test_helper::print_test_result(true, "鑾峰彇鍏冩暟鎹簱鏈嶅姟鎴愬姛");
         } else {
-            test_helper::print_test_result(false, "无法获取元数据库服务");
+            test_helper::print_test_result(false, "鏃犳硶鑾峰彇鍏冩暟鎹簱鏈嶅姟");
             all_passed = false;
         }
         
-        // 测试1.5: 配置管理服务
+        // 娴嬭瘯1.5: 閰嶇疆绠＄悊鏈嶅姟
         auto* config = fb2k_config_manager();
         if(config) {
-            test_helper::print_test_result(true, "获取配置管理服务成功");
+            test_helper::print_test_result(true, "鑾峰彇閰嶇疆绠＄悊鏈嶅姟鎴愬姛");
         } else {
-            test_helper::print_test_result(false, "无法获取配置管理服务");
+            test_helper::print_test_result(false, "鏃犳硶鑾峰彇閰嶇疆绠＄悊鏈嶅姟");
             all_passed = false;
         }
         
         shutdown_fb2k_core_services();
         
     } catch(const std::exception& e) {
-        test_helper::print_test_result(false, std::string("COM系统异常: ") + e.what());
+        test_helper::print_test_result(false, std::string("COM绯荤粺寮傚父: ") + e.what());
         all_passed = false;
     }
     
     return all_passed;
 }
 
-// 测试2: 组件系统测试
+// 娴嬭瘯2: 缁勪欢绯荤粺娴嬭瘯
 bool test_component_system(const test_config& config) {
-    test_helper::print_test_header("组件系统测试");
+    test_helper::print_test_header("缁勪欢绯荤粺娴嬭瘯");
     
     bool all_passed = true;
     
     try {
-        // 初始化组件系统
+        // 鍒濆鍖栫粍浠剁郴缁?
         initialize_fb2k_core_services();
         initialize_fb2k_component_system();
         
-        // 测试2.1: 获取组件管理器
+        // 娴嬭瘯2.1: 鑾峰彇缁勪欢绠＄悊鍣?
         auto* manager = fb2k_get_component_manager();
         if(manager) {
-            test_helper::print_test_result(true, "获取组件管理器成功");
+            test_helper::print_test_result(true, "鑾峰彇缁勪欢绠＄悊鍣ㄦ垚鍔?);
             
-            // 测试2.2: 扫描组件
+            // 娴嬭瘯2.2: 鎵弿缁勪欢
             if(SUCCEEDED(manager->ScanComponents("components"))) {
-                test_helper::print_test_result(true, "组件扫描成功");
+                test_helper::print_test_result(true, "缁勪欢鎵弿鎴愬姛");
             } else {
-                test_helper::print_test_result(false, "组件扫描失败");
+                test_helper::print_test_result(false, "缁勪欢鎵弿澶辫触");
                 all_passed = false;
             }
             
-            // 测试2.3: 枚举组件
+            // 娴嬭瘯2.3: 鏋氫妇缁勪欢
             DWORD count = 0;
             if(SUCCEEDED(manager->GetComponentCount(&count))) {
-                test_helper::print_test_result(true, "组件数量: " + std::to_string(count));
+                test_helper::print_test_result(true, "缁勪欢鏁伴噺: " + std::to_string(count));
             } else {
-                test_helper::print_test_result(false, "无法获取组件数量");
+                test_helper::print_test_result(false, "鏃犳硶鑾峰彇缁勪欢鏁伴噺");
                 all_passed = false;
             }
             
-            // 测试2.4: 组件类型枚举
+            // 娴嬭瘯2.4: 缁勪欢绫诲瀷鏋氫妇
             component_type* types = nullptr;
             DWORD type_count = 0;
             if(SUCCEEDED(manager->GetComponentTypes(&types, &type_count))) {
-                test_helper::print_test_result(true, "组件类型数量: " + std::to_string(type_count));
+                test_helper::print_test_result(true, "缁勪欢绫诲瀷鏁伴噺: " + std::to_string(type_count));
             } else {
-                test_helper::print_test_result(false, "无法获取组件类型");
+                test_helper::print_test_result(false, "鏃犳硶鑾峰彇缁勪欢绫诲瀷");
                 all_passed = false;
             }
             
         } else {
-            test_helper::print_test_result(false, "无法获取组件管理器");
+            test_helper::print_test_result(false, "鏃犳硶鑾峰彇缁勪欢绠＄悊鍣?);
             all_passed = false;
         }
         
@@ -218,294 +218,294 @@ bool test_component_system(const test_config& config) {
         shutdown_fb2k_core_services();
         
     } catch(const std::exception& e) {
-        test_helper::print_test_result(false, std::string("组件系统异常: ") + e.what());
+        test_helper::print_test_result(false, std::string("缁勪欢绯荤粺寮傚父: ") + e.what());
         all_passed = false;
     }
     
     return all_passed;
 }
 
-// 测试3: ASIO输出设备测试
+// 娴嬭瘯3: ASIO杈撳嚭璁惧娴嬭瘯
 bool test_asio_output(const test_config& config) {
-    test_helper::print_test_header("ASIO输出设备测试");
+    test_helper::print_test_header("ASIO杈撳嚭璁惧娴嬭瘯");
     
     bool all_passed = true;
     
     try {
-        // 创建ASIO输出设备
+        // 鍒涘缓ASIO杈撳嚭璁惧
         auto asio_output = create_asio_output();
         if(!asio_output) {
-            test_helper::print_test_result(false, "无法创建ASIO输出设备");
+            test_helper::print_test_result(false, "鏃犳硶鍒涘缓ASIO杈撳嚭璁惧");
             return false;
         }
-        test_helper::print_test_result(true, "创建ASIO输出设备成功");
+        test_helper::print_test_result(true, "鍒涘缓ASIO杈撳嚭璁惧鎴愬姛");
         
-        // 测试3.1: 枚举ASIO驱动
+        // 娴嬭瘯3.1: 鏋氫妇ASIO椹卞姩
         std::vector<asio_driver_info> drivers;
         if(asio_output->enum_drivers(drivers) && !drivers.empty()) {
-            test_helper::print_test_result(true, "枚举ASIO驱动成功，发现 " + std::to_string(drivers.size()) + " 个驱动");
+            test_helper::print_test_result(true, "鏋氫妇ASIO椹卞姩鎴愬姛锛屽彂鐜?" + std::to_string(drivers.size()) + " 涓┍鍔?);
             
-            // 显示驱动信息
+            // 鏄剧ず椹卞姩淇℃伅
             for(size_t i = 0; i < drivers.size() && i < 3; ++i) {
-                std::cout << "  驱动[" << i << "]: " << drivers[i].name 
+                std::cout << "  椹卞姩[" << i << "]: " << drivers[i].name 
                          << " (" << drivers[i].description << ")" << std::endl;
             }
         } else {
-            test_helper::print_test_result(false, "无法枚举ASIO驱动");
+            test_helper::print_test_result(false, "鏃犳硶鏋氫妇ASIO椹卞姩");
             all_passed = false;
         }
         
-        // 测试3.2: 加载第一个可用驱动
+        // 娴嬭瘯3.2: 鍔犺浇绗竴涓彲鐢ㄩ┍鍔?
         if(!drivers.empty()) {
             if(asio_output->load_driver(drivers[0].id)) {
-                test_helper::print_test_result(true, "加载ASIO驱动成功: " + drivers[0].name);
+                test_helper::print_test_result(true, "鍔犺浇ASIO椹卞姩鎴愬姛: " + drivers[0].name);
             } else {
-                test_helper::print_test_result(false, "无法加载ASIO驱动");
+                test_helper::print_test_result(false, "鏃犳硶鍔犺浇ASIO椹卞姩");
                 all_passed = false;
             }
         }
         
-        // 测试3.3: 配置ASIO参数
+        // 娴嬭瘯3.3: 閰嶇疆ASIO鍙傛暟
         asio_output->set_buffer_size(512);
         asio_output->set_sample_rate(44100);
-        test_helper::print_test_result(true, "配置ASIO参数成功");
+        test_helper::print_test_result(true, "閰嶇疆ASIO鍙傛暟鎴愬姛");
         
-        // 测试3.4: 获取ASIO信息
-        std::cout << "\nASIO设备信息:" << std::endl;
-        std::cout << "  当前驱动: " << asio_output->get_current_driver_name() << std::endl;
-        std::cout << "  缓冲区大小: " << asio_output->get_buffer_size() << std::endl;
-        std::cout << "  采样率: " << asio_output->get_sample_rate() << "Hz" << std::endl;
-        std::cout << "  输入延迟: " << asio_output->get_input_latency() << " 采样" << std::endl;
-        std::cout << "  输出延迟: " << asio_output->get_output_latency() << " 采样" << std::endl;
+        // 娴嬭瘯3.4: 鑾峰彇ASIO淇℃伅
+        std::cout << "\nASIO璁惧淇℃伅:" << std::endl;
+        std::cout << "  褰撳墠椹卞姩: " << asio_output->get_current_driver_name() << std::endl;
+        std::cout << "  缂撳啿鍖哄ぇ灏? " << asio_output->get_buffer_size() << std::endl;
+        std::cout << "  閲囨牱鐜? " << asio_output->get_sample_rate() << "Hz" << std::endl;
+        std::cout << "  杈撳叆寤惰繜: " << asio_output->get_input_latency() << " 閲囨牱" << std::endl;
+        std::cout << "  杈撳嚭寤惰繜: " << asio_output->get_output_latency() << " 閲囨牱" << std::endl;
         
-        // 测试3.5: 打开音频流（不实际播放）
+        // 娴嬭瘯3.5: 鎵撳紑闊抽娴侊紙涓嶅疄闄呮挱鏀撅級
         abort_callback_dummy abort;
         try {
             asio_output->open(44100, 2, 0, abort);
-            test_helper::print_test_result(true, "打开ASIO音频流成功");
+            test_helper::print_test_result(true, "鎵撳紑ASIO闊抽娴佹垚鍔?);
             
-            // 测试音量控制
+            // 娴嬭瘯闊抽噺鎺у埗
             asio_output->volume_set(0.5f);
-            test_helper::print_test_result(true, "ASIO音量控制成功");
+            test_helper::print_test_result(true, "ASIO闊抽噺鎺у埗鎴愬姛");
             
-            // 关闭音频流
+            // 鍏抽棴闊抽娴?
             asio_output->close(abort);
-            test_helper::print_test_result(true, "关闭ASIO音频流成功");
+            test_helper::print_test_result(true, "鍏抽棴ASIO闊抽娴佹垚鍔?);
             
         } catch(const std::exception& e) {
-            test_helper::print_test_result(false, std::string("ASIO音频流异常: ") + e.what());
+            test_helper::print_test_result(false, std::string("ASIO闊抽娴佸紓甯? ") + e.what());
             all_passed = false;
         }
         
     } catch(const std::exception& e) {
-        test_helper::print_test_result(false, std::string("ASIO输出异常: ") + e.what());
+        test_helper::print_test_result(false, std::string("ASIO杈撳嚭寮傚父: ") + e.what());
         all_passed = false;
     }
     
     return all_passed;
 }
 
-// 测试4: VST桥接测试
+// 娴嬭瘯4: VST妗ユ帴娴嬭瘯
 bool test_vst_bridge(const test_config& config) {
-    test_helper::print_test_header("VST桥接测试");
+    test_helper::print_test_header("VST妗ユ帴娴嬭瘯");
     
     bool all_passed = true;
     
     try {
-        // 初始化VST桥接管理器
+        // 鍒濆鍖朧ST妗ユ帴绠＄悊鍣?
         auto& vst_manager = vst_bridge_manager::get_instance();
         if(!vst_manager.initialize()) {
-            test_helper::print_test_result(false, "VST桥接管理器初始化失败");
+            test_helper::print_test_result(false, "VST妗ユ帴绠＄悊鍣ㄥ垵濮嬪寲澶辫触");
             return false;
         }
-        test_helper::print_test_result(true, "VST桥接管理器初始化成功");
+        test_helper::print_test_result(true, "VST妗ユ帴绠＄悊鍣ㄥ垵濮嬪寲鎴愬姛");
         
-        // 测试4.1: 扫描VST目录
+        // 娴嬭瘯4.1: 鎵弿VST鐩綍
         auto vst_dirs = vst_manager.get_vst_directories();
         if(!vst_dirs.empty()) {
-            test_helper::print_test_result(true, "获取VST目录成功，发现 " + std::to_string(vst_dirs.size()) + " 个目录");
+            test_helper::print_test_result(true, "鑾峰彇VST鐩綍鎴愬姛锛屽彂鐜?" + std::to_string(vst_dirs.size()) + " 涓洰褰?);
             
-            // 扫描每个目录
+            // 鎵弿姣忎釜鐩綍
             int total_plugins = 0;
             for(const auto& dir : vst_dirs) {
                 auto plugins = vst_manager.scan_vst_plugins(dir);
                 total_plugins += plugins.size();
             }
-            test_helper::print_test_result(true, "扫描VST插件成功，发现 " + std::to_string(total_plugins) + " 个插件");
+            test_helper::print_test_result(true, "鎵弿VST鎻掍欢鎴愬姛锛屽彂鐜?" + std::to_string(total_plugins) + " 涓彃浠?);
         } else {
-            test_helper::print_test_result(false, "未找到VST目录");
+            test_helper::print_test_result(false, "鏈壘鍒癡ST鐩綍");
             all_passed = false;
         }
         
-        // 测试4.2: 加载VST插件（如果有指定路径）
+        // 娴嬭瘯4.2: 鍔犺浇VST鎻掍欢锛堝鏋滄湁鎸囧畾璺緞锛?
         if(!config.vst_plugin_path.empty()) {
             auto* plugin = vst_manager.load_vst_plugin(config.vst_plugin_path);
             if(plugin) {
-                test_helper::print_test_result(true, "加载VST插件成功: " + config.vst_plugin_path);
+                test_helper::print_test_result(true, "鍔犺浇VST鎻掍欢鎴愬姛: " + config.vst_plugin_path);
                 
-                // 测试插件信息
-                std::cout << "\nVST插件信息:" << std::endl;
-                std::cout << "  插件名称: " << plugin->get_plugin_name() << std::endl;
-                std::cout << "  供应商: " << plugin->get_plugin_vendor() << std::endl;
-                std::cout << "  版本: " << plugin->get_plugin_version() << std::endl;
-                std::cout << "  输入声道: " << plugin->get_num_inputs() << std::endl;
-                std::cout << "  输出声道: " << plugin->get_num_outputs() << std::endl;
-                std::cout << "  参数数量: " << plugin->get_num_parameters() << std::endl;
-                std::cout << "  预设数量: " << plugin->get_num_programs() << std::endl;
+                // 娴嬭瘯鎻掍欢淇℃伅
+                std::cout << "\nVST鎻掍欢淇℃伅:" << std::endl;
+                std::cout << "  鎻掍欢鍚嶇О: " << plugin->get_plugin_name() << std::endl;
+                std::cout << "  渚涘簲鍟? " << plugin->get_plugin_vendor() << std::endl;
+                std::cout << "  鐗堟湰: " << plugin->get_plugin_version() << std::endl;
+                std::cout << "  杈撳叆澹伴亾: " << plugin->get_num_inputs() << std::endl;
+                std::cout << "  杈撳嚭澹伴亾: " << plugin->get_num_outputs() << std::endl;
+                std::cout << "  鍙傛暟鏁伴噺: " << plugin->get_num_parameters() << std::endl;
+                std::cout << "  棰勮鏁伴噺: " << plugin->get_num_programs() << std::endl;
                 
-                // 测试参数获取
+                // 娴嬭瘯鍙傛暟鑾峰彇
                 auto params = plugin->get_parameter_info();
                 if(!params.empty()) {
-                    std::cout << "  参数信息:" << std::endl;
+                    std::cout << "  鍙傛暟淇℃伅:" << std::endl;
                     for(size_t i = 0; i < std::min(params.size(), size_t(5)); ++i) {
                         std::cout << "    [" << i << "] " << params[i].name 
                                  << " (" << params[i].min_value << " - " << params[i].max_value << ")" << std::endl;
                     }
                 }
                 
-                // 卸载插件
+                // 鍗歌浇鎻掍欢
                 vst_manager.unload_vst_plugin(plugin);
-                test_helper::print_test_result(true, "卸载VST插件成功");
+                test_helper::print_test_result(true, "鍗歌浇VST鎻掍欢鎴愬姛");
                 
             } else {
-                test_helper::print_test_result(false, "无法加载指定VST插件");
+                test_helper::print_test_result(false, "鏃犳硶鍔犺浇鎸囧畾VST鎻掍欢");
                 all_passed = false;
             }
         } else {
-            test_helper::print_test_result(true, "未指定VST插件路径，跳过插件加载测试");
+            test_helper::print_test_result(true, "鏈寚瀹歏ST鎻掍欢璺緞锛岃烦杩囨彃浠跺姞杞芥祴璇?);
         }
         
-        // 测试4.3: VST宿主功能
-        std::cout << "\nVST宿主信息:" << std::endl;
-        std::cout << "  宿主名称: " << vst_manager.vst_host_->get_host_name() << std::endl;
-        std::cout << "  宿主版本: " << vst_manager.vst_host_->get_host_version() << std::endl;
-        std::cout << "  宿主供应商: " << vst_manager.vst_host_->get_host_vendor() << std::endl;
-        std::cout << "  缓冲区大小: " << vst_manager.get_vst_buffer_size() << std::endl;
-        std::cout << "  采样率: " << vst_manager.get_vst_sample_rate() << "Hz" << std::endl;
+        // 娴嬭瘯4.3: VST瀹夸富鍔熻兘
+        std::cout << "\nVST瀹夸富淇℃伅:" << std::endl;
+        std::cout << "  瀹夸富鍚嶇О: " << vst_manager.vst_host_->get_host_name() << std::endl;
+        std::cout << "  瀹夸富鐗堟湰: " << vst_manager.vst_host_->get_host_version() << std::endl;
+        std::cout << "  瀹夸富渚涘簲鍟? " << vst_manager.vst_host_->get_host_vendor() << std::endl;
+        std::cout << "  缂撳啿鍖哄ぇ灏? " << vst_manager.get_vst_buffer_size() << std::endl;
+        std::cout << "  閲囨牱鐜? " << vst_manager.get_vst_sample_rate() << "Hz" << std::endl;
         
         vst_manager.shutdown();
         
     } catch(const std::exception& e) {
-        test_helper::print_test_result(false, std::string("VST桥接异常: ") + e.what());
+        test_helper::print_test_result(false, std::string("VST妗ユ帴寮傚父: ") + e.what());
         all_passed = false;
     }
     
     return all_passed;
 }
 
-// 测试5: 音频分析工具测试
+// 娴嬭瘯5: 闊抽鍒嗘瀽宸ュ叿娴嬭瘯
 bool test_audio_analyzer(const test_config& config) {
-    test_helper::print_test_header("音频分析工具测试");
+    test_helper::print_test_header("闊抽鍒嗘瀽宸ュ叿娴嬭瘯");
     
     bool all_passed = true;
     
     try {
-        // 获取音频分析管理器
+        // 鑾峰彇闊抽鍒嗘瀽绠＄悊鍣?
         auto& analysis_manager = get_audio_analysis_manager();
         
-        // 测试5.1: 频谱分析仪
+        // 娴嬭瘯5.1: 棰戣氨鍒嗘瀽浠?
         auto spectrum_analyzer = std::make_unique<fb2k::spectrum_analyzer>();
         if(spectrum_analyzer) {
-            test_helper::print_test_result(true, "创建频谱分析仪成功");
+            test_helper::print_test_result(true, "鍒涘缓棰戣氨鍒嗘瀽浠垚鍔?);
             
-            // 初始化分析仪
+            // 鍒濆鍖栧垎鏋愪华
             if(SUCCEEDED(spectrum_analyzer->Initialize())) {
-                test_helper::print_test_result(true, "初始化频谱分析仪成功");
+                test_helper::print_test_result(true, "鍒濆鍖栭璋卞垎鏋愪华鎴愬姛");
                 
-                // 配置分析仪
+                // 閰嶇疆鍒嗘瀽浠?
                 spectrum_analyzer->set_fft_size(2048);
-                spectrum_analyzer->set_window_type(1); // Hann窗
-                spectrum_analyzer->set_analysis_mode(0); // 实时模式
-                test_helper::print_test_result(true, "配置频谱分析仪成功");
+                spectrum_analyzer->set_window_type(1); // Hann绐?
+                spectrum_analyzer->set_analysis_mode(0); // 瀹炴椂妯″紡
+                test_helper::print_test_result(true, "閰嶇疆棰戣氨鍒嗘瀽浠垚鍔?);
                 
-                // 创建测试音频
+                // 鍒涘缓娴嬭瘯闊抽
                 auto test_chunk = test_helper::create_test_chunk(44100, 2, 2048, 1000.0f);
                 
-                // 测试基本分析
+                // 娴嬭瘯鍩烘湰鍒嗘瀽
                 audio_features features;
                 if(SUCCEEDED(spectrum_analyzer->analyze_chunk(test_chunk, features))) {
-                    test_helper::print_test_result(true, "音频特征分析成功");
+                    test_helper::print_test_result(true, "闊抽鐗瑰緛鍒嗘瀽鎴愬姛");
                     
-                    std::cout << "\n音频特征:" << std::endl;
-                    std::cout << "  RMS电平: " << std::fixed << std::setprecision(2) << features.rms_level << " dB" << std::endl;
-                    std::cout << "  峰值电平: " << features.peak_level << " dB" << std::endl;
-                    std::cout << "  响度: " << features.loudness << " LUFS" << std::endl;
-                    std::cout << "  动态范围: " << features.dynamic_range << " dB" << std::endl;
-                    std::cout << "  DC偏移: " << features.dc_offset << std::endl;
-                    std::cout << "  立体声相关性: " << features.stereo_correlation << std::endl;
+                    std::cout << "\n闊抽鐗瑰緛:" << std::endl;
+                    std::cout << "  RMS鐢靛钩: " << std::fixed << std::setprecision(2) << features.rms_level << " dB" << std::endl;
+                    std::cout << "  宄板€肩數骞? " << features.peak_level << " dB" << std::endl;
+                    std::cout << "  鍝嶅害: " << features.loudness << " LUFS" << std::endl;
+                    std::cout << "  鍔ㄦ€佽寖鍥? " << features.dynamic_range << " dB" << std::endl;
+                    std::cout << "  DC鍋忕Щ: " << features.dc_offset << std::endl;
+                    std::cout << "  绔嬩綋澹扮浉鍏虫€? " << features.stereo_correlation << std::endl;
                 } else {
-                    test_helper::print_test_result(false, "音频特征分析失败");
+                    test_helper::print_test_result(false, "闊抽鐗瑰緛鍒嗘瀽澶辫触");
                     all_passed = false;
                 }
                 
-                // 测试频谱分析
+                // 娴嬭瘯棰戣氨鍒嗘瀽
                 spectrum_data spectrum;
                 if(SUCCEEDED(spectrum_analyzer->analyze_spectrum(test_chunk, spectrum))) {
-                    test_helper::print_test_result(true, "频谱分析成功");
+                    test_helper::print_test_result(true, "棰戣氨鍒嗘瀽鎴愬姛");
                     
-                    std::cout << "\n频谱信息:" << std::endl;
-                    std::cout << "  FFT大小: " << spectrum.fft_size << std::endl;
-                    std::cout << "  频率分辨率: " << (spectrum.sample_rate / spectrum.fft_size) << " Hz" << std::endl;
-                    std::cout << "  频点数量: " << spectrum.frequencies.size() << std::endl;
+                    std::cout << "\n棰戣氨淇℃伅:" << std::endl;
+                    std::cout << "  FFT澶у皬: " << spectrum.fft_size << std::endl;
+                    std::cout << "  棰戠巼鍒嗚鲸鐜? " << (spectrum.sample_rate / spectrum.fft_size) << " Hz" << std::endl;
+                    std::cout << "  棰戠偣鏁伴噺: " << spectrum.frequencies.size() << std::endl;
                     
-                    // 测试频率带分析
+                    // 娴嬭瘯棰戠巼甯﹀垎鏋?
                     double band_level = 0.0;
                     if(SUCCEEDED(spectrum_analyzer->get_frequency_band_level(frequency_band::midrange, band_level))) {
-                        std::cout << "  中频带(500-2000Hz)电平: " << band_level << " dB" << std::endl;
+                        std::cout << "  涓甯?500-2000Hz)鐢靛钩: " << band_level << " dB" << std::endl;
                     }
                 } else {
-                    test_helper::print_test_result(false, "频谱分析失败");
+                    test_helper::print_test_result(false, "棰戣氨鍒嗘瀽澶辫触");
                     all_passed = false;
                 }
                 
-                // 测试实时分析
+                // 娴嬭瘯瀹炴椂鍒嗘瀽
                 real_time_analysis analysis;
                 if(SUCCEEDED(spectrum_analyzer->get_real_time_analysis(analysis))) {
-                    test_helper::print_test_result(true, "实时分析成功");
+                    test_helper::print_test_result(true, "瀹炴椂鍒嗘瀽鎴愬姛");
                 } else {
-                    test_helper::print_test_result(false, "实时分析失败");
+                    test_helper::print_test_result(false, "瀹炴椂鍒嗘瀽澶辫触");
                     all_passed = false;
                 }
                 
-                // 生成分析报告
+                // 鐢熸垚鍒嗘瀽鎶ュ憡
                 std::string report;
                 if(SUCCEEDED(spectrum_analyzer->generate_report(report))) {
-                    test_helper::print_test_result(true, "生成分析报告成功");
+                    test_helper::print_test_result(true, "鐢熸垚鍒嗘瀽鎶ュ憡鎴愬姛");
                     if(config.verbose) {
-                        std::cout << "\n分析报告预览:\n" << report.substr(0, 300) << "..." << std::endl;
+                        std::cout << "\n鍒嗘瀽鎶ュ憡棰勮:\n" << report.substr(0, 300) << "..." << std::endl;
                     }
                 }
                 
                 spectrum_analyzer->Shutdown();
             } else {
-                test_helper::print_test_result(false, "初始化频谱分析仪失败");
+                test_helper::print_test_result(false, "鍒濆鍖栭璋卞垎鏋愪华澶辫触");
                 all_passed = false;
             }
         } else {
-            test_helper::print_test_result(false, "无法创建频谱分析仪");
+            test_helper::print_test_result(false, "鏃犳硶鍒涘缓棰戣氨鍒嗘瀽浠?);
             all_passed = false;
         }
         
     } catch(const std::exception& e) {
-        test_helper::print_test_result(false, std::string("音频分析异常: ") + e.what());
+        test_helper::print_test_result(false, std::string("闊抽鍒嗘瀽寮傚父: ") + e.what());
         all_passed = false;
     }
     
     return all_passed;
 }
 
-// 测试6: 集成测试
+// 娴嬭瘯6: 闆嗘垚娴嬭瘯
 bool test_integration(const test_config& config) {
-    test_helper::print_test_header("集成测试");
+    test_helper::print_test_header("闆嗘垚娴嬭瘯");
     
     bool all_passed = true;
     
     try {
-        // 初始化所有系统
+        // 鍒濆鍖栨墍鏈夌郴缁?
         initialize_fb2k_core_services();
         initialize_fb2k_component_system();
         
-        // 创建音频处理器
+        // 鍒涘缓闊抽澶勭悊鍣?
         auto processor = create_audio_processor();
         
         audio_processor_config processor_config;
@@ -516,12 +516,12 @@ bool test_integration(const test_config& config) {
         processor_config.enable_performance_monitoring = true;
         
         if(!processor->initialize(processor_config)) {
-            test_helper::print_test_result(false, "音频处理器初始化失败");
+            test_helper::print_test_result(false, "闊抽澶勭悊鍣ㄥ垵濮嬪寲澶辫触");
             return false;
         }
-        test_helper::print_test_result(true, "音频处理器初始化成功");
+        test_helper::print_test_result(true, "闊抽澶勭悊鍣ㄥ垵濮嬪寲鎴愬姛");
         
-        // 添加DSP效果器
+        // 娣诲姞DSP鏁堟灉鍣?
         auto dsp_manager = std::make_unique<fb2k::dsp_manager>();
         dsp_config dsp_config;
         dsp_config.enable_standard_effects = true;
@@ -532,10 +532,10 @@ bool test_integration(const test_config& config) {
             auto reverb = dsp_manager->create_reverb();
             processor->add_dsp_effect(std::move(eq));
             processor->add_dsp_effect(std::move(reverb));
-            test_helper::print_test_result(true, "添加DSP效果器成功");
+            test_helper::print_test_result(true, "娣诲姞DSP鏁堟灉鍣ㄦ垚鍔?);
         }
         
-        // 测试6.1: 完整音频处理链路
+        // 娴嬭瘯6.1: 瀹屾暣闊抽澶勭悊閾捐矾
         auto test_chunk = test_helper::create_test_chunk(44100, 2, 1024, 440.0f);
         audio_chunk output_chunk;
         abort_callback_dummy abort;
@@ -548,45 +548,45 @@ bool test_integration(const test_config& config) {
         double processing_time_ms = duration.count() / 1000.0;
         
         if(process_success) {
-            test_helper::print_test_result(true, "完整音频处理链路成功，耗时: " + std::to_string(processing_time_ms) + "ms");
+            test_helper::print_test_result(true, "瀹屾暣闊抽澶勭悊閾捐矾鎴愬姛锛岃€楁椂: " + std::to_string(processing_time_ms) + "ms");
             
-            // 验证输出
+            // 楠岃瘉杈撳嚭
             float output_rms = output_chunk.calculate_rms();
             if(output_rms > 0.0f) {
-                test_helper::print_test_result(true, "输出验证通过，RMS: " + std::to_string(output_rms));
+                test_helper::print_test_result(true, "杈撳嚭楠岃瘉閫氳繃锛孯MS: " + std::to_string(output_rms));
             } else {
-                test_helper::print_test_result(false, "输出为空");
+                test_helper::print_test_result(false, "杈撳嚭涓虹┖");
                 all_passed = false;
             }
         } else {
-            test_helper::print_test_result(false, "完整音频处理链路失败");
+            test_helper::print_test_result(false, "瀹屾暣闊抽澶勭悊閾捐矾澶辫触");
             all_passed = false;
         }
         
-        // 测试6.2: 性能监控
+        // 娴嬭瘯6.2: 鎬ц兘鐩戞帶
         auto stats = processor->get_stats();
         test_helper::print_performance_stats(stats);
         
-        // 测试6.3: 状态报告
+        // 娴嬭瘯6.3: 鐘舵€佹姤鍛?
         std::string status_report = processor->get_status_report();
         if(!status_report.empty()) {
-            test_helper::print_test_result(true, "状态报告生成成功");
+            test_helper::print_test_result(true, "鐘舵€佹姤鍛婄敓鎴愭垚鍔?);
             if(config.verbose) {
-                std::cout << "\n状态报告预览:\n" << status_report.substr(0, 400) << "..." << std::endl;
+                std::cout << "\n鐘舵€佹姤鍛婇瑙?\n" << status_report.substr(0, 400) << "..." << std::endl;
             }
         } else {
-            test_helper::print_test_result(false, "状态报告为空");
+            test_helper::print_test_result(false, "鐘舵€佹姤鍛婁负绌?);
             all_passed = false;
         }
         
-        // 测试6.4: 实时参数调节
+        // 娴嬭瘯6.4: 瀹炴椂鍙傛暟璋冭妭
         processor->set_realtime_parameter("Reverb", "room_size", 0.8f);
         float room_size = processor->get_realtime_parameter("Reverb", "room_size");
         
         if(std::abs(room_size - 0.8f) < 0.01f) {
-            test_helper::print_test_result(true, "实时参数调节验证通过");
+            test_helper::print_test_result(true, "瀹炴椂鍙傛暟璋冭妭楠岃瘉閫氳繃");
         } else {
-            test_helper::print_test_result(false, "实时参数调节验证失败");
+            test_helper::print_test_result(false, "瀹炴椂鍙傛暟璋冭妭楠岃瘉澶辫触");
             all_passed = false;
         }
         
@@ -595,25 +595,25 @@ bool test_integration(const test_config& config) {
         shutdown_fb2k_core_services();
         
     } catch(const std::exception& e) {
-        test_helper::print_test_result(false, std::string("集成测试异常: ") + e.what());
+        test_helper::print_test_result(false, std::string("闆嗘垚娴嬭瘯寮傚父: ") + e.what());
         all_passed = false;
     }
     
     return all_passed;
 }
 
-// 性能基准测试
+// 鎬ц兘鍩哄噯娴嬭瘯
 bool test_performance_benchmark(const test_config& config) {
-    test_helper::print_test_header("性能基准测试");
+    test_helper::print_test_header("鎬ц兘鍩哄噯娴嬭瘯");
     
     bool all_passed = true;
     
     try {
-        // 初始化系统
+        // 鍒濆鍖栫郴缁?
         initialize_fb2k_core_services();
         initialize_fb2k_component_system();
         
-        // 创建音频处理器
+        // 鍒涘缓闊抽澶勭悊鍣?
         auto processor = create_audio_processor();
         
         audio_processor_config processor_config;
@@ -624,11 +624,11 @@ bool test_performance_benchmark(const test_config& config) {
         processor_config.enable_performance_monitoring = true;
         
         if(!processor->initialize(processor_config)) {
-            test_helper::print_test_result(false, "音频处理器初始化失败");
+            test_helper::print_test_result(false, "闊抽澶勭悊鍣ㄥ垵濮嬪寲澶辫触");
             return false;
         }
         
-        // 添加多个效果器进行压力测试
+        // 娣诲姞澶氫釜鏁堟灉鍣ㄨ繘琛屽帇鍔涙祴璇?
         auto dsp_manager = std::make_unique<fb2k::dsp_manager>();
         dsp_config dsp_config;
         dsp_config.enable_standard_effects = true;
@@ -643,7 +643,7 @@ bool test_performance_benchmark(const test_config& config) {
             }
         }
         
-        // 性能测试
+        // 鎬ц兘娴嬭瘯
         const int iterations = 100;
         std::vector<double> processing_times;
         
@@ -658,12 +658,12 @@ bool test_performance_benchmark(const test_config& config) {
             
             if(success) {
                 auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
-                processing_times.push_back(duration.count() / 1000.0); // 转换为毫秒
+                processing_times.push_back(duration.count() / 1000.0); // 杞崲涓烘绉?
             }
         }
         
         if(!processing_times.empty()) {
-            // 计算统计信息
+            // 璁＄畻缁熻淇℃伅
             double total_time = 0.0;
             double min_time = processing_times[0];
             double max_time = processing_times[0];
@@ -675,23 +675,23 @@ bool test_performance_benchmark(const test_config& config) {
             }
             
             double avg_time = total_time / processing_times.size();
-            double rtf = (avg_time / (1024.0 / 44100 * 1000.0)); // 实时倍数
+            double rtf = (avg_time / (1024.0 / 44100 * 1000.0)); // 瀹炴椂鍊嶆暟
             
-            std::cout << "\n性能基准结果:" << std::endl;
-            std::cout << "  测试次数: " << processing_times.size() << std::endl;
-            std::cout << "  平均处理时间: " << std::fixed << std::setprecision(3) << avg_time << "ms" << std::endl;
-            std::cout << "  最小处理时间: " << min_time << "ms" << std::endl;
-            std::cout << "  最大处理时间: " << max_time << "ms" << std::endl;
-            std::cout << "  实时倍数: " << std::fixed << std::setprecision(2) << rtf << "x" << std::endl;
+            std::cout << "\n鎬ц兘鍩哄噯缁撴灉:" << std::endl;
+            std::cout << "  娴嬭瘯娆℃暟: " << processing_times.size() << std::endl;
+            std::cout << "  骞冲潎澶勭悊鏃堕棿: " << std::fixed << std::setprecision(3) << avg_time << "ms" << std::endl;
+            std::cout << "  鏈€灏忓鐞嗘椂闂? " << min_time << "ms" << std::endl;
+            std::cout << "  鏈€澶у鐞嗘椂闂? " << max_time << "ms" << std::endl;
+            std::cout << "  瀹炴椂鍊嶆暟: " << std::fixed << std::setprecision(2) << rtf << "x" << std::endl;
             
             if(rtf < 1.0) {
-                test_helper::print_test_result(true, "性能基准测试通过（实时倍数 < 1.0）");
+                test_helper::print_test_result(true, "鎬ц兘鍩哄噯娴嬭瘯閫氳繃锛堝疄鏃跺€嶆暟 < 1.0锛?);
             } else {
-                test_helper::print_test_result(false, "性能基准测试失败（实时倍数 >= 1.0）");
+                test_helper::print_test_result(false, "鎬ц兘鍩哄噯娴嬭瘯澶辫触锛堝疄鏃跺€嶆暟 >= 1.0锛?);
                 all_passed = false;
             }
         } else {
-            test_helper::print_test_result(false, "性能基准测试无有效数据");
+            test_helper::print_test_result(false, "鎬ц兘鍩哄噯娴嬭瘯鏃犳湁鏁堟暟鎹?);
             all_passed = false;
         }
         
@@ -700,7 +700,7 @@ bool test_performance_benchmark(const test_config& config) {
         shutdown_fb2k_core_services();
         
     } catch(const std::exception& e) {
-        test_helper::print_test_result(false, std::string("性能基准测试异常: ") + e.what());
+        test_helper::print_test_result(false, std::string("鎬ц兘鍩哄噯娴嬭瘯寮傚父: ") + e.what());
         all_passed = false;
     }
     
@@ -709,15 +709,15 @@ bool test_performance_benchmark(const test_config& config) {
 
 } // namespace fb2k
 
-// 主测试函数
+// 涓绘祴璇曞嚱鏁?
 int main(int argc, char* argv[]) {
     using namespace fb2k;
     
-    std::cout << "foobar2000兼容层 - 阶段1.4功能测试" << std::endl;
+    std::cout << "foobar2000鍏煎灞?- 闃舵1.4鍔熻兘娴嬭瘯" << std::endl;
     std::cout << "====================================" << std::endl;
-    std::cout << "测试时间: " << std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) << std::endl;
+    std::cout << "娴嬭瘯鏃堕棿: " << std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) << std::endl;
     
-    // 解析命令行参数
+    // 瑙ｆ瀽鍛戒护琛屽弬鏁?
     test_config config;
     
     for(int i = 1; i < argc; ++i) {
@@ -730,30 +730,30 @@ int main(int argc, char* argv[]) {
         } else if(arg == "--quiet") {
             config.verbose = false;
         } else if(arg == "--help") {
-            std::cout << "用法: " << argv[0] << " [选项]" << std::endl;
-            std::cout << "选项:" << std::endl;
-            std::cout << "  --vst-plugin <path>    指定VST插件路径进行测试" << std::endl;
-            std::cout << "  --duration <seconds>   设置测试持续时间 (默认: 5)" << std::endl;
-            std::cout << "  --quiet                减少输出信息" << std::endl;
-            std::cout << "  --help                 显示帮助信息" << std::endl;
+            std::cout << "鐢ㄦ硶: " << argv[0] << " [閫夐」]" << std::endl;
+            std::cout << "閫夐」:" << std::endl;
+            std::cout << "  --vst-plugin <path>    鎸囧畾VST鎻掍欢璺緞杩涜娴嬭瘯" << std::endl;
+            std::cout << "  --duration <seconds>   璁剧疆娴嬭瘯鎸佺画鏃堕棿 (榛樿: 5)" << std::endl;
+            std::cout << "  --quiet                鍑忓皯杈撳嚭淇℃伅" << std::endl;
+            std::cout << "  --help                 鏄剧ず甯姪淇℃伅" << std::endl;
             return 0;
         }
     }
     
-    std::cout << "\n测试配置:" << std::endl;
-    std::cout << "  VST插件路径: " << (config.vst_plugin_path.empty() ? "未指定" : config.vst_plugin_path) << std::endl;
-    std::cout << "  测试持续时间: " << config.test_duration_seconds << "秒" << std::endl;
-    std::cout << "  详细输出: " << (config.verbose ? "启用" : "禁用") << std::endl;
+    std::cout << "\n娴嬭瘯閰嶇疆:" << std::endl;
+    std::cout << "  VST鎻掍欢璺緞: " << (config.vst_plugin_path.empty() ? "鏈寚瀹? : config.vst_plugin_path) << std::endl;
+    std::cout << "  娴嬭瘯鎸佺画鏃堕棿: " << config.test_duration_seconds << "绉? << std::endl;
+    std::cout << "  璇︾粏杈撳嚭: " << (config.verbose ? "鍚敤" : "绂佺敤") << std::endl;
     
-    // 运行所有测试
+    // 杩愯鎵€鏈夋祴璇?
     std::vector<std::pair<std::string, std::function<bool(const test_config&)>>> tests = {
-        {"COM系统测试", test_com_system},
-        {"组件系统测试", test_component_system},
-        {"ASIO输出设备测试", test_asio_output},
-        {"VST桥接测试", test_vst_bridge},
-        {"音频分析工具测试", test_audio_analyzer},
-        {"集成测试", test_integration},
-        {"性能基准测试", test_performance_benchmark}
+        {"COM绯荤粺娴嬭瘯", test_com_system},
+        {"缁勪欢绯荤粺娴嬭瘯", test_component_system},
+        {"ASIO杈撳嚭璁惧娴嬭瘯", test_asio_output},
+        {"VST妗ユ帴娴嬭瘯", test_vst_bridge},
+        {"闊抽鍒嗘瀽宸ュ叿娴嬭瘯", test_audio_analyzer},
+        {"闆嗘垚娴嬭瘯", test_integration},
+        {"鎬ц兘鍩哄噯娴嬭瘯", test_performance_benchmark}
     };
     
     int passed_count = 0;
@@ -765,30 +765,30 @@ int main(int argc, char* argv[]) {
             passed_count++;
         }
         
-        std::cout << "\n" << test_name << " 结果: " << (passed ? "通过" : "失败") << std::endl;
+        std::cout << "\n" << test_name << " 缁撴灉: " << (passed ? "閫氳繃" : "澶辫触") << std::endl;
     }
     
-    // 总结
+    // 鎬荤粨
     std::cout << "\n" << std::string(60, '=') << std::endl;
-    std::cout << "测试总结:" << std::endl;
-    std::cout << "  总测试数: " << total_count << std::endl;
-    std::cout << "  通过测试: " << passed_count << std::endl;
-    std::cout << "  失败测试: " << (total_count - passed_count) << std::endl;
-    std::cout << "  通过率: " << std::fixed << std::setprecision(1) 
+    std::cout << "娴嬭瘯鎬荤粨:" << std::endl;
+    std::cout << "  鎬绘祴璇曟暟: " << total_count << std::endl;
+    std::cout << "  閫氳繃娴嬭瘯: " << passed_count << std::endl;
+    std::cout << "  澶辫触娴嬭瘯: " << (total_count - passed_count) << std::endl;
+    std::cout << "  閫氳繃鐜? " << std::fixed << std::setprecision(1) 
               << (passed_count * 100.0 / total_count) << "%" << std::endl;
     
     if(passed_count == total_count) {
-        std::cout << "\n✓ 所有测试通过！阶段1.4功能正常。" << std::endl;
-        std::cout << "\n阶段1.4实现了以下核心功能:" << std::endl;
-        std::cout << "- 完整的foobar2000 COM接口体系" << std::endl;
-        std::cout << "- 组件系统和插件加载器" << std::endl;
-        std::cout << "- ASIO专业音频驱动支持" << std::endl;
-        std::cout << "- VST插件桥接系统" << std::endl;
-        std::cout << "- 高级音频分析工具" << std::endl;
-        std::cout << "- 完整的音频处理链路集成" << std::endl;
+        std::cout << "\n鉁?鎵€鏈夋祴璇曢€氳繃锛侀樁娈?.4鍔熻兘姝ｅ父銆? << std::endl;
+        std::cout << "\n闃舵1.4瀹炵幇浜嗕互涓嬫牳蹇冨姛鑳?" << std::endl;
+        std::cout << "- 瀹屾暣鐨刦oobar2000 COM鎺ュ彛浣撶郴" << std::endl;
+        std::cout << "- 缁勪欢绯荤粺鍜屾彃浠跺姞杞藉櫒" << std::endl;
+        std::cout << "- ASIO涓撲笟闊抽椹卞姩鏀寔" << std::endl;
+        std::cout << "- VST鎻掍欢妗ユ帴绯荤粺" << std::endl;
+        std::cout << "- 楂樼骇闊抽鍒嗘瀽宸ュ叿" << std::endl;
+        std::cout << "- 瀹屾暣鐨勯煶棰戝鐞嗛摼璺泦鎴? << std::endl;
         return 0;
     } else {
-        std::cout << "\n✗ 部分测试失败，请检查错误信息。" << std::endl;
+        std::cout << "\n鉁?閮ㄥ垎娴嬭瘯澶辫触锛岃妫€鏌ラ敊璇俊鎭€? << std::endl;
         return 1;
     }
 }

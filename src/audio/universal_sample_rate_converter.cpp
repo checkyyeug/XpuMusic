@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file universal_sample_rate_converter.cpp
  * @brief Universal sample rate converter implementation
  * @date 2025-12-10
@@ -245,7 +245,7 @@ std::vector<std::string> UniversalSampleRateConverter::get_cached_conversions() 
     std::vector<std::string> conversions;
     for (const auto& [key, _] : converter_cache_) {
         conversions.push_back(
-            std::to_string(key.input_rate) + "Hz → " +
+            std::to_string(key.input_rate) + "Hz 鈫?" +
             std::to_string(key.output_rate) + "Hz (" +
             std::to_string(key.channels) + " channels)"
         );

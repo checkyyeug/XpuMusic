@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file platform_utils.h
  * @brief Cross-platform detection and utilities
  * @date 2025-12-10

@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @file metadb_handle_impl.cpp
- * @brief metadb_handle_impl 实现
+ * @brief metadb_handle_impl 瀹炵幇
  * @date 2025-12-09
  */
 
@@ -19,10 +19,10 @@
 
 namespace foobar2000_sdk {
 
-// 使用 xpumusic_sdk 中的类型
+// 浣跨敤 xpumusic_sdk 涓殑绫诲瀷
 using xpumusic_sdk::abort_callback;
 
-// TrackStatistics 实现
+// TrackStatistics 瀹炵幇
 typedef std::chrono::system_clock::time_point time_point;
 typedef std::chrono::system_clock::duration duration;
 
@@ -33,7 +33,7 @@ static uint64_t get_current_timestamp() {
 }
 
 //==============================================================================
-// metadb_handle_impl 实现
+// metadb_handle_impl 瀹炵幇
 //==============================================================================
 
 metadb_handle_impl::metadb_handle_impl() {
@@ -59,11 +59,11 @@ Result metadb_handle_impl::initialize(const playable_location& loc, metadb_impl*
     location_ = loc;
     parent_db_ = parent;
     
-    // 尝试从文件加载元数据
+    // 灏濊瘯浠庢枃浠跺姞杞藉厓鏁版嵁
     Result result = load_metadata_from_file();
     if (result != Result::Success) {
-        // 可以没有有效元数据继续
-        // 标记为初始化但仍可用
+        // 鍙互娌℃湁鏈夋晥鍏冩暟鎹户缁?
+        // 鏍囪涓哄垵濮嬪寲浣嗕粛鍙敤
     }
     
     initialized_ = true;
@@ -71,15 +71,15 @@ Result metadb_handle_impl::initialize(const playable_location& loc, metadb_impl*
 }
 
 Result metadb_handle_impl::load_metadata_from_file() {
-    // 这个实现是简化的
-    // 真正的实现需要调用解码器来获取元数据
+    // 杩欎釜瀹炵幇鏄畝鍖栫殑
+    // 鐪熸鐨勫疄鐜伴渶瑕佽皟鐢ㄨВ鐮佸櫒鏉ヨ幏鍙栧厓鏁版嵁
     
     const std::string& path = location_.get_path();
     if (!path || strlen(path) == 0) {
         return Result::InvalidParameter;
     }
     
-    // 获取文件统计（大小、时间戳）
+    // 鑾峰彇鏂囦欢缁熻锛堝ぇ灏忋€佹椂闂存埑锛?
 #ifdef _WIN32
     struct _stat64 st;
     if (_stat64(path, &st) != 0) {
@@ -97,16 +97,16 @@ Result metadb_handle_impl::load_metadata_from_file() {
     
     info_->set_file_stats(file_stats_);
     
-    // 注意：这里没有实际读取音频文件的元数据
-    // 在实际系统中，这会调用解码器的 get_info 方法
-    // 为简单起见，我们只填充了一些基础信息
+    // 娉ㄦ剰锛氳繖閲屾病鏈夊疄闄呰鍙栭煶棰戞枃浠剁殑鍏冩暟鎹?
+    // 鍦ㄥ疄闄呯郴缁熶腑锛岃繖浼氳皟鐢ㄨВ鐮佸櫒鐨?get_info 鏂规硶
+    // 涓虹畝鍗曡捣瑙侊紝鎴戜滑鍙～鍏呬簡涓€浜涘熀纭€淇℃伅
     
     return Result::Success;
 }
 
 const file_info_interface& metadb_handle_impl::get_info() const {
-    // 注意：返回的引用可能在没有锁的情况下被修改
-    // 在实际 foobar2000 中，这需要更复杂的线程安全机制
+    // 娉ㄦ剰锛氳繑鍥炵殑寮曠敤鍙兘鍦ㄦ病鏈夐攣鐨勬儏鍐典笅琚慨鏀?
+    // 鍦ㄥ疄闄?foobar2000 涓紝杩欓渶瑕佹洿澶嶆潅鐨勭嚎绋嬪畨鍏ㄦ満鍒?
     std::lock_guard<std::mutex> lock(mutex_);
     
     if (!info_) {
@@ -129,8 +129,8 @@ file_info_interface& metadb_handle_impl::get_info() {
 
 void metadb_handle_impl::get_info_async(file_info_interface& p_info, abort_callback& p_abort, 
                                        bool p_can_expire) const {
-    // 异步版本：简单地委托给同步版本
-    // 在真实 foobar2000 中，这会在后台线程执行
+    // 寮傛鐗堟湰锛氱畝鍗曞湴濮旀墭缁欏悓姝ョ増鏈?
+    // 鍦ㄧ湡瀹?foobar2000 涓紝杩欎細鍦ㄥ悗鍙扮嚎绋嬫墽琛?
     (void)p_abort;
     (void)p_can_expire;
     
@@ -152,12 +152,12 @@ void metadb_handle_impl::update_info(const file_info_interface& p_info, abort_ca
     
     info_->copy_from(p_info);
     
-    // 在实际系统中，这会触发数据库更新和通知
-    // 现在只是简单保存
+    // 鍦ㄥ疄闄呯郴缁熶腑锛岃繖浼氳Е鍙戞暟鎹簱鏇存柊鍜岄€氱煡
+    // 鐜板湪鍙槸绠€鍗曚繚瀛?
 }
 
 void metadb_handle_impl::refresh_info(abort_callback& p_abort) {
-    // 重新从文件加载元数据
+    // 閲嶆柊浠庢枃浠跺姞杞藉厓鏁版嵁
     (void)p_abort;
     
     std::lock_guard<std::mutex> lock(mutex_);
@@ -177,7 +177,7 @@ std::string metadb_handle_impl::get_filename() const {
     const char* filename = PathFindFileNameA(path);
     return filename ? filename : "";
 #else
-    // Unix: 找到最后一个 "/"
+    // Unix: 鎵惧埌鏈€鍚庝竴涓?"/"
     const char* filename = std::strrchr(path, '/');
     return filename ? (filename + 1) : path;
 #endif
@@ -195,7 +195,7 @@ std::string metadb_handle_impl::get_directory() const {
     size_t last_slash = path_str.find_last_of("\\/");
     
     if (last_slash == std::string::npos) {
-        return ".";  // 当前目录
+        return ".";  // 褰撳墠鐩綍
     }
     
     return path_str.substr(0, last_slash);
@@ -221,8 +221,8 @@ bool metadb_handle_impl::is_file_valid() const {
 std::string metadb_handle_impl::get_identifier() const {
     std::lock_guard<std::mutex> lock(mutex_);
     
-    // 创建唯一的文件标识
-    // 包括路径、大小和时间戳
+    // 鍒涘缓鍞竴鐨勬枃浠舵爣璇?
+    // 鍖呮嫭璺緞銆佸ぇ灏忓拰鏃堕棿鎴?
     std::stringstream ss;
     ss << location_.get_path();
     ss << "|" << file_stats_.m_size;
@@ -233,17 +233,17 @@ std::string metadb_handle_impl::get_identifier() const {
 }
 
 bool metadb_handle_impl::equals(const metadb_handle_impl& other) const {
-    const metadb_handle_impl* other_impl = &other;  // 已经是正确的类型
+    const metadb_handle_impl* other_impl = &other;  // 宸茬粡鏄纭殑绫诲瀷
     if (!other_impl) {
         return false;
     }
     
-    // 比较位置（路径 + subsong）
+    // 姣旇緝浣嶇疆锛堣矾寰?+ subsong锛?
     return location_.get_path() == other_impl->location_.get_path() &&
            location_.get_subsong_index() == other_impl->location_.get_subsong_index();
 }
 
-// 辅助函数
+// 杈呭姪鍑芥暟
 std::unique_ptr<metadb_handle_impl> metadb_handle_create(const playable_location& loc) {
     auto handle = std::make_unique<metadb_handle_impl>();
     if (handle->initialize(loc) == Result::Success) {

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file enhanced_sample_rate_converter.cpp
  * @brief Enhanced sample rate converter with quality levels implementation
  * @date 2025-12-10
@@ -28,9 +28,11 @@ EnhancedSampleRateConverter::create_converter(ResampleQuality quality) {
         case ResampleQuality::Good:
             return CubicSampleRateConverterFactory::create();
         case ResampleQuality::High:
-            return HighQualitySampleRateConverterFactory::create();
+            // Currently fall back to cubic (good) for High
+            return CubicSampleRateConverterFactory::create();
         case ResampleQuality::Best:
-            return BestQualitySampleRateConverterFactory::create();
+            // Currently fall back to cubic (good) for Best
+            return CubicSampleRateConverterFactory::create();
         default:
             return SampleRateConverterFactory::create("linear");
     }
@@ -82,8 +84,8 @@ const char* EnhancedSampleRateConverter::get_name() const {
     switch (quality_) {
         case ResampleQuality::Fast: return "Linear (Fast)";
         case ResampleQuality::Good: return "Cubic (Good)";
-        case ResampleQuality::High: return "Cubic (High)";  // Placeholder
-        case ResampleQuality::Best: return "Cubic (Best)";  // Placeholder
+        case ResampleQuality::High: return "Cubic (High)";  // Currently using Cubic
+        case ResampleQuality::Best: return "Cubic (Best)";  // Currently using Cubic
         default: return "Unknown";
     }
 }
@@ -121,8 +123,8 @@ double EnhancedSampleRateConverter::get_cpu_usage_estimate(ResampleQuality quali
     switch (quality) {
         case ResampleQuality::Fast: return 0.1;      // <0.1% CPU
         case ResampleQuality::Good: return 0.5;      // ~0.5% CPU
-        case ResampleQuality::High: return 2.0;      // ~2% CPU
-        case ResampleQuality::Best: return 5.0;      // ~5% CPU
+        case ResampleQuality::High: return 1.0;      // Currently same as Good
+        case ResampleQuality::Best: return 1.0;      // Currently same as Good
         default: return 1.0;
     }
 }

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../../sdk/xpumusic_plugin_sdk.h"
 #include "../../sdk/headers/mp_types.h"
@@ -25,35 +25,35 @@ using xpumusic::PluginType;
 using xpumusic::ITypedPluginFactory;
 
 /**
- * @brief MP3解码器插件
+ * @brief MP3瑙ｇ爜鍣ㄦ彃浠?
  *
- * 使用minimp3库解码MP3文件，支持：
- * - 恒定比特率和可变比特率
- * - 多种采样率和声道配置
- * - ID3标签读取
- * - 快速定位
+ * 浣跨敤minimp3搴撹В鐮丮P3鏂囦欢锛屾敮鎸侊細
+ * - 鎭掑畾姣旂壒鐜囧拰鍙彉姣旂壒鐜?
+ * - 澶氱閲囨牱鐜囧拰澹伴亾閰嶇疆
+ * - ID3鏍囩璇诲彇
+ * - 蹇€熷畾浣?
  */
 class MP3Decoder : public IAudioDecoder {
 private:
-    // 解码状态
+    // 瑙ｇ爜鐘舵€?
     mp3dec_t mp3d_;
     mp3dec_file_info_t mp3info_;
 
-    // 文件信息
+    // 鏂囦欢淇℃伅
     std::string file_path_;
     FILE* file_ = nullptr;
     bool is_open_ = false;
     bool metadata_loaded_ = false;
 
-    // 音频格式
+    // 闊抽鏍煎紡
     AudioFormat format_;
 
-    // 缓冲区
+    // 缂撳啿鍖?
     std::vector<uint8_t> input_buffer_;
     size_t input_buffer_size_;
     size_t input_buffer_pos_;
 
-    // ID3标签
+    // ID3鏍囩
     struct ID3Tag {
         std::string title;
         std::string artist;
@@ -64,10 +64,10 @@ private:
         int track = 0;
     } id3_tag_;
 
-    // 错误信息
+    // 閿欒淇℃伅
     std::string last_error_;
 
-    // 统计信息
+    // 缁熻淇℃伅
     uint64_t current_sample_ = 0;
     uint64_t total_samples_ = 0;
     double duration_ = 0.0;
@@ -76,7 +76,7 @@ public:
     MP3Decoder();
     ~MP3Decoder() override;
 
-    // IPlugin 接口
+    // IPlugin 鎺ュ彛
     bool initialize() override;
     void finalize() override;
     PluginState get_state() const override;
@@ -84,7 +84,7 @@ public:
     PluginInfo get_info() const override;
     std::string get_last_error() const override;
 
-    // IAudioDecoder 接口
+    // IAudioDecoder 鎺ュ彛
     bool can_decode(const std::string& file_path) override;
     std::vector<std::string> get_supported_extensions() override;
     bool open(const std::string& file_path) override;
@@ -99,13 +99,13 @@ public:
     int64_t get_position() const override;
     bool is_eof() const override;
 
-    // MP3特定功能
+    // MP3鐗瑰畾鍔熻兘
     bool seek(double seconds);
     ID3Tag get_id3_tag() const;
 
     
 private:
-    // 内部方法
+    // 鍐呴儴鏂规硶
     bool parse_id3v1_tag(FILE* file);
     bool parse_id3v2_tag(FILE* file);
     void calculate_duration();
@@ -113,12 +113,12 @@ private:
     void cleanup();
     void set_error(const std::string& error);
 
-    // ID3标签解析
+    // ID3鏍囩瑙ｆ瀽
     std::string parse_id3_text(const uint8_t* data, size_t size, bool unicode = false);
     int parse_id3_int(const uint8_t* data, size_t size);
 };
 
-// MP3解码器工厂
+// MP3瑙ｇ爜鍣ㄥ伐鍘?
 class MP3DecoderFactory : public ITypedPluginFactory<IAudioDecoder> {
 public:
     std::unique_ptr<IAudioDecoder> create_typed() override {

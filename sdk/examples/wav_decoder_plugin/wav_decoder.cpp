@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @file wav_decoder.cpp
- * @brief XpuMusic WAV解码器插件示例
+ * @brief XpuMusic WAV瑙ｇ爜鍣ㄦ彃浠剁ず渚?
  * @date 2025-12-10
  */
 
@@ -19,7 +19,7 @@ using xpumusic::AudioBuffer;
 using xpumusic::MetadataItem;
 using xpumusic::PluginType;
 
-// WAV文件头
+// WAV鏂囦欢澶?
 #pragma pack(push, 1)
 struct WAVHeader {
     char riff[4];
@@ -87,7 +87,7 @@ public:
     }
 
     bool can_decode(const std::string& file_path) override {
-        // 检查扩展名
+        // 妫€鏌ユ墿灞曞悕
         size_t pos = file_path.find_last_of('.');
         if (pos == std::string::npos) return false;
 
@@ -113,7 +113,7 @@ public:
             return false;
         }
 
-        // 读取WAV头
+        // 璇诲彇WAV澶?
         file_.read(reinterpret_cast<char*>(&header_), sizeof(header_));
         if (file_.gcount() != sizeof(header_)) {
             last_error_ = "Invalid WAV file: cannot read header";
@@ -122,7 +122,7 @@ public:
             return false;
         }
 
-        // 验证WAV格式
+        // 楠岃瘉WAV鏍煎紡
         if (strncmp(header_.riff, "RIFF", 4) != 0 ||
             strncmp(header_.wave, "WAVE", 4) != 0) {
             last_error_ = "Invalid WAV file: wrong signature";
@@ -131,13 +131,13 @@ public:
             return false;
         }
 
-        // 设置音频格式
+        // 璁剧疆闊抽鏍煎紡
         format_.sample_rate = header_.sample_rate;
         format_.channels = header_.channels;
         format_.bits_per_sample = header_.bits;
         format_.is_float = false;
 
-        // 计算总样本数
+        // 璁＄畻鎬绘牱鏈暟
         if (format_.bits_per_sample == 0) {
             last_error_ = "Invalid bits per sample";
             file_.close();
@@ -148,7 +148,7 @@ public:
         total_samples_ = header_.data_size / (format_.bits_per_sample / 8) / format_.channels;
         current_position_ = 0;
 
-        // 定位到数据开始
+        // 瀹氫綅鍒版暟鎹紑濮?
         file_.seekg(sizeof(header_), std::ios::beg);
         if (file_.fail()) {
             last_error_ = "Failed to seek to data position";
@@ -168,7 +168,7 @@ public:
             return -1;
         }
 
-        // 计算可读取的帧数
+        // 璁＄畻鍙鍙栫殑甯ф暟
         int64_t remaining_frames = total_samples_ - current_position_;
         int frames_to_read = std::min(static_cast<int64_t>(max_frames), remaining_frames);
 
@@ -176,7 +176,7 @@ public:
             return 0; // EOF
         }
 
-        // 读取原始数据
+        // 璇诲彇鍘熷鏁版嵁
         std::vector<char> raw_data(frames_to_read * format_.channels * (format_.bits_per_sample / 8));
         file_.read(raw_data.data(), raw_data.size());
         int bytes_read = file_.gcount();
@@ -187,7 +187,7 @@ public:
 
         int frames_read = bytes_read / (format_.channels * (format_.bits_per_sample / 8));
 
-        // 转换为浮点数
+        // 杞崲涓烘诞鐐规暟
         convert_to_float(raw_data.data(), frames_read, buffer.data);
 
         current_position_ += frames_read;
@@ -245,7 +245,7 @@ public:
 
     std::vector<MetadataItem> get_metadata() override {
         std::vector<MetadataItem> metadata;
-        // WAV文件通常不包含元数据，但可以添加一些基本信息
+        // WAV鏂囦欢閫氬父涓嶅寘鍚厓鏁版嵁锛屼絾鍙互娣诲姞涓€浜涘熀鏈俊鎭?
         metadata.emplace_back("codec", "PCM");
         metadata.emplace_back("bits_per_sample", std::to_string(format_.bits_per_sample));
         return metadata;
@@ -276,12 +276,12 @@ private:
             }
         }
         else if (format_.bits_per_sample == 24) {
-            // 24位整数
+            // 24浣嶆暣鏁?
             for (int i = 0; i < samples; i++) {
                 int32_t value = (static_cast<uint8_t>(src[2]) << 16) |
                                (static_cast<uint8_t>(src[1]) << 8) |
                                 static_cast<uint8_t>(src[0]);
-                // 符号扩展
+                // 绗﹀彿鎵╁睍
                 if (value & 0x800000) {
                     value |= 0xFF000000;
                 }
@@ -298,7 +298,7 @@ private:
     }
 };
 
-// 插件工厂
+// 鎻掍欢宸ュ巶
 class WAVDecoderFactory : public ITypedPluginFactory<IAudioDecoder> {
 public:
     std::unique_ptr<IAudioDecoder> create_typed() override {
@@ -317,5 +317,5 @@ public:
     }
 };
 
-// 导出插件
+// 瀵煎嚭鎻掍欢
 XPUMUSIC_EXPORT_AUDIO_PLUGIN(WAVDecoderPlugin)

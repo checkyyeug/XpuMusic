@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file sample_rate_converter.h
  * @brief Sample rate conversion interface and implementations
  * @date 2025-12-10

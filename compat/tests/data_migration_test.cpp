@@ -1,4 +1,4 @@
-#include "test_framework.h"
+﻿#include "test_framework.h"
 #include "migration/data_migration_manager.h"
 
 using namespace mp::compat;

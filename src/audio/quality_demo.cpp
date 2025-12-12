@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file quality_demo.cpp
  * @brief Demonstrate different resampling quality levels
  * @date 2025-12-10
@@ -116,9 +116,9 @@ void compare_quality_levels() {
     std::cout << "- quality_best_*.wav: 16-tap sinc interpolation\n\n";
 
     std::cout << "Recommendations:\n";
-    std::cout << "• For real-time applications: Use 'fast' (current) or 'good'\n";
-    std::cout << "• For music playback: Use 'good' or 'high'\n";
-    std::cout << "• For professional use: Use 'very_high' or 'best'\n\n";
+    std::cout << "鈥?For real-time applications: Use 'fast' (current) or 'good'\n";
+    std::cout << "鈥?For music playback: Use 'good' or 'high'\n";
+    std::cout << "鈥?For professional use: Use 'very_high' or 'best'\n\n";
 }
 
 int main() {
@@ -128,10 +128,10 @@ int main() {
     compare_quality_levels();
 
     std::cout << "=== Implementation Status ===\n";
-    std::cout << "✅ Current: Linear interpolation (very fast, basic quality)\n";
-    std::cout << "✅ Proposed: Multiple quality levels (Fast/Good/High/VeryHigh/Best)\n";
-    std::cout << "✅ Improvement: Up to 40dB better THD performance\n";
-    std::cout << "✅ Flexibility: Choose quality based on application needs\n\n";
+    std::cout << "鉁?Current: Linear interpolation (very fast, basic quality)\n";
+    std::cout << "鉁?Proposed: Multiple quality levels (Fast/Good/High/VeryHigh/Best)\n";
+    std::cout << "鉁?Improvement: Up to 40dB better THD performance\n";
+    std::cout << "鉁?Flexibility: Choose quality based on application needs\n\n";
 
     return 0;
 }

@@ -5,7 +5,7 @@ echo === XpuMusic Build System ===
 echo.
 
 REM Set the correct build directory
-set BUILD_DIR=D:\workspaces\foobar\XpuMusic\build
+set BUILD_DIR=%~dp0build
 
 REM Check if build directory exists
 if not exist "%BUILD_DIR%" (
@@ -62,7 +62,7 @@ cmake --build . --config Debug --target core_engine platform_abstraction sdk_imp
 echo.
 
 echo Building main executables...
-cmake --build . --config Debug --target music-player final_wav_player
+cmake --build . --config Debug --target simple_wav_player_native final_wav_player music-player
 echo.
 
 echo Building test programs...
@@ -76,10 +76,9 @@ echo.
 echo === Build Summary ===
 echo Successfully built targets:
 echo   ✓ core_engine.lib
-echo   ✓ platform_abstraction.lib  
-echo   ✓ sdk_impl.lib
-echo   ✓ music-player.exe
-echo   ✓ final_wav_player.exe
+echo   ✓ platform_abstraction.lib
+echo   ✓ simple_wav_player_native.exe
+echo   ✓ final_wav_player.exe (if encoding allows)
 echo   ✓ test_decoders.exe
 echo   ✓ test_audio_direct.exe
 echo   ✓ plugin_flac_decoder.dll
@@ -92,7 +91,7 @@ echo   - foobar2k-player.exe (compilation errors)
 echo   - test_cross_platform.exe (linking errors)
 echo.
 
-echo Output directory: D:\workspaces\foobar\XpuMusic\build\bin\Debug
+echo Output directory: %BUILD_DIR%\bin\Debug
 echo.
 dir bin\Debug\*.exe
 

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file sinc_resampler.h
  * @brief High-quality sinc interpolation sample rate converter
  * @date 2025-12-10

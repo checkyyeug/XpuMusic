@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file adapter_base.h
  * @brief Base class for XpuMusic adapters
  * @date 2025-12-10

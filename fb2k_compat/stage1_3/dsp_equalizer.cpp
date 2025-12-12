@@ -1,4 +1,4 @@
-#include "dsp_equalizer.h"
+﻿#include "dsp_equalizer.h"
 #include <algorithm>
 #include <cmath>
 #include <complex>
@@ -6,9 +6,9 @@
 
 namespace fb2k {
 
-// 双二阶滤波器实现
+// 鍙屼簩闃舵护娉㈠櫒瀹炵幇
 void biquad_filter::set_coefficients(float b0, float b1, float b2, float a0, float a1, float a2) {
-    // 归一化系数
+    // 褰掍竴鍖栫郴鏁?
     float a0_inv = 1.0f / a0;
     b0_ = b0 * a0_inv;
     b1_ = b1 * a0_inv;
@@ -21,7 +21,7 @@ void biquad_filter::set_coefficients(float b0, float b1, float b2, float a0, flo
 float biquad_filter::process(float input) {
     float output = b0_ * input + b1_ * x1_ + b2_ * x2_ - a1_ * y1_ - a2_ * y2_;
     
-    // 更新状态
+    // 鏇存柊鐘舵€?
     x2_ = x1_;
     x1_ = input;
     y2_ = y1_;
@@ -45,28 +45,28 @@ std::complex<float> biquad_filter::get_frequency_response(float frequency, float
     std::complex<float> z(cos(omega), -sin(omega));
     std::complex<float> z2 = z * z;
     
-    // 分子: b0 + b1*z^-1 + b2*z^-2
+    // 鍒嗗瓙: b0 + b1*z^-1 + b2*z^-2
     std::complex<float> numerator = b0_ + b1_ / z + b2_ / z2;
     
-    // 分母: a0 + a1*z^-1 + a2*z^-2
+    // 鍒嗘瘝: a0 + a1*z^-1 + a2*z^-2
     std::complex<float> denominator = a0_ + a1_ / z + a2_ / z2;
     
     return numerator / denominator;
 }
 
-// 设计峰值滤波器
+// 璁捐宄板€兼护娉㈠櫒
 void biquad_filter::design_peaking(float frequency, float gain_db, float bandwidth, 
                                   float sample_rate, float& b0, float& b1, float& b2,
                                   float& a0, float& a1, float& a2) {
     float omega = 2.0f * M_PI * frequency / sample_rate;
-    float A = std::pow(10.0f, gain_db / 40.0f);  // 幅度转换
+    float A = std::pow(10.0f, gain_db / 40.0f);  // 骞呭害杞崲
     float alpha = std::sin(omega) * std::sinh(std::log(2.0f) / 2.0f * bandwidth * omega / std::sin(omega));
     
     float cos_omega = std::cos(omega);
     float alpha_A = alpha * A;
     float alpha_div_A = alpha / A;
     
-    // 峰值滤波器系数
+    // 宄板€兼护娉㈠櫒绯绘暟
     b0 = 1.0f + alpha * A;
     b1 = -2.0f * cos_omega;
     b2 = 1.0f - alpha * A;
@@ -75,7 +75,7 @@ void biquad_filter::design_peaking(float frequency, float gain_db, float bandwid
     a2 = 1.0f - alpha / A;
 }
 
-// 设计低架滤波器
+// 璁捐浣庢灦婊ゆ尝鍣?
 void biquad_filter::design_low_shelf(float frequency, float gain_db, float slope,
                                     float sample_rate, float& b0, float& b1, float& b2,
                                     float& a0, float& a1, float& a2) {
@@ -88,7 +88,7 @@ void biquad_filter::design_low_shelf(float frequency, float gain_db, float slope
     float sqrt_A_alpha = sqrt_A * alpha;
     float sqrt_A_alpha_2 = 2.0f * sqrt_A * alpha;
     
-    // 低架滤波器系数
+    // 浣庢灦婊ゆ尝鍣ㄧ郴鏁?
     b0 = A * ((A + 1.0f) - (A - 1.0f) * cos_omega + sqrt_A_alpha_2);
     b1 = 2.0f * A * ((A - 1.0f) - (A + 1.0f) * cos_omega);
     b2 = A * ((A + 1.0f) - (A - 1.0f) * cos_omega - sqrt_A_alpha_2);
@@ -97,7 +97,7 @@ void biquad_filter::design_low_shelf(float frequency, float gain_db, float slope
     a2 = (A + 1.0f) + (A - 1.0f) * cos_omega - sqrt_A_alpha_2;
 }
 
-// 设计高架滤波器
+// 璁捐楂樻灦婊ゆ尝鍣?
 void biquad_filter::design_high_shelf(float frequency, float gain_db, float slope,
                                      float sample_rate, float& b0, float& b1, float& b2,
                                      float& a0, float& a1, float& a2) {
@@ -110,7 +110,7 @@ void biquad_filter::design_high_shelf(float frequency, float gain_db, float slop
     float sqrt_A_alpha = sqrt_A * alpha;
     float sqrt_A_alpha_2 = 2.0f * sqrt_A * alpha;
     
-    // 高架滤波器系数
+    // 楂樻灦婊ゆ尝鍣ㄧ郴鏁?
     b0 = A * ((A + 1.0f) + (A - 1.0f) * cos_omega + sqrt_A_alpha_2);
     b1 = -2.0f * A * ((A - 1.0f) + (A + 1.0f) * cos_omega);
     b2 = A * ((A + 1.0f) + (A - 1.0f) * cos_omega - sqrt_A_alpha_2);
@@ -119,7 +119,7 @@ void biquad_filter::design_high_shelf(float frequency, float gain_db, float slop
     a2 = (A + 1.0f) - (A - 1.0f) * cos_omega - sqrt_A_alpha_2;
 }
 
-// 设计低通滤波器
+// 璁捐浣庨€氭护娉㈠櫒
 void biquad_filter::design_low_pass(float frequency, float q, float sample_rate,
                                    float& b0, float& b1, float& b2,
                                    float& a0, float& a1, float& a2) {
@@ -135,7 +135,7 @@ void biquad_filter::design_low_pass(float frequency, float q, float sample_rate,
     a2 = 1.0f - alpha;
 }
 
-// 设计高通滤波器
+// 璁捐楂橀€氭护娉㈠櫒
 void biquad_filter::design_high_pass(float frequency, float q, float sample_rate,
                                     float& b0, float& b1, float& b2,
                                     float& a0, float& a1, float& a2) {
@@ -151,7 +151,7 @@ void biquad_filter::design_high_pass(float frequency, float q, float sample_rate
     a2 = 1.0f - alpha;
 }
 
-// EQ频段实现
+// EQ棰戞瀹炵幇
 eq_band::eq_band(const eq_band_params& params) : params_(params), needs_update_(true) {}
 
 void eq_band::set_params(const eq_band_params& params) {
@@ -188,7 +188,7 @@ void eq_band::process(audio_chunk& chunk) {
         needs_update_ = false;
     }
     
-    // 跳过增益为0的频段
+    // 璺宠繃澧炵泭涓?鐨勯娈?
     if(std::abs(params_.gain) < 0.01f) {
         return;
     }
@@ -224,7 +224,7 @@ void eq_band::update_filter_coefficients() {
     switch(params_.type) {
         case filter_type::peak:
             biquad_filter::design_peaking(params_.frequency, params_.gain, 
-                                         params_.bandwidth, 44100.0f, // 假设标准采样率
+                                         params_.bandwidth, 44100.0f, // 鍋囪鏍囧噯閲囨牱鐜?
                                          b0, b1, b2, a0, a1, a2);
             break;
             
@@ -251,7 +251,7 @@ void eq_band::update_filter_coefficients() {
             break;
             
         default:
-            // 默认峰值滤波器
+            // 榛樿宄板€兼护娉㈠櫒
             biquad_filter::design_peaking(params_.frequency, params_.gain, 
                                          params_.bandwidth, 44100.0f,
                                          b0, b1, b2, a0, a1, a2);
@@ -262,13 +262,13 @@ void eq_band::update_filter_coefficients() {
 }
 
 void eq_band::validate_params() {
-    // 确保参数在合理范围内
+    // 纭繚鍙傛暟鍦ㄥ悎鐞嗚寖鍥村唴
     params_.frequency = std::max(10.0f, std::min(20000.0f, params_.frequency));
     params_.gain = std::max(-24.0f, std::min(24.0f, params_.gain));
     params_.bandwidth = std::max(0.1f, std::min(10.0f, params_.bandwidth));
 }
 
-// 参数均衡器高级实现
+// 鍙傛暟鍧囪　鍣ㄩ珮绾у疄鐜?
 dsp_equalizer_advanced::dsp_equalizer_advanced() 
     : dsp_effect_advanced(create_default_params()),
       needs_coefficient_update_(false),
@@ -295,11 +295,11 @@ bool dsp_equalizer_advanced::instantiate(audio_chunk& chunk, uint32_t sample_rat
         return false;
     }
     
-    // 更新所有频段的采样率
+    // 鏇存柊鎵€鏈夐娈电殑閲囨牱鐜?
     for(auto& band : bands_) {
         if(band) {
-            // 这里需要根据实际采样率重新计算系数
-            band->set_params(band->get_params()); // 触发系数更新
+            // 杩欓噷闇€瑕佹牴鎹疄闄呴噰鏍风巼閲嶆柊璁＄畻绯绘暟
+            band->set_params(band->get_params()); // 瑙﹀彂绯绘暟鏇存柊
         }
     }
     
@@ -318,7 +318,7 @@ void dsp_equalizer_advanced::run(audio_chunk& chunk, abort_callback& abort) {
     auto end_time = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
     
-    update_cpu_usage(static_cast<float>(duration.count()) / 1000.0f); // 转换为毫秒
+    update_cpu_usage(static_cast<float>(duration.count()) / 1000.0f); // 杞崲涓烘绉?
 }
 
 void dsp_equalizer_advanced::reset() {
@@ -331,7 +331,7 @@ void dsp_equalizer_advanced::reset() {
 
 size_t dsp_equalizer_advanced::add_band(const eq_band_params& params) {
     if(bands_.size() >= MAX_BANDS) {
-        return static_cast<size_t>(-1); // 达到最大频段数
+        return static_cast<size_t>(-1); // 杈惧埌鏈€澶ч娈垫暟
     }
     
     auto band = create_band(params);
@@ -367,7 +367,7 @@ const eq_band* dsp_equalizer_advanced::get_band(size_t index) const {
 void dsp_equalizer_advanced::load_iso_preset() {
     clear_bands();
     
-    // 添加ISO标准频段
+    // 娣诲姞ISO鏍囧噯棰戞
     for(size_t i = 0; i < 10; ++i) {
         eq_band_params params;
         params.frequency = ISO_FREQUENCIES[i];
@@ -384,7 +384,7 @@ void dsp_equalizer_advanced::load_iso_preset() {
 void dsp_equalizer_advanced::load_classical_preset() {
     load_iso_preset();
     
-    // 古典音乐典型EQ设置
+    // 鍙ゅ吀闊充箰鍏稿瀷EQ璁剧疆
     if(bands_.size() >= 10) {
         bands_[2]->set_gain(2.0f);  // 125Hz: +2dB
         bands_[3]->set_gain(1.5f);  // 250Hz: +1.5dB
@@ -396,7 +396,7 @@ void dsp_equalizer_advanced::load_classical_preset() {
 void dsp_equalizer_advanced::load_rock_preset() {
     load_iso_preset();
     
-    // 摇滚音乐典型EQ设置
+    // 鎽囨粴闊充箰鍏稿瀷EQ璁剧疆
     if(bands_.size() >= 10) {
         bands_[0]->set_gain(3.0f);  // 31.25Hz: +3dB
         bands_[1]->set_gain(2.0f);  // 62.5Hz: +2dB
@@ -408,7 +408,7 @@ void dsp_equalizer_advanced::load_rock_preset() {
 void dsp_equalizer_advanced::load_jazz_preset() {
     load_iso_preset();
     
-    // 爵士音乐典型EQ设置
+    // 鐖靛＋闊充箰鍏稿瀷EQ璁剧疆
     if(bands_.size() >= 10) {
         bands_[1]->set_gain(1.5f);  // 62.5Hz: +1.5dB
         bands_[2]->set_gain(1.0f);  // 125Hz: +1dB
@@ -420,7 +420,7 @@ void dsp_equalizer_advanced::load_jazz_preset() {
 void dsp_equalizer_advanced::load_pop_preset() {
     load_iso_preset();
     
-    // 流行音乐典型EQ设置
+    // 娴佽闊充箰鍏稿瀷EQ璁剧疆
     if(bands_.size() >= 10) {
         bands_[4]->set_gain(1.0f);  // 500Hz: +1dB
         bands_[5]->set_gain(2.0f);  // 1kHz: +2dB
@@ -432,7 +432,7 @@ void dsp_equalizer_advanced::load_pop_preset() {
 void dsp_equalizer_advanced::load_headphone_preset() {
     load_iso_preset();
     
-    // 耳机优化EQ设置
+    // 鑰虫満浼樺寲EQ璁剧疆
     if(bands_.size() >= 10) {
         bands_[0]->set_gain(2.0f);  // 31.25Hz: +2dB
         bands_[1]->set_gain(1.0f);  // 62.5Hz: +1dB
@@ -486,7 +486,7 @@ void dsp_equalizer_advanced::process_chunk_internal(audio_chunk& chunk, abort_ca
     
     if(!data) return;
     
-    // 处理每个频段
+    // 澶勭悊姣忎釜棰戞
     for(const auto& band : bands_) {
         if(band && band->is_enabled()) {
             band->process_block(data, total_samples);
@@ -499,12 +499,12 @@ void dsp_equalizer_advanced::process_chunk_internal(audio_chunk& chunk, abort_ca
 }
 
 void dsp_equalizer_advanced::update_cpu_usage(float usage) {
-    // 这里可以实现更复杂的CPU使用率计算
-    // 目前直接使用传入的值
+    // 杩欓噷鍙互瀹炵幇鏇村鏉傜殑CPU浣跨敤鐜囪绠?
+    // 鐩墠鐩存帴浣跨敤浼犲叆鐨勫€?
 }
 
 void dsp_equalizer_advanced::initialize_default_bands() {
-    // 默认加载ISO预设
+    // 榛樿鍔犺浇ISO棰勮
     load_iso_preset();
 }
 
@@ -512,18 +512,18 @@ std::unique_ptr<eq_band> dsp_equalizer_advanced::create_band(const eq_band_param
     return std::make_unique<eq_band>(params);
 }
 
-// 10段参数均衡器
+// 10娈靛弬鏁板潎琛″櫒
 dsp_equalizer_10band::dsp_equalizer_10band() : dsp_equalizer_advanced() {
-    // 默认就是ISO预设
+    // 榛樿灏辨槸ISO棰勮
 }
 
 dsp_equalizer_10band::dsp_equalizer_10band(const dsp_effect_params& params) 
     : dsp_equalizer_advanced(params) {
-    // 默认就是ISO预设
+    // 榛樿灏辨槸ISO棰勮
 }
 
 void dsp_equalizer_10band::load_flat_response() {
-    // 平直响应（所有增益为0）
+    // 骞崇洿鍝嶅簲锛堟墍鏈夊鐩婁负0锛?
     for(auto& band : bands_) {
         if(band) {
             band->set_gain(0.0f);
@@ -558,7 +558,7 @@ void dsp_equalizer_10band::load_loudness_contour() {
     }
 }
 
-// 图形均衡器
+// 鍥惧舰鍧囪　鍣?
 dsp_graphic_equalizer::dsp_graphic_equalizer() : dsp_effect_advanced(create_default_params()) {
     initialize_iso_bands();
 }
@@ -587,10 +587,10 @@ void dsp_graphic_equalizer::initialize_iso_bands() {
 
 bool dsp_graphic_equalizer::instantiate(audio_chunk& chunk, uint32_t sample_rate, 
                                        uint32_t channels) {
-    // 更新所有ISO频段的采样率
+    // 鏇存柊鎵€鏈塈SO棰戞鐨勯噰鏍风巼
     for(auto& band : iso_bands_) {
         if(band) {
-            band->set_params(band->get_params()); // 触发系数更新
+            band->set_params(band->get_params()); // 瑙﹀彂绯绘暟鏇存柊
         }
     }
     
@@ -607,7 +607,7 @@ void dsp_graphic_equalizer::run(audio_chunk& chunk, abort_callback& abort) {
     
     if(!data) return;
     
-    // 处理每个ISO频段
+    // 澶勭悊姣忎釜ISO棰戞
     for(auto& band : iso_bands_) {
         if(band && band->is_enabled()) {
             band->process_block(data, total_samples);
@@ -654,7 +654,7 @@ const std::vector<float>& dsp_graphic_equalizer::get_iso_frequencies() const {
     return freqs;
 }
 
-// 均衡器工具函数
+// 鍧囪　鍣ㄥ伐鍏峰嚱鏁?
 namespace eq_utils {
 
 float frequency_to_midi(float frequency) {

@@ -1,4 +1,4 @@
-#include "output_asio.h"
+﻿#include "output_asio.h"
 #include <windows.h>
 #include <comdef.h>
 #include <algorithm>
@@ -15,7 +15,7 @@
 
 namespace fb2k {
 
-// 帮助函数：将窄字符串转换为宽字符串
+// 甯姪鍑芥暟锛氬皢绐勫瓧绗︿覆杞崲涓哄瀛楃涓?
 static std::wstring string_to_wstring(const std::string& str) {
     if (str.empty()) return std::wstring();
     int size_needed = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), nullptr, 0);
@@ -24,7 +24,7 @@ static std::wstring string_to_wstring(const std::string& str) {
     return wstrTo;
 }
 
-// 帮助函数：将宽字符串转换为窄字符串
+// 甯姪鍑芥暟锛氬皢瀹藉瓧绗︿覆杞崲涓虹獎瀛楃涓?
 static std::string wstring_to_string(const std::wstring& wstr) {
     if (wstr.empty()) return std::string();
     int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), nullptr, 0, nullptr, nullptr);
@@ -33,14 +33,14 @@ static std::string wstring_to_string(const std::wstring& wstr) {
     return strTo;
 }
 
-// ASIO驱动枚举器
+// ASIO椹卞姩鏋氫妇鍣?
 class asio_driver_enumerator {
 public:
     static std::vector<asio_driver_info> enumerate_drivers() {
         std::vector<asio_driver_info> drivers;
         
-        // 这里应该实现真实的ASIO驱动枚举
-        // 简化实现：返回一些常见的ASIO驱动
+        // 杩欓噷搴旇瀹炵幇鐪熷疄鐨凙SIO椹卞姩鏋氫妇
+        // 绠€鍖栧疄鐜帮細杩斿洖涓€浜涘父瑙佺殑ASIO椹卞姩
         
         asio_driver_info asio4all;
         asio4all.name = "ASIO4ALL v2";
@@ -78,7 +78,7 @@ public:
     }
 };
 
-// ASIO缓冲区管理器实现
+// ASIO缂撳啿鍖虹鐞嗗櫒瀹炵幇
 asio_buffer_manager::asio_buffer_manager()
     : num_channels_(0)
     , buffer_size_(0)
@@ -123,7 +123,7 @@ bool asio_buffer_manager::allocate_buffers() {
         buffer_infos_[i].data_size = buffer_size_ * sample_size;
         buffer_infos_[i].sample_type = sample_type_;
         
-        // 分配双缓冲
+        // 鍒嗛厤鍙岀紦鍐?
         for (int j = 0; j < 2; ++j) {
             buffer_infos_[i].buffer[j] = new uint8_t[buffer_infos_[i].data_size];
             std::memset(buffer_infos_[i].buffer[j], 0, buffer_infos_[i].data_size);
@@ -169,7 +169,7 @@ float* asio_buffer_manager::get_input_buffer(long channel, long buffer_index) {
 }
 
 float* asio_buffer_manager::get_output_buffer(long channel, long buffer_index) {
-    return get_input_buffer(channel, buffer_index); // 同样的缓冲区用于输入输出
+    return get_input_buffer(channel, buffer_index); // 鍚屾牱鐨勭紦鍐插尯鐢ㄤ簬杈撳叆杈撳嚭
 }
 
 long asio_buffer_manager::get_sample_size(asio_sample_type type) const {
@@ -189,11 +189,11 @@ long asio_buffer_manager::get_sample_size(asio_sample_type type) const {
         case ASIOST_FLOAT64MSB:
             return 8;
         default:
-            return 4; // 默认32位
+            return 4; // 榛樿32浣?
     }
 }
 
-// ASIO时间管理器实现
+// ASIO鏃堕棿绠＄悊鍣ㄥ疄鐜?
 asio_time_manager::asio_time_manager() {
     std::memset(&time_info_, 0, sizeof(time_info_));
     time_info_.sampleRate = 44100.0;
@@ -218,7 +218,7 @@ double asio_time_manager::get_sample_position() const {
 
 double asio_time_manager::get_system_time() const {
     std::lock_guard<std::mutex> lock(time_mutex_);
-    return time_info_.nanoSeconds * 1e-9; // 转换为秒
+    return time_info_.nanoSeconds * 1e-9; // 杞崲涓虹
 }
 
 double asio_time_manager::get_sample_rate() const {
@@ -241,7 +241,7 @@ void asio_time_manager::clear_flags() {
     time_info_.flags = 0;
 }
 
-// ASIO回调处理器实现
+// ASIO鍥炶皟澶勭悊鍣ㄥ疄鐜?
 asio_callback_handler::asio_callback_handler()
     : buffer_switch_callback_(nullptr)
     , sample_rate_callback_(nullptr)
@@ -284,7 +284,7 @@ long asio_callback_handler::on_message(long selector, long value, void* message,
 }
 
 void asio_callback_handler::process_input_buffers(long buffer_index) {
-    // 处理输入缓冲区（如果需要录音功能）
+    // 澶勭悊杈撳叆缂撳啿鍖猴紙濡傛灉闇€瑕佸綍闊冲姛鑳斤級
     if (!input_buffers_.empty() && audio_processor_) {
         float** inputs = new float*[num_channels_];
         for (long i = 0; i < num_channels_; ++i) {
@@ -298,7 +298,7 @@ void asio_callback_handler::process_input_buffers(long buffer_index) {
 }
 
 void asio_callback_handler::process_output_buffers(long buffer_index) {
-    // 处理输出缓冲区
+    // 澶勭悊杈撳嚭缂撳啿鍖?
     if (!output_buffers_.empty() && audio_processor_) {
         float** outputs = new float*[num_channels_];
         for (long i = 0; i < num_channels_; ++i) {
@@ -337,7 +337,7 @@ void asio_callback_handler::get_output_data(float** output_data, long num_channe
     }
 }
 
-// 错误处理
+// 閿欒澶勭悊
 std::string asio_error_handler::get_error_string(long error_code) {
     switch (error_code) {
         case ASE_OK: return "Success";
@@ -374,7 +374,7 @@ void asio_error_handler::log_asio_error(const std::string& context, long error_c
     std::cerr << "[ASIO] " << context << " - Error: " << error_code << " (" << error_msg << ")" << std::endl;
 }
 
-// output_asio_impl实现
+// output_asio_impl瀹炵幇
 output_asio_impl::output_asio_impl()
     : device_enumerator_(nullptr)
     , driver_(nullptr)
@@ -398,14 +398,14 @@ output_asio_impl::output_asio_impl()
     , supports_input_monitoring_(false)
     , supports_variable_buffer_size_(false) {
     
-    // 创建ASIO组件
+    // 鍒涘缓ASIO缁勪欢
     buffer_manager_ = new asio_buffer_manager();
     time_manager_ = new asio_time_manager();
     callback_handler_ = new asio_callback_handler();
 }
 
 output_asio_impl::~output_asio_impl() {
-    std::cout << "[ASIO] 销毁ASIO输出设备" << std::endl;
+    std::cout << "[ASIO] 閿€姣丄SIO杈撳嚭璁惧" << std::endl;
     
     if (is_initialized_) {
         abort_callback_dummy abort;
@@ -417,59 +417,59 @@ output_asio_impl::~output_asio_impl() {
     delete callback_handler_;
 }
 
-// ASIO输出设备接口实现
+// ASIO杈撳嚭璁惧鎺ュ彛瀹炵幇
 void output_asio_impl::open(t_uint32 sample_rate, t_uint32 channels, t_uint32 flags, abort_callback& p_abort) {
-    std::cout << "[ASIO] 打开ASIO输出设备 - " << sample_rate << "Hz, " << channels << "ch" << std::endl;
+    std::cout << "[ASIO] 鎵撳紑ASIO杈撳嚭璁惧 - " << sample_rate << "Hz, " << channels << "ch" << std::endl;
     
     if (is_initialized_) {
-        std::cerr << "[ASIO] 设备已经初始化" << std::endl;
+        std::cerr << "[ASIO] 璁惧宸茬粡鍒濆鍖? << std::endl;
         return;
     }
     
     p_abort.check();
     
     try {
-        // 保存音频格式
+        // 淇濆瓨闊抽鏍煎紡
         sample_rate_ = sample_rate;
         channels_ = channels;
-        bits_per_sample_ = 32; // ASIO通常使用32位浮点
+        bits_per_sample_ = 32; // ASIO閫氬父浣跨敤32浣嶆诞鐐?
         
-        // 检查当前驱动是否支持格式
+        // 妫€鏌ュ綋鍓嶉┍鍔ㄦ槸鍚︽敮鎸佹牸寮?
         if (!current_driver_name_.empty() && !validate_asio_format(ASIOST_FLOAT32LSB, channels, sample_rate)) {
-            throw std::runtime_error("ASIO驱动不支持指定格式");
+            throw std::runtime_error("ASIO椹卞姩涓嶆敮鎸佹寚瀹氭牸寮?);
         }
         
-        // 创建并初始化ASIO驱动
+        // 鍒涘缓骞跺垵濮嬪寲ASIO椹卞姩
         if (!load_driver(current_driver_id_)) {
-            throw std::runtime_error("无法加载ASIO驱动");
+            throw std::runtime_error("鏃犳硶鍔犺浇ASIO椹卞姩");
         }
         
-        // 初始化ASIO缓冲区管理器
+        // 鍒濆鍖朅SIO缂撳啿鍖虹鐞嗗櫒
         if (!buffer_manager_->initialize(channels, buffer_size_, ASIOST_FLOAT32LSB)) {
-            throw std::runtime_error("ASIO缓冲区初始化失败");
+            throw std::runtime_error("ASIO缂撳啿鍖哄垵濮嬪寲澶辫触");
         }
         
-        // 创建ASIO缓冲区
+        // 鍒涘缓ASIO缂撳啿鍖?
         if (!create_asio_buffers()) {
-            throw std::runtime_error("ASIO缓冲区创建失败");
+            throw std::runtime_error("ASIO缂撳啿鍖哄垱寤哄け璐?);
         }
         
-        // 设置回调处理器
+        // 璁剧疆鍥炶皟澶勭悊鍣?
         setup_callbacks();
         
         is_initialized_ = true;
-        std::cout << "[ASIO] ASIO输出设备打开成功" << std::endl;
+        std::cout << "[ASIO] ASIO杈撳嚭璁惧鎵撳紑鎴愬姛" << std::endl;
         log_asio_info();
         
     } catch (const std::exception& e) {
-        std::cerr << "[ASIO] 打开设备失败: " << e.what() << std::endl;
+        std::cerr << "[ASIO] 鎵撳紑璁惧澶辫触: " << e.what() << std::endl;
         cleanup_asio();
         throw;
     }
 }
 
 void output_asio_impl::close(abort_callback& p_abort) {
-    std::cout << "[ASIO] 关闭ASIO输出设备" << std::endl;
+    std::cout << "[ASIO] 鍏抽棴ASIO杈撳嚭璁惧" << std::endl;
     
     if (!is_initialized_) {
         return;
@@ -477,17 +477,17 @@ void output_asio_impl::close(abort_callback& p_abort) {
     
     p_abort.check();
     
-    // 停止音频流
+    // 鍋滄闊抽娴?
     stop_asio_streaming();
     
-    // 清理资源
+    // 娓呯悊璧勬簮
     cleanup_asio();
     
     is_initialized_ = false;
     is_playing_ = false;
     is_paused_ = false;
     
-    std::cout << "[ASIO] ASIO输出设备已关闭" << std::endl;
+    std::cout << "[ASIO] ASIO杈撳嚭璁惧宸插叧闂? << std::endl;
 }
 
 t_uint32 output_asio_impl::get_latency() {
@@ -505,24 +505,24 @@ void output_asio_impl::write(const void* buffer, t_size bytes, abort_callback& p
     t_size bytes_written = 0;
     
     while (bytes_written < bytes && !p_abort.is_aborting()) {
-        // 检查缓冲区空间
+        // 妫€鏌ョ紦鍐插尯绌洪棿
         long available_frames = get_available_frames();
         if (available_frames <= 0) {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
             continue;
         }
         
-        // 计算可以写入的帧数
+        // 璁＄畻鍙互鍐欏叆鐨勫抚鏁?
         long frames_to_write = std::min(available_frames, 
                                        static_cast<long>((bytes - bytes_written) / (channels_ * sizeof(float))));
         if (frames_to_write <= 0) {
             continue;
         }
         
-        // 写入数据到ASIO缓冲区
+        // 鍐欏叆鏁版嵁鍒癆SIO缂撳啿鍖?
         HRESULT hr = write_to_asio_buffers(data + bytes_written, frames_to_write);
         if (FAILED(hr)) {
-            handle_asio_error("写入ASIO缓冲区", hr);
+            handle_asio_error("鍐欏叆ASIO缂撳啿鍖?, hr);
             break;
         }
         
@@ -538,12 +538,12 @@ void output_asio_impl::pause(bool state) {
     
     is_paused_.store(state);
     
-    // ASIO通常不支持软件暂停，这里只是状态标记
-    std::cout << "[ASIO] " << (state ? "暂停" : "恢复") << "音频流" << std::endl;
+    // ASIO閫氬父涓嶆敮鎸佽蒋浠舵殏鍋滐紝杩欓噷鍙槸鐘舵€佹爣璁?
+    std::cout << "[ASIO] " << (state ? "鏆傚仠" : "鎭㈠") << "闊抽娴? << std::endl;
 }
 
 void output_asio_impl::flush(abort_callback& p_abort) {
-    std::cout << "[ASIO] 清空ASIO缓冲区" << std::endl;
+    std::cout << "[ASIO] 娓呯┖ASIO缂撳啿鍖? << std::endl;
     
     if (!is_initialized_) {
         return;
@@ -551,18 +551,18 @@ void output_asio_impl::flush(abort_callback& p_abort) {
     
     p_abort.check();
     
-    // ASIO缓冲区重置通常通过驱动完成
+    // ASIO缂撳啿鍖洪噸缃€氬父閫氳繃椹卞姩瀹屾垚
     if (driver_) {
-        // driver_->ResetBuffers(); // 需要实际的ASIO接口
+        // driver_->ResetBuffers(); // 闇€瑕佸疄闄呯殑ASIO鎺ュ彛
     }
 }
 
 void output_asio_impl::volume_set(float volume) {
     volume_.store(volume);
     
-    // ASIO通常通过硬件混音器控制音量
-    // 这里只是软件音量标记
-    std::cout << "[ASIO] 设置音量: " << volume << std::endl;
+    // ASIO閫氬父閫氳繃纭欢娣烽煶鍣ㄦ帶鍒堕煶閲?
+    // 杩欓噷鍙槸杞欢闊抽噺鏍囪
+    std::cout << "[ASIO] 璁剧疆闊抽噺: " << volume << std::endl;
 }
 
 bool output_asio_impl::is_playing() {
@@ -577,7 +577,7 @@ bool output_asio_impl::can_write() {
     return get_available_frames() > 0;
 }
 
-// ASIO特定接口实现
+// ASIO鐗瑰畾鎺ュ彛瀹炵幇
 bool output_asio_impl::enum_drivers(std::vector<asio_driver_info>& drivers) {
     drivers = asio_driver_enumerator::enumerate_drivers();
     return !drivers.empty();
@@ -588,11 +588,11 @@ bool output_asio_impl::load_driver(const std::string& driver_id) {
         return false;
     }
     
-    // 卸载当前驱动
+    // 鍗歌浇褰撳墠椹卞姩
     unload_driver();
     
-    // 这里应该实现真实的ASIO驱动加载
-    // 简化实现：模拟驱动加载
+    // 杩欓噷搴旇瀹炵幇鐪熷疄鐨凙SIO椹卞姩鍔犺浇
+    // 绠€鍖栧疄鐜帮細妯℃嫙椹卞姩鍔犺浇
     
     auto drivers = asio_driver_enumerator::enumerate_drivers();
     for (const auto& driver : drivers) {
@@ -600,30 +600,30 @@ bool output_asio_impl::load_driver(const std::string& driver_id) {
             current_driver_name_ = driver.name;
             current_driver_id_ = driver_id;
             
-            // 设置驱动信息
-            input_latency_ = driver.buffer_size_preferred / 2; // 估算输入延迟
-            output_latency_ = driver.buffer_size_preferred / 2; // 估算输出延迟
+            // 璁剧疆椹卞姩淇℃伅
+            input_latency_ = driver.buffer_size_preferred / 2; // 浼扮畻杈撳叆寤惰繜
+            output_latency_ = driver.buffer_size_preferred / 2; // 浼扮畻杈撳嚭寤惰繜
             buffer_size_ = driver.buffer_size_preferred;
             
-            // 设置支持的功能
-            supports_time_code_ = false; // 简化实现
+            // 璁剧疆鏀寔鐨勫姛鑳?
+            supports_time_code_ = false; // 绠€鍖栧疄鐜?
             supports_input_monitoring_ = false;
             supports_variable_buffer_size_ = (driver.buffer_size_granularity > 0);
             
-            std::cout << "[ASIO] 驱动加载成功: " << driver.name << std::endl;
+            std::cout << "[ASIO] 椹卞姩鍔犺浇鎴愬姛: " << driver.name << std::endl;
             return true;
         }
     }
     
-    std::cerr << "[ASIO] 未找到指定驱动: " << driver_id << std::endl;
+    std::cerr << "[ASIO] 鏈壘鍒版寚瀹氶┍鍔? " << driver_id << std::endl;
     return false;
 }
 
 void output_asio_impl::unload_driver() {
     if (!current_driver_id_.empty()) {
-        std::cout << "[ASIO] 卸载驱动: " << current_driver_name_ << std::endl;
+        std::cout << "[ASIO] 鍗歌浇椹卞姩: " << current_driver_name_ << std::endl;
         
-        // 停止音频流
+        // 鍋滄闊抽娴?
         if (is_playing_) {
             stop_asio_streaming();
         }
@@ -645,7 +645,7 @@ std::string output_asio_impl::get_current_driver_name() const {
 void output_asio_impl::set_buffer_size(long size) {
     if (size >= 64 && size <= 4096) {
         buffer_size_ = size;
-        std::cout << "[ASIO] 设置缓冲区大小: " << size << std::endl;
+        std::cout << "[ASIO] 璁剧疆缂撳啿鍖哄ぇ灏? " << size << std::endl;
     }
 }
 
@@ -655,7 +655,7 @@ long output_asio_impl::get_buffer_size() const {
 
 void output_asio_impl::set_sample_rate(double rate) {
     sample_rate_ = static_cast<t_uint32>(rate);
-    std::cout << "[ASIO] 设置采样率: " << rate << "Hz" << std::endl;
+    std::cout << "[ASIO] 璁剧疆閲囨牱鐜? " << rate << "Hz" << std::endl;
 }
 
 double output_asio_impl::get_sample_rate() const {
@@ -663,7 +663,7 @@ double output_asio_impl::get_sample_rate() const {
 }
 
 std::vector<double> output_asio_impl::get_available_sample_rates() const {
-    // 返回常见的ASIO采样率
+    // 杩斿洖甯歌鐨凙SIO閲囨牱鐜?
     return {44100.0, 48000.0, 88200.0, 96000.0, 176400.0, 192000.0};
 }
 
@@ -692,15 +692,15 @@ bool output_asio_impl::supports_variable_buffer_size() const {
 }
 
 void output_asio_impl::show_control_panel() {
-    std::cout << "[ASIO] 显示控制面板" << std::endl;
+    std::cout << "[ASIO] 鏄剧ず鎺у埗闈㈡澘" << std::endl;
     
-    // 这里应该调用驱动的控制面板
-    // 简化实现：只是输出信息
-    std::cout << "[ASIO] 驱动: " << current_driver_name_ << std::endl;
-    std::cout << "[ASIO] 采样率: " << sample_rate_ << "Hz" << std::endl;
-    std::cout << "[ASIO] 缓冲区大小: " << buffer_size_ << std::endl;
-    std::cout << "[ASIO] 输入延迟: " << input_latency_ << " 采样" << std::endl;
-    std::cout << "[ASIO] 输出延迟: " << output_latency_ << " 采样" << std::endl;
+    // 杩欓噷搴旇璋冪敤椹卞姩鐨勬帶鍒堕潰鏉?
+    // 绠€鍖栧疄鐜帮細鍙槸杈撳嚭淇℃伅
+    std::cout << "[ASIO] 椹卞姩: " << current_driver_name_ << std::endl;
+    std::cout << "[ASIO] 閲囨牱鐜? " << sample_rate_ << "Hz" << std::endl;
+    std::cout << "[ASIO] 缂撳啿鍖哄ぇ灏? " << buffer_size_ << std::endl;
+    std::cout << "[ASIO] 杈撳叆寤惰繜: " << input_latency_ << " 閲囨牱" << std::endl;
+    std::cout << "[ASIO] 杈撳嚭寤惰繜: " << output_latency_ << " 閲囨牱" << std::endl;
 }
 
 long output_asio_impl::get_buffer_size_min() const {
@@ -720,21 +720,21 @@ long output_asio_impl::get_buffer_size_granularity() const {
 }
 
 std::vector<std::string> output_asio_impl::get_clock_sources() const {
-    // 返回时钟源列表
+    // 杩斿洖鏃堕挓婧愬垪琛?
     return {"Internal", "Word Clock", "Digital Input", "S/PDIF"};
 }
 
 void output_asio_impl::set_clock_source(long index) {
-    std::cout << "[ASIO] 设置时钟源: " << index << std::endl;
+    std::cout << "[ASIO] 璁剧疆鏃堕挓婧? " << index << std::endl;
 }
 
 long output_asio_impl::get_current_clock_source() const {
     return 0; // Internal
 }
 
-// 音频处理回调
+// 闊抽澶勭悊鍥炶皟
 void output_asio_impl::process_samples(const audio_chunk* p_chunk, t_uint32 p_samples_written, t_uint32 p_samples_total, abort_callback& p_abort) {
-    // ASIO使用回调模式，这里不需要实现
+    // ASIO浣跨敤鍥炶皟妯″紡锛岃繖閲屼笉闇€瑕佸疄鐜?
 }
 
 void output_asio_impl::pause_ex(bool p_state, t_uint32 p_samples_written) {
@@ -760,28 +760,28 @@ void output_asio_impl::get_latency_ex4(t_uint32& p_samples, t_uint32& p_samples_
     p_samples_in_device_buffer = p_samples_in_buffer;
 }
 
-// 私有实现方法
+// 绉佹湁瀹炵幇鏂规硶
 bool output_asio_impl::initialize_asio() {
-    std::cout << "[ASIO] 初始化ASIO系统" << std::endl;
+    std::cout << "[ASIO] 鍒濆鍖朅SIO绯荤粺" << std::endl;
     
     if (!driver_) {
-        std::cerr << "[ASIO] 没有加载的驱动" << std::endl;
+        std::cerr << "[ASIO] 娌℃湁鍔犺浇鐨勯┍鍔? << std::endl;
         return false;
     }
     
-    // 初始化驱动
-    // 简化实现：假设初始化成功
+    // 鍒濆鍖栭┍鍔?
+    // 绠€鍖栧疄鐜帮細鍋囪鍒濆鍖栨垚鍔?
     return true;
 }
 
 bool output_asio_impl::create_asio_buffers() {
-    std::cout << "[ASIO] 创建ASIO缓冲区" << std::endl;
+    std::cout << "[ASIO] 鍒涘缓ASIO缂撳啿鍖? << std::endl;
     
     if (!driver_ || !buffer_manager_) {
         return false;
     }
     
-    // 创建缓冲区信息数组
+    // 鍒涘缓缂撳啿鍖轰俊鎭暟缁?
     std::vector<asio_buffer_info> buffer_infos(channels_);
     for (long i = 0; i < channels_; ++i) {
         buffer_infos[i].buffer_index = 0;
@@ -793,21 +793,21 @@ bool output_asio_impl::create_asio_buffers() {
         buffer_infos[i].buffer[1] = nullptr;
     }
     
-    // 这里应该调用真实的ASIO接口创建缓冲区
-    // 简化实现：使用缓冲区管理器
+    // 杩欓噷搴旇璋冪敤鐪熷疄鐨凙SIO鎺ュ彛鍒涘缓缂撳啿鍖?
+    // 绠€鍖栧疄鐜帮細浣跨敤缂撳啿鍖虹鐞嗗櫒
     
     return true;
 }
 
 bool output_asio_impl::start_asio_streaming() {
-    std::cout << "[ASIO] 开始ASIO流式传输" << std::endl;
+    std::cout << "[ASIO] 寮€濮婣SIO娴佸紡浼犺緭" << std::endl;
     
     if (!driver_ || is_playing_) {
         return false;
     }
     
-    // 启动音频流
-    // 简化实现：标记为播放状态
+    // 鍚姩闊抽娴?
+    // 绠€鍖栧疄鐜帮細鏍囪涓烘挱鏀剧姸鎬?
     is_playing_.store(true);
     start_time_ = std::chrono::steady_clock::now();
     
@@ -815,20 +815,20 @@ bool output_asio_impl::start_asio_streaming() {
 }
 
 bool output_asio_impl::stop_asio_streaming() {
-    std::cout << "[ASIO] 停止ASIO流式传输" << std::endl;
+    std::cout << "[ASIO] 鍋滄ASIO娴佸紡浼犺緭" << std::endl;
     
     if (!driver_ || !is_playing_) {
         return false;
     }
     
-    // 停止音频流
+    // 鍋滄闊抽娴?
     is_playing_.store(false);
     
     return true;
 }
 
 void output_asio_impl::cleanup_asio() {
-    std::cout << "[ASIO] 清理ASIO资源" << std::endl;
+    std::cout << "[ASIO] 娓呯悊ASIO璧勬簮" << std::endl;
     
     if (buffer_manager_) {
         buffer_manager_->cleanup();
@@ -838,48 +838,48 @@ void output_asio_impl::cleanup_asio() {
         time_manager_->clear_flags();
     }
     
-    // 卸载驱动
+    // 鍗歌浇椹卞姩
     unload_driver();
 }
 
 void output_asio_impl::asio_thread_func() {
-    std::cout << "[ASIO] ASIO线程启动" << std::endl;
+    std::cout << "[ASIO] ASIO绾跨▼鍚姩" << std::endl;
     
-    // 提升线程优先级
+    // 鎻愬崌绾跨▼浼樺厛绾?
     DWORD task_index = 0;
     HANDLE avrt_handle = AvSetMmThreadCharacteristics(L"Pro Audio", &task_index);
     if (avrt_handle) {
-        std::cout << "[ASIO] ASIO线程优先级已提升" << std::endl;
+        std::cout << "[ASIO] ASIO绾跨▼浼樺厛绾у凡鎻愬崌" << std::endl;
     }
     
     while (asio_thread_running_.load() && !should_stop_.load()) {
-        // ASIO音频处理循环
+        // ASIO闊抽澶勭悊寰幆
         if (is_playing_.load() && !is_paused_.load()) {
-            // 处理音频数据
+            // 澶勭悊闊抽鏁版嵁
             update_performance_stats();
             
-            // 小延迟以避免CPU占用过高
+            // 灏忓欢杩熶互閬垮厤CPU鍗犵敤杩囬珮
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         } else {
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }
     
-    // 恢复线程优先级
+    // 鎭㈠绾跨▼浼樺厛绾?
     if (avrt_handle) {
         AvRevertMmThreadCharacteristics(avrt_handle);
     }
     
-    std::cout << "[ASIO] ASIO线程停止" << std::endl;
+    std::cout << "[ASIO] ASIO绾跨▼鍋滄" << std::endl;
 }
 
 void output_asio_impl::process_audio_data(float** input_channels, float** output_channels, long num_channels, long buffer_size) {
-    // 处理音频数据
+    // 澶勭悊闊抽鏁版嵁
     if (!output_channels || num_channels <= 0 || buffer_size <= 0) {
         return;
     }
     
-    // 应用音量
+    // 搴旂敤闊抽噺
     float current_volume = volume_.load();
     
     for (long ch = 0; ch < num_channels; ++ch) {
@@ -894,7 +894,7 @@ void output_asio_impl::process_audio_data(float** input_channels, float** output
 }
 
 void output_asio_impl::update_performance_stats() {
-    // 更新性能统计
+    // 鏇存柊鎬ц兘缁熻
     auto now = std::chrono::steady_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - start_time_).count();
     
@@ -905,7 +905,7 @@ void output_asio_impl::update_performance_stats() {
 }
 
 double output_asio_impl::get_current_cpu_usage() {
-    // 简化的CPU使用率计算
+    // 绠€鍖栫殑CPU浣跨敤鐜囪绠?
     static FILETIME prev_idle, prev_kernel, prev_user;
     FILETIME idle, kernel, user;
     
@@ -932,10 +932,10 @@ double output_asio_impl::get_current_cpu_usage() {
 }
 
 bool output_asio_impl::validate_asio_format(long asio_sample_type, long num_channels, double sample_rate) {
-    // 检查ASIO驱动是否支持指定格式
+    // 妫€鏌SIO椹卞姩鏄惁鏀寔鎸囧畾鏍煎紡
     if (!driver_) return false;
     
-    // 简化验证：检查常见格式
+    // 绠€鍖栭獙璇侊細妫€鏌ュ父瑙佹牸寮?
     if (asio_sample_type != ASIOST_FLOAT32LSB && asio_sample_type != ASIOST_FLOAT32MSB) {
         return false;
     }
@@ -944,7 +944,7 @@ bool output_asio_impl::validate_asio_format(long asio_sample_type, long num_chan
         return false;
     }
     
-    // 检查采样率
+    // 妫€鏌ラ噰鏍风巼
     auto supported_rates = get_available_sample_rates();
     if (std::find(supported_rates.begin(), supported_rates.end(), sample_rate) == supported_rates.end()) {
         return false;
@@ -958,8 +958,8 @@ t_uint32 output_asio_impl::get_padding_frames() {
         return 0;
     }
     
-    // 这里应该调用ASIO驱动获取当前填充帧数
-    // 简化实现：返回估算值
+    // 杩欓噷搴旇璋冪敤ASIO椹卞姩鑾峰彇褰撳墠濉厖甯ф暟
+    // 绠€鍖栧疄鐜帮細杩斿洖浼扮畻鍊?
     return buffer_size_ / 2;
 }
 
@@ -968,8 +968,8 @@ t_uint32 output_asio_impl::get_available_frames() {
         return 0;
     }
     
-    // 这里应该调用ASIO驱动获取可用帧数
-    // 简化实现：返回估算值
+    // 杩欓噷搴旇璋冪敤ASIO椹卞姩鑾峰彇鍙敤甯ф暟
+    // 绠€鍖栧疄鐜帮細杩斿洖浼扮畻鍊?
     return buffer_size_ - get_padding_frames();
 }
 
@@ -978,13 +978,13 @@ HRESULT output_asio_impl::write_to_asio_buffers(const void* data, t_uint32 frame
         return E_FAIL;
     }
     
-    // 将数据写入ASIO缓冲区
+    // 灏嗘暟鎹啓鍏SIO缂撳啿鍖?
     const float* float_data = static_cast<const float*>(data);
     
     for (long ch = 0; ch < channels_; ++ch) {
         float* asio_buffer = buffer_manager_->get_output_buffer(ch, buffer_manager_->get_current_buffer_index());
         if (asio_buffer) {
-            // 复制数据到ASIO缓冲区
+            // 澶嶅埗鏁版嵁鍒癆SIO缂撳啿鍖?
             for (t_uint32 i = 0; i < frames; ++i) {
                 asio_buffer[i] = float_data[i * channels_ + ch] * volume_.load();
             }
@@ -995,27 +995,27 @@ HRESULT output_asio_impl::write_to_asio_buffers(const void* data, t_uint32 frame
 }
 
 void output_asio_impl::setup_callbacks() {
-    // 设置ASIO回调
+    // 璁剧疆ASIO鍥炶皟
     callback_handler_->set_buffer_switch_callback(
         [](long buffer_index) {
-            // 缓冲区切换回调
-            // 这里应该处理实际的缓冲区切换
+            // 缂撳啿鍖哄垏鎹㈠洖璋?
+            // 杩欓噷搴旇澶勭悊瀹為檯鐨勭紦鍐插尯鍒囨崲
         });
     
     callback_handler_->set_sample_rate_callback(
         [this](double sample_rate) {
-            // 采样率变化回调
+            // 閲囨牱鐜囧彉鍖栧洖璋?
             sample_rate_ = static_cast<t_uint32>(sample_rate);
-            std::cout << "[ASIO] 采样率改变: " << sample_rate << "Hz" << std::endl;
+            std::cout << "[ASIO] 閲囨牱鐜囨敼鍙? " << sample_rate << "Hz" << std::endl;
         });
     
     callback_handler_->set_message_callback(
         [](long selector, long value, void* ptr, double* opt) -> long {
-            // 消息回调
+            // 娑堟伅鍥炶皟
             return 0;
         });
     
-    // 设置音频处理器
+    // 璁剧疆闊抽澶勭悊鍣?
     callback_handler_->set_audio_processor(
         [this](float** inputs, float** outputs, long num_channels, long buffer_size) {
             this->process_audio_data(inputs, outputs, num_channels, buffer_size);
@@ -1023,22 +1023,22 @@ void output_asio_impl::setup_callbacks() {
 }
 
 void output_asio_impl::log_asio_info() {
-    std::cout << "[ASIO] 设备信息:" << std::endl;
-    std::cout << "  驱动: " << current_driver_name_ << std::endl;
-    std::cout << "  采样率: " << sample_rate_ << "Hz" << std::endl;
-    std::cout << "  声道数: " << channels_ << std::endl;
-    std::cout << "  缓冲区大小: " << buffer_size_ << std::endl;
-    std::cout << "  输入延迟: " << input_latency_ << " 采样" << std::endl;
-    std::cout << "  输出延迟: " << output_latency_ << " 采样" << std::endl;
-    std::cout << "  支持时间码: " << (supports_time_code_ ? "是" : "否") << std::endl;
-    std::cout << "  支持输入监听: " << (supports_input_monitoring_ ? "是" : "否") << std::endl;
+    std::cout << "[ASIO] 璁惧淇℃伅:" << std::endl;
+    std::cout << "  椹卞姩: " << current_driver_name_ << std::endl;
+    std::cout << "  閲囨牱鐜? " << sample_rate_ << "Hz" << std::endl;
+    std::cout << "  澹伴亾鏁? " << channels_ << std::endl;
+    std::cout << "  缂撳啿鍖哄ぇ灏? " << buffer_size_ << std::endl;
+    std::cout << "  杈撳叆寤惰繜: " << input_latency_ << " 閲囨牱" << std::endl;
+    std::cout << "  杈撳嚭寤惰繜: " << output_latency_ << " 閲囨牱" << std::endl;
+    std::cout << "  鏀寔鏃堕棿鐮? " << (supports_time_code_ ? "鏄? : "鍚?) << std::endl;
+    std::cout << "  鏀寔杈撳叆鐩戝惉: " << (supports_input_monitoring_ ? "鏄? : "鍚?) << std::endl;
 }
 
 void output_asio_impl::handle_asio_error(const std::string& operation, HRESULT hr) {
     asio_error_handler::handle_error(operation, hr);
 }
 
-// ASIO工具函数实现
+// ASIO宸ュ叿鍑芥暟瀹炵幇
 namespace asio_utils {
 
 std::vector<asio_driver_info> enumerate_asio_drivers() {
@@ -1055,9 +1055,9 @@ std::string get_asio_version() {
 }
 
 long get_optimal_buffer_size(double sample_rate, int channels) {
-    // 根据采样率和声道数推荐最优缓冲区大小
+    // 鏍规嵁閲囨牱鐜囧拰澹伴亾鏁版帹鑽愭渶浼樼紦鍐插尯澶у皬
     if (sample_rate >= 192000) {
-        return 256; // 高采样率使用小缓冲区
+        return 256; // 楂橀噰鏍风巼浣跨敤灏忕紦鍐插尯
     } else if (sample_rate >= 96000) {
         return 512;
     } else if (sample_rate >= 48000) {
@@ -1088,12 +1088,12 @@ asio_driver_info get_driver_info(const std::string& driver_id) {
         }
     }
     
-    return asio_driver_info(); // 返回空信息
+    return asio_driver_info(); // 杩斿洖绌轰俊鎭?
 }
 
 } // namespace asio_utils
 
-// 创建ASIO输出设备
+// 鍒涘缓ASIO杈撳嚭璁惧
 std::unique_ptr<output_asio> create_asio_output() {
     return std::make_unique<output_asio_impl>();
 }

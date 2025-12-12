@@ -1,5 +1,5 @@
-// 阶段1测试程序
-// 测试加载foobar2000组件并解码音频文件
+﻿// 闃舵1娴嬭瘯绋嬪簭
+// 娴嬭瘯鍔犺浇foobar2000缁勪欢骞惰В鐮侀煶棰戞枃浠?
 
 #include "minihost.h"
 #include <iostream>
@@ -9,11 +9,11 @@
 
 namespace fs = std::filesystem;
 
-// 查找foobar2000组件目录
+// 鏌ユ壘foobar2000缁勪欢鐩綍
 std::vector<std::wstring> find_fb2k_components() {
     std::vector<std::wstring> components;
     
-    // 常见安装路径
+    // 甯歌瀹夎璺緞
     std::vector<std::wstring> search_paths = {
         L"C:\\Program Files (x86)\\foobar2000\\components",
         L"C:\\Program Files\\foobar2000\\components",
@@ -23,14 +23,14 @@ std::vector<std::wstring> find_fb2k_components() {
     for(const auto& base_path : search_paths) {
         if(!fs::exists(base_path)) continue;
         
-        // 查找所有DLL文件
+        // 鏌ユ壘鎵€鏈塂LL鏂囦欢
         for(const auto& entry : fs::directory_iterator(base_path)) {
             if(entry.is_regular_file() && entry.path().extension() == L".dll") {
                 components.push_back(entry.path().wstring());
             }
         }
         
-        // 也查找子目录中的DLL
+        // 涔熸煡鎵惧瓙鐩綍涓殑DLL
         for(const auto& entry : fs::recursive_directory_iterator(base_path)) {
             if(entry.is_regular_file() && entry.path().extension() == L".dll") {
                 components.push_back(entry.path().wstring());
@@ -41,9 +41,9 @@ std::vector<std::wstring> find_fb2k_components() {
     return components;
 }
 
-// 查找测试音频文件
+// 鏌ユ壘娴嬭瘯闊抽鏂囦欢
 std::string find_test_audio_file() {
-    // 优先使用项目目录下的测试文件
+    // 浼樺厛浣跨敤椤圭洰鐩綍涓嬬殑娴嬭瘯鏂囦欢
     std::vector<std::string> test_files = {
         "test_440hz.wav",
         "input_44100Hz.wav", 
@@ -56,40 +56,40 @@ std::string find_test_audio_file() {
         }
     }
     
-    // 如果没有，让用户选择
-    std::cout << "请输入要测试的音频文件路径: ";
+    // 濡傛灉娌℃湁锛岃鐢ㄦ埛閫夋嫨
+    std::cout << "璇疯緭鍏ヨ娴嬭瘯鐨勯煶棰戞枃浠惰矾寰? ";
     std::string path;
     std::getline(std::cin, path);
     return path;
 }
 
 int main(int argc, char* argv[]) {
-    std::cout << "=== foobar2000 组件兼容测试程序 ===" << std::endl;
-    std::cout << "阶段1：最小主机接口测试" << std::endl;
+    std::cout << "=== foobar2000 缁勪欢鍏煎娴嬭瘯绋嬪簭 ===" << std::endl;
+    std::cout << "闃舵1锛氭渶灏忎富鏈烘帴鍙ｆ祴璇? << std::endl;
     std::cout << std::endl;
     
-    // 创建主机
+    // 鍒涘缓涓绘満
     mini_host host;
     if(!host.initialize()) {
-        std::cerr << "初始化主机失败!" << std::endl;
+        std::cerr << "鍒濆鍖栦富鏈哄け璐?" << std::endl;
         return 1;
     }
     
-    std::cout << "正在搜索 foobar2000 组件..." << std::endl;
+    std::cout << "姝ｅ湪鎼滅储 foobar2000 缁勪欢..." << std::endl;
     auto components = find_fb2k_components();
     
     if(components.empty()) {
-        std::cout << "未找到 foobar2000 组件!" << std::endl;
-        std::cout << "请手动指定组件目录: ";
+        std::cout << "鏈壘鍒?foobar2000 缁勪欢!" << std::endl;
+        std::cout << "璇锋墜鍔ㄦ寚瀹氱粍浠剁洰褰? ";
         std::string path;
         std::getline(std::cin, path);
         
         if(!fs::exists(path)) {
-            std::cerr << "路径不存在!" << std::endl;
+            std::cerr << "璺緞涓嶅瓨鍦?" << std::endl;
             return 1;
         }
         
-        // 手动添加DLL文件
+        // 鎵嬪姩娣诲姞DLL鏂囦欢
         for(const auto& entry : fs::directory_iterator(path)) {
             if(entry.is_regular_file() && entry.path().extension() == ".dll") {
                 components.push_back(entry.path().wstring());
@@ -97,69 +97,69 @@ int main(int argc, char* argv[]) {
         }
     }
     
-    std::cout << "找到 " << components.size() << " 个组件:" << std::endl;
+    std::cout << "鎵惧埌 " << components.size() << " 涓粍浠?" << std::endl;
     for(size_t i = 0; i < components.size(); ++i) {
         std::wcout << L"  [" << i << L"] " << components[i] << std::endl;
     }
     
-    // 加载核心组件（优先加载input_std）
-    std::cout << std::endl << "正在加载组件..." << std::endl;
+    // 鍔犺浇鏍稿績缁勪欢锛堜紭鍏堝姞杞絠nput_std锛?
+    std::cout << std::endl << "姝ｅ湪鍔犺浇缁勪欢..." << std::endl;
     
     int loaded_count = 0;
     for(const auto& component : components) {
         std::string name = wide_to_utf8(component);
         
-        // 优先加载input_std组件
+        // 浼樺厛鍔犺浇input_std缁勪欢
         if(name.find("input_std") != std::string::npos || 
            name.find("foo_input_std") != std::string::npos) {
-            std::cout << "优先加载核心组件: " << name << std::endl;
+            std::cout << "浼樺厛鍔犺浇鏍稿績缁勪欢: " << name << std::endl;
             if(host.load_component(component)) {
                 loaded_count++;
-                break; // 先只加载一个核心组件进行测试
+                break; // 鍏堝彧鍔犺浇涓€涓牳蹇冪粍浠惰繘琛屾祴璇?
             }
         }
     }
     
-    // 如果没找到input_std，尝试加载其他组件
+    // 濡傛灉娌℃壘鍒癷nput_std锛屽皾璇曞姞杞藉叾浠栫粍浠?
     if(loaded_count == 0 && !components.empty()) {
-        std::cout << "尝试加载第一个组件: " << wide_to_utf8(components[0]) << std::endl;
+        std::cout << "灏濊瘯鍔犺浇绗竴涓粍浠? " << wide_to_utf8(components[0]) << std::endl;
         if(host.load_component(components[0])) {
             loaded_count++;
         }
     }
     
-    std::cout << std::endl << "成功加载 " << loaded_count << " 个组件" << std::endl;
+    std::cout << std::endl << "鎴愬姛鍔犺浇 " << loaded_count << " 涓粍浠? << std::endl;
     
-    // 显示已加载的组件
+    // 鏄剧ず宸插姞杞界殑缁勪欢
     auto loaded = host.get_loaded_components();
     for(const auto& name : loaded) {
         std::cout << "  - " << name << std::endl;
     }
     
     if(loaded.empty()) {
-        std::cout << "没有组件被加载，测试结束。" << std::endl;
+        std::cout << "娌℃湁缁勪欢琚姞杞斤紝娴嬭瘯缁撴潫銆? << std::endl;
         return 0;
     }
     
-    // 测试解码
-    std::cout << std::endl << "准备测试解码..." << std::endl;
+    // 娴嬭瘯瑙ｇ爜
+    std::cout << std::endl << "鍑嗗娴嬭瘯瑙ｇ爜..." << std::endl;
     std::string test_file = find_test_audio_file();
     
     if(!fs::exists(test_file)) {
-        std::cerr << "测试文件不存在: " << test_file << std::endl;
+        std::cerr << "娴嬭瘯鏂囦欢涓嶅瓨鍦? " << test_file << std::endl;
         return 1;
     }
     
-    std::cout << "使用测试文件: " << test_file << std::endl;
+    std::cout << "浣跨敤娴嬭瘯鏂囦欢: " << test_file << std::endl;
     
-    // 运行解码测试
-    std::cout << std::endl << "开始解码测试..." << std::endl;
+    // 杩愯瑙ｇ爜娴嬭瘯
+    std::cout << std::endl << "寮€濮嬭В鐮佹祴璇?.." << std::endl;
     bool success = host.test_decode(test_file);
     
     if(success) {
-        std::cout << std::endl << "✅ 测试成功! foobar2000 组件兼容层工作正常。" << std::endl;
+        std::cout << std::endl << "鉁?娴嬭瘯鎴愬姛! foobar2000 缁勪欢鍏煎灞傚伐浣滄甯搞€? << std::endl;
     } else {
-        std::cout << std::endl << "❌ 测试失败，请检查错误信息。" << std::endl;
+        std::cout << std::endl << "鉂?娴嬭瘯澶辫触锛岃妫€鏌ラ敊璇俊鎭€? << std::endl;
     }
     
     return success ? 0 : 1;

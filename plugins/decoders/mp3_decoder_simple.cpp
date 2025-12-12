@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file mp3_decoder_simple.cpp
  * @brief Simple MP3 decoder for testing
  * @date 2025-12-11

@@ -1,7 +1,7 @@
-#pragma once
+﻿#pragma once
 
-// 阶段1.1：真实foobar2000组件主机
-// 目标：加载和运行真实的fb2k组件DLL
+// 闃舵1.1锛氱湡瀹瀎oobar2000缁勪欢涓绘満
+// 鐩爣锛氬姞杞藉拰杩愯鐪熷疄鐨刦b2k缁勪欢DLL
 
 #include <windows.h>
 #include <unknwn.h>
@@ -12,42 +12,42 @@
 #include <functional>
 #include <iostream>
 
-// 真实的foobar2000 GUID定义（基于公开信息）
+// 鐪熷疄鐨刦oobar2000 GUID瀹氫箟锛堝熀浜庡叕寮€淇℃伅锛?
 namespace fb2k {
 
-// 基础接口GUID
+// 鍩虹鎺ュ彛GUID
 // {00000000-0000-0000-C000-000000000046}
 DEFINE_GUID(IID_IUnknown, 
     0x00000000, 0x0000, 0x0000, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46);
 
-// 服务基础接口
+// 鏈嶅姟鍩虹鎺ュ彛
 // {FB2KServiceBase-1234-1234-1234-123456789ABC}
 DEFINE_GUID(IID_ServiceBase,
     0xFB2KServiceBase, 0x1234, 0x1234, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0);
 
-// 文件信息接口  
+// 鏂囦欢淇℃伅鎺ュ彛  
 // {FB2KFileInfo-5678-5678-5678-567890ABCDEF}
 DEFINE_GUID(IID_FileInfo,
     0xFB2KFileInfo, 0x5678, 0x5678, 0x56, 0x78, 0x90, 0xAB, 0xCD, 0xEF, 0x12, 0x34);
 
-// 中止回调接口
+// 涓鍥炶皟鎺ュ彛
 // {FB2KAbortCallback-9ABC-9ABC-9ABC-9ABCDEF01234}
 DEFINE_GUID(IID_AbortCallback,
     0xFB2KAbortCallback, 0x9ABC, 0x9ABC, 0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78);
 
-// 输入解码器接口
+// 杈撳叆瑙ｇ爜鍣ㄦ帴鍙?
 // {FB2KInputDecoder-DEF0-DEF0-DEF0-DEF012345678}
 DEFINE_GUID(IID_InputDecoder,
     0xFB2KInputDecoder, 0xDEF0, 0xDEF0, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC);
 
-// 服务类GUID
+// 鏈嶅姟绫籊UID
 // {FB2KServiceClass-1234-5678-9ABC-DEF012345678}
 DEFINE_GUID(CLSID_InputDecoderService,
     0xFB2KServiceClass, 0x1234, 0x5678, 0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78);
 
 } // namespace fb2k
 
-// 前向声明
+// 鍓嶅悜澹版槑
 namespace fb2k {
     class ServiceBase;
     class FileInfo;
@@ -55,7 +55,7 @@ namespace fb2k {
     class InputDecoder;
 }
 
-// 基础COM对象（符合真实fb2k规范）
+// 鍩虹COM瀵硅薄锛堢鍚堢湡瀹瀎b2k瑙勮寖锛?
 class ComObject : public IUnknown {
 protected:
     ULONG m_refCount;
@@ -69,13 +69,13 @@ public:
     virtual ULONG STDMETHODCALLTYPE AddRef() override;
     virtual ULONG STDMETHODCALLTYPE Release() override;
     
-    // 派生类需要重载这个函数
+    // 娲剧敓绫婚渶瑕侀噸杞借繖涓嚱鏁?
     virtual HRESULT QueryInterfaceImpl(REFIID riid, void** ppvObject) {
         return E_NOINTERFACE;
     }
 };
 
-// 服务基类（符合fb2k规范）
+// 鏈嶅姟鍩虹被锛堢鍚坒b2k瑙勮寖锛?
 class ServiceBase : public ComObject {
 public:
     virtual int service_add_ref() { return AddRef(); }
@@ -84,7 +84,7 @@ public:
     HRESULT QueryInterfaceImpl(REFIID riid, void** ppvObject) override;
 };
 
-// 智能指针模板（符合fb2k规范）
+// 鏅鸿兘鎸囬拡妯℃澘锛堢鍚坒b2k瑙勮寖锛?
 template<typename T>
 class service_ptr_t {
 private:
@@ -141,7 +141,7 @@ public:
     }
 };
 
-// 基础数据结构
+// 鍩虹鏁版嵁缁撴瀯
 struct audio_info {
     uint32_t sample_rate;
     uint32_t channels;
@@ -158,7 +158,7 @@ struct file_stats {
     file_stats() : size(0), timestamp(0) {}
 };
 
-// 文件信息接口
+// 鏂囦欢淇℃伅鎺ュ彛
 class FileInfo : public ServiceBase {
 public:
     virtual void reset() = 0;
@@ -173,28 +173,28 @@ public:
     virtual void set_file_stats(const file_stats& stats) = 0;
 };
 
-// 中止回调接口
+// 涓鍥炶皟鎺ュ彛
 class AbortCallback : public ServiceBase {
 public:
     virtual bool is_aborting() const = 0;
 };
 
-// 输入解码器接口
+// 杈撳叆瑙ｇ爜鍣ㄦ帴鍙?
 class InputDecoder : public ServiceBase {
 public:
-    // 核心解码接口
+    // 鏍稿績瑙ｇ爜鎺ュ彛
     virtual bool open(const char* path, FileInfo& info, AbortCallback& abort) = 0;
     virtual int decode(float* buffer, int samples, AbortCallback& abort) = 0;
     virtual void seek(double seconds, AbortCallback& abort) = 0;
     virtual bool can_seek() = 0;
     virtual void close() = 0;
     
-    // 能力查询
+    // 鑳藉姏鏌ヨ
     virtual bool is_our_path(const char* path) = 0;
     virtual const char* get_name() = 0;
 };
 
-// 服务工厂接口
+// 鏈嶅姟宸ュ巶鎺ュ彛
 class ServiceFactory {
 public:
     virtual ~ServiceFactory() {}
@@ -202,7 +202,7 @@ public:
     virtual const GUID& GetServiceGUID() const = 0;
 };
 
-// 真实的文件信息实现
+// 鐪熷疄鐨勬枃浠朵俊鎭疄鐜?
 class RealFileInfo : public FileInfo {
 private:
     std::unordered_map<std::string, std::vector<std::string>> metadata_;
@@ -216,7 +216,7 @@ public:
     // IUnknown
     HRESULT QueryInterfaceImpl(REFIID riid, void** ppvObject) override;
     
-    // FileInfo接口
+    // FileInfo鎺ュ彛
     void reset() override {
         metadata_.clear();
         audio_info_ = audio_info();
@@ -255,7 +255,7 @@ public:
     void set_file_stats(const file_stats& stats) override { file_stats_ = stats; }
 };
 
-// 真实的解码器包装器
+// 鐪熷疄鐨勮В鐮佸櫒鍖呰鍣?
 class RealDecoderWrapper : public InputDecoder {
 private:
     HMODULE m_module;
@@ -263,14 +263,14 @@ private:
     bool m_isOpen;
     std::string m_currentPath;
     
-    // 组件特定的函数指针类型
+    // 缁勪欢鐗瑰畾鐨勫嚱鏁版寚閽堢被鍨?
     typedef HRESULT (*GetServiceFunc)(REFGUID, void**);
     GetServiceFunc m_getService;
     
 public:
     RealDecoderWrapper(HMODULE module, const std::string& name) 
         : m_module(module), m_name(name), m_isOpen(false) {
-        // 获取服务入口点
+        // 鑾峰彇鏈嶅姟鍏ュ彛鐐?
         m_getService = (GetServiceFunc)GetProcAddress(module, "fb2k_get_service");
         if(!m_getService) {
             m_getService = (GetServiceFunc)GetProcAddress(module, "get_service");
@@ -285,7 +285,7 @@ public:
     // IUnknown
     HRESULT QueryInterfaceImpl(REFIID riid, void** ppvObject) override;
     
-    // InputDecoder接口
+    // InputDecoder鎺ュ彛
     bool open(const char* path, FileInfo& info, AbortCallback& abort) override;
     int decode(float* buffer, int samples, AbortCallback& abort) override;
     void seek(double seconds, AbortCallback& abort) override;
@@ -295,7 +295,7 @@ public:
     const char* get_name() override { return m_name.c_str(); }
 };
 
-// 真实的主机类
+// 鐪熷疄鐨勪富鏈虹被
 class RealMiniHost {
 private:
     std::vector<HMODULE> m_modules;
@@ -308,23 +308,23 @@ public:
         Shutdown();
     }
     
-    // 初始化和清理
+    // 鍒濆鍖栧拰娓呯悊
     bool Initialize();
     void Shutdown();
     
-    // 组件管理
+    // 缁勪欢绠＄悊
     bool LoadComponent(const std::wstring& dll_path);
     bool LoadComponentDirectory(const std::wstring& directory);
     std::vector<std::string> GetLoadedComponents() const;
     
-    // 解码器创建
+    // 瑙ｇ爜鍣ㄥ垱寤?
     service_ptr_t<InputDecoder> CreateDecoderForPath(const std::string& path);
     
-    // 服务管理
+    // 鏈嶅姟绠＄悊
     HRESULT GetService(REFGUID guid, void** ppvObject);
     bool RegisterService(const GUID& guid, std::unique_ptr<ServiceFactory> factory);
     
-    // 测试功能
+    // 娴嬭瘯鍔熻兘
     bool TestRealComponent(const std::string& audio_file);
     
 private:
@@ -334,7 +334,7 @@ private:
     std::wstring UTF8ToWide(const std::string& utf8);
 };
 
-// GUID哈希函数
+// GUID鍝堝笇鍑芥暟
 struct GUID_hash {
     size_t operator()(const GUID& guid) const {
         const uint64_t* p = reinterpret_cast<const uint64_t*>(&guid);
@@ -342,7 +342,7 @@ struct GUID_hash {
     }
 };
 
-// 日志工具
+// 鏃ュ織宸ュ叿
 class FB2KLogger {
 public:
     static void Info(const char* format, ...);
@@ -350,7 +350,7 @@ public:
     static void Debug(const char* format, ...);
 };
 
-// 错误处理
+// 閿欒澶勭悊
 class FB2KException : public std::exception {
 private:
     std::string m_message;

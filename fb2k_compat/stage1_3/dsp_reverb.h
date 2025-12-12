@@ -1,7 +1,7 @@
-#pragma once
+﻿#pragma once
 
-// 阶段1.3：混响效果器
-// 专业级混响效果器，支持多种混响算法
+// 闃舵1.3锛氭贩鍝嶆晥鏋滃櫒
+// 涓撲笟绾ф贩鍝嶆晥鏋滃櫒锛屾敮鎸佸绉嶆贩鍝嶇畻娉?
 
 #include "dsp_manager.h"
 #include <vector>
@@ -11,32 +11,32 @@
 
 namespace fb2k {
 
-// 混响类型
+// 娣峰搷绫诲瀷
 enum class reverb_type {
-    room,        // 房间混响
-    hall,        // 大厅混响
-    plate,       // 板式混响
-    spring,      // 弹簧混响
-    cathedral,   // 大教堂混响
-    stadium,     // 体育场混响
-    custom       // 自定义混响
+    room,        // 鎴块棿娣峰搷
+    hall,        // 澶у巺娣峰搷
+    plate,       // 鏉垮紡娣峰搷
+    spring,      // 寮圭哀娣峰搷
+    cathedral,   // 澶ф暀鍫傛贩鍝?
+    stadium,     // 浣撹偛鍦烘贩鍝?
+    custom       // 鑷畾涔夋贩鍝?
 };
 
-// 混响参数
+// 娣峰搷鍙傛暟
 struct reverb_parameters {
     reverb_type type;
-    float room_size;        // 房间大小 (0.0 - 1.0)
-    float damping;          // 阻尼 (0.0 - 1.0)
-    float wet_level;        // 湿信号电平 (0.0 - 1.0)
-    float dry_level;        // 干信号电平 (0.0 - 1.0)
-    float width;            // 立体声宽度 (0.0 - 1.0)
-    float predelay;         // 预延迟 (ms)
-    float decay_time;       // 衰减时间 (s)
-    float diffusion;        // 扩散 (0.0 - 1.0)
-    float modulation_rate;  // 调制速率 (Hz)
-    float modulation_depth; // 调制深度 (0.0 - 1.0)
-    bool enable_modulation; // 启用调制
-    bool enable_filtering;  // 启用滤波
+    float room_size;        // 鎴块棿澶у皬 (0.0 - 1.0)
+    float damping;          // 闃诲凹 (0.0 - 1.0)
+    float wet_level;        // 婀夸俊鍙风數骞?(0.0 - 1.0)
+    float dry_level;        // 骞蹭俊鍙风數骞?(0.0 - 1.0)
+    float width;            // 绔嬩綋澹板搴?(0.0 - 1.0)
+    float predelay;         // 棰勫欢杩?(ms)
+    float decay_time;       // 琛板噺鏃堕棿 (s)
+    float diffusion;        // 鎵╂暎 (0.0 - 1.0)
+    float modulation_rate;  // 璋冨埗閫熺巼 (Hz)
+    float modulation_depth; // 璋冨埗娣卞害 (0.0 - 1.0)
+    bool enable_modulation; // 鍚敤璋冨埗
+    bool enable_filtering;  // 鍚敤婊ゆ尝
     
     reverb_parameters() :
         type(reverb_type::room),
@@ -54,7 +54,7 @@ struct reverb_parameters {
         enable_filtering(false) {}
 };
 
-// 全通滤波器（用于混响）
+// 鍏ㄩ€氭护娉㈠櫒锛堢敤浜庢贩鍝嶏級
 class allpass_filter {
 private:
     std::vector<float> buffer_;
@@ -90,7 +90,7 @@ public:
     }
 };
 
-// 梳状滤波器（用于混响）
+// 姊崇姸婊ゆ尝鍣紙鐢ㄤ簬娣峰搷锛?
 class comb_filter {
 private:
     std::vector<float> buffer_;
@@ -111,7 +111,7 @@ public:
     float process(float input) {
         float delayed = buffer_[read_pos_];
         
-        // 应用阻尼滤波器
+        // 搴旂敤闃诲凹婊ゆ尝鍣?
         damping_filter_state_ = delayed + damping_ * (damping_filter_state_ - delayed);
         
         float output = damping_filter_state_;
@@ -136,7 +136,7 @@ public:
     void set_damping(float damping) { damping_ = damping; }
 };
 
-// 早期反射生成器
+// 鏃╂湡鍙嶅皠鐢熸垚鍣?
 class early_reflections {
 private:
     std::vector<size_t> delay_times_;
@@ -167,7 +167,7 @@ public:
             }
         }
         
-        // 更新延迟线
+        // 鏇存柊寤惰繜绾?
         delay_buffers_[channel][delay_positions_[channel]] = input;
         delay_positions_[channel] = (delay_positions_[channel] + 1) % delay_buffers_[channel].size();
         
@@ -182,7 +182,7 @@ public:
     }
 };
 
-// 调制器（用于混响尾音）
+// 璋冨埗鍣紙鐢ㄤ簬娣峰搷灏鹃煶锛?
 class modulator {
 private:
     float rate_;
@@ -198,12 +198,12 @@ public:
           rng_(std::random_device{}()), dist_(-1.0f, 1.0f) {}
     
     float process() {
-        // LFO调制
+        // LFO璋冨埗
         float lfo = depth_ * std::sin(2.0f * M_PI * rate_ * phase_);
         phase_ += 1.0f / sample_rate_;
         if(phase_ > 1.0f) phase_ -= 1.0f;
         
-        // 添加随机调制
+        // 娣诲姞闅忔満璋冨埗
         float random = 0.1f * depth_ * dist_(rng_);
         
         return lfo + random;
@@ -217,7 +217,7 @@ public:
     void set_depth(float depth) { depth_ = depth; }
 };
 
-// 混响引擎基类
+// 娣峰搷寮曟搸鍩虹被
 class reverb_engine {
 protected:
     reverb_parameters params_;
@@ -237,20 +237,20 @@ public:
     void set_params(const reverb_parameters& params) { params_ = params; }
 };
 
-// 房间混响引擎
+// 鎴块棿娣峰搷寮曟搸
 class room_reverb_engine : public reverb_engine {
 private:
-    // 早期反射
+    // 鏃╂湡鍙嶅皠
     std::unique_ptr<early_reflections> early_reflections_;
     
-    // 混响尾音
+    // 娣峰搷灏鹃煶
     std::vector<std::unique_ptr<comb_filter>> comb_filters_;
     std::vector<std::unique_ptr<allpass_filter>> allpass_filters_;
     
-    // 调制
+    // 璋冨埗
     std::unique_ptr<modulator> modulator_;
     
-    // 参数
+    // 鍙傛暟
     std::vector<size_t> comb_delays_;
     std::vector<size_t> allpass_delays_;
     std::vector<float> comb_feedbacks_;
@@ -270,10 +270,10 @@ private:
     void apply_modulation(audio_chunk& chunk);
 };
 
-// 大厅混响引擎
+// 澶у巺娣峰搷寮曟搸
 class hall_reverb_engine : public reverb_engine {
 private:
-    // 更大的延迟时间和更多的滤波器
+    // 鏇村ぇ鐨勫欢杩熸椂闂村拰鏇村鐨勬护娉㈠櫒
     std::vector<std::unique_ptr<comb_filter>> comb_filters_;
     std::vector<std::unique_ptr<allpass_filter>> allpass_filters_;
     std::unique_ptr<modulator> modulator_;
@@ -290,14 +290,14 @@ private:
     void initialize_hall_filters();
 };
 
-// 板式混响引擎
+// 鏉垮紡娣峰搷寮曟搸
 class plate_reverb_engine : public reverb_engine {
 private:
-    // 高密度滤波器组
+    // 楂樺瘑搴︽护娉㈠櫒缁?
     std::vector<std::unique_ptr<allpass_filter>> allpass_filters_;
     std::unique_ptr<modulator> modulator_;
     
-    // 扩散网络
+    // 鎵╂暎缃戠粶
     std::vector<std::vector<float>> diffusion_matrix_;
     std::vector<float> diffusion_state_;
     
@@ -313,7 +313,7 @@ private:
     void process_diffusion_network(audio_chunk& chunk);
 };
 
-// 混响效果器主类
+// 娣峰搷鏁堟灉鍣ㄤ富绫?
 class dsp_reverb_advanced : public dsp_effect_advanced {
 private:
     reverb_parameters params_;
@@ -321,10 +321,10 @@ private:
     std::unique_ptr<audio_chunk> wet_buffer_;
     std::unique_ptr<audio_chunk> dry_buffer_;
     
-    // 调制支持
+    // 璋冨埗鏀寔
     std::unique_ptr<modulator> modulation_;
     
-    // 滤波支持
+    // 婊ゆ尝鏀寔
     std::unique_ptr<biquad_filter> input_filter_;
     std::unique_ptr<biquad_filter> output_filter_;
     
@@ -333,13 +333,13 @@ public:
     explicit dsp_reverb_advanced(const dsp_effect_params& params);
     ~dsp_reverb_advanced() override;
     
-    // DSP接口实现
+    // DSP鎺ュ彛瀹炵幇
     bool instantiate(audio_chunk& chunk, uint32_t sample_rate, 
                     uint32_t channels) override;
     void run(audio_chunk& chunk, abort_callback& abort) override;
     void reset() override;
     
-    // 混响特定接口
+    // 娣峰搷鐗瑰畾鎺ュ彛
     void set_room_size(float size);
     void set_damping(float damping);
     void set_wet_level(float level);
@@ -349,19 +349,19 @@ public:
     void set_decay_time(float seconds);
     void set_diffusion(float diffusion);
     
-    // 高级控制
+    // 楂樼骇鎺у埗
     void set_modulation_rate(float rate);
     void set_modulation_depth(float depth);
     void enable_modulation(bool enable);
     void enable_filtering(bool enable);
     
-    // 预设管理
+    // 棰勮绠＄悊
     void load_room_preset(float room_size);
     void load_hall_preset(float room_size);
     void load_plate_preset();
     void load_cathedral_preset();
     
-    // 房间类型预设
+    // 鎴块棿绫诲瀷棰勮
     void set_small_room();
     void set_medium_room();
     void set_large_room();
@@ -369,7 +369,7 @@ public:
     void set_cathedral();
     
 protected:
-    // dsp_effect_advanced 接口实现
+    // dsp_effect_advanced 鎺ュ彛瀹炵幇
     void process_chunk_internal(audio_chunk& chunk, abort_callback& abort) override;
     void update_cpu_usage(float usage) override;
     
@@ -387,43 +387,43 @@ private:
     void apply_stereo_width(audio_chunk& chunk);
 };
 
-// 混响工具函数
+// 娣峰搷宸ュ叿鍑芥暟
 namespace reverb_utils {
 
-// 混响时间计算
+// 娣峰搷鏃堕棿璁＄畻
 float calculate_reverb_time(float room_size, float damping, float diffusion);
 
-// 混响密度计算
+// 娣峰搷瀵嗗害璁＄畻
 float calculate_reverb_density(float room_size, float diffusion);
 
-// 延迟时间计算
+// 寤惰繜鏃堕棿璁＄畻
 std::vector<size_t> calculate_comb_delays(float room_size, float sample_rate);
 std::vector<size_t> calculate_allpass_delays(float room_size, float sample_rate);
 
-// 房间响应分析
+// 鎴块棿鍝嶅簲鍒嗘瀽
 struct room_acoustics {
-    float rt60;           // 混响时间
-    float clarity;        // 清晰度
-    float definition;     // 定义度
-    float envelopment;    // 包围感
-    float warmth;         // 温暖度
-    float brilliance;     // 明亮度
+    float rt60;           // 娣峰搷鏃堕棿
+    float clarity;        // 娓呮櫚搴?
+    float definition;     // 瀹氫箟搴?
+    float envelopment;    // 鍖呭洿鎰?
+    float warmth;         // 娓╂殩搴?
+    float brilliance;     // 鏄庝寒搴?
 };
 
 room_acoustics analyze_room_acoustics(const std::vector<float>& impulse_response,
                                      float sample_rate);
 
-// 混响预设生成器
+// 娣峰搷棰勮鐢熸垚鍣?
 reverb_parameters generate_room_reverb(float room_size, float room_type);
 reverb_parameters generate_hall_reverb(float hall_size, float hall_type);
 reverb_parameters generate_plate_reverb(float plate_type);
 
-// 混响质量评估
+// 娣峰搷璐ㄩ噺璇勪及
 float calculate_reverb_quality(const audio_chunk& dry_signal,
                               const audio_chunk& wet_signal,
                               const reverb_parameters& params);
 
-// 混响调试工具
+// 娣峰搷璋冭瘯宸ュ叿
 std::string generate_reverb_report(const dsp_reverb_advanced& reverb);
 void analyze_reverb_impulse_response(const std::vector<float>& impulse_response);
 

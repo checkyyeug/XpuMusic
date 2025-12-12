@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file wav_writer.h
  * @brief Simple WAV file writer
  * @date 2025-12-10

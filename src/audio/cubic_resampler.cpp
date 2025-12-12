@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file cubic_resampler.cpp
  * @brief Cubic interpolation sample rate converter implementation
  * @date 2025-12-10

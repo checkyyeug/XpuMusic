@@ -15,6 +15,32 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+# Compiler-specific settings
+if(MSVC)
+    # Suppress common warnings
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+    add_definitions(-D_SCL_SECURE_NO_WARNINGS)
+    add_definitions(-DNOMINMAX)
+    add_definitions(-DWIN32_LEAN_AND_MEAN)
+    add_definitions(-DUNICODE -D_UNICODE)
+
+    # Disable specific warnings
+    add_compile_options(/wd4996)  # Deprecated functions
+    add_compile_options(/wd4100)  # Unreferenced formal parameter
+    add_compile_options(/wd4189)  # Local variable is initialized but not referenced
+    add_compile_options(/wd4244)  # Conversion from 'type1' to 'type2', possible loss of data
+    add_compile_options(/wd4245)  # Conversion from 'type1' to 'type2', signed/unsigned mismatch
+    add_compile_options(/wd4267)  # 'var' : conversion from 'size_t' to 'type', possible loss of data
+    add_compile_options(/wd4995)  # '#pragma warning : disable'
+
+    # Set warning level
+    add_compile_options(/W3)
+else()
+    # GCC/Clang settings
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-sign-conversion -Wno-shorten-64-to-32")
+endif()
+
 # Build type
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
@@ -96,6 +122,14 @@ add_library(core_engine STATIC
     core/playlist_manager.cpp
     core/playback_engine.cpp
     core/visualization_engine.cpp
+    # Audio resampling components
+    src/audio/sample_rate_converter.cpp
+    src/audio/cubic_resampler.cpp
+    # src/audio/linear_resampler.cpp  # LinearSampleRateConverter implementation is in sample_rate_converter.cpp
+    src/audio/enhanced_sample_rate_converter.cpp
+    # Optimized audio processing
+    src/audio/optimized_audio_processor.cpp
+    src/audio/optimized_format_converter.cpp
 )
 
 target_include_directories(core_engine PUBLIC
@@ -132,19 +166,42 @@ endif()
 # Compatibility Layer
 # ============================================================================
 
-# SDK Implementations
+# SDK Implementations - Simplified version
 add_library(sdk_impl STATIC
-    compat/sdk_implementations/service_base.cpp
-    compat/sdk_implementations/abort_callback.impl.cpp
-    compat/sdk_implementations/file_info_impl.cpp
-    compat/sdk_implementations/audio_chunk_impl.cpp
+    compat/sdk_implementations/sdk_impl_simple.cpp
+    compat/sdk_implementations/foobar_sdk_wrapper.cpp
+    # compat/sdk_implementations/service_base.cpp
+    # compat/sdk_implementations/abort_callback.impl.cpp
+    # compat/sdk_implementations/file_info_impl.cpp
+    # compat/sdk_implementations/audio_chunk_impl.cpp
     # compat/sdk_implementations/metadb_handle_impl.cpp  # 暂时禁用，使用简化版本
 )
+
+# Add foobar2000 SDK path
+set(FOOBAR2000_SDK_PATH "${CMAKE_CURRENT_SOURCE_DIR}/foobar2000_sdk")
+if(EXISTS ${FOOBAR2000_SDK_PATH})
+    message(STATUS "Found foobar2000 SDK at: ${FOOBAR2000_SDK_PATH}")
+    set(FOOBAR2000_SDK_FOUND TRUE)
+else()
+    message(WARNING "foobar2000 SDK not found at: ${FOOBAR2000_SDK_PATH}")
+    set(FOOBAR2000_SDK_FOUND FALSE)
+endif()
 
 target_include_directories(sdk_impl PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/compat/sdk_implementations
     ${CMAKE_CURRENT_SOURCE_DIR}/compat/foobar_sdk
+    ${CMAKE_CURRENT_SOURCE_DIR}/compat/xpumusic_sdk
 )
+
+# Add SDK headers if available
+if(FOOBAR2000_SDK_FOUND)
+    target_include_directories(sdk_impl PUBLIC
+        ${FOOBAR2000_SDK_PATH}
+        ${FOOBAR2000_SDK_PATH}/foobar2000/SDK
+        ${FOOBAR2000_SDK_PATH}/pfc
+        ${FOOBAR2000_SDK_PATH}/libPPUI
+    )
+endif()
 
 # ============================================================================
 # Plugin Ecosystem
@@ -185,7 +242,16 @@ target_include_directories(plugin_flac_decoder PRIVATE
 # Main Music Player
 if(WIN32)
     add_executable(music-player
-        src/music_player_legacy.cpp
+        src/music_player_with_resampling.cpp
+        src/audio/enhanced_sample_rate_converter.cpp
+        src/audio/cubic_resampler.cpp
+        src/audio/sample_rate_converter.cpp
+        src/audio/universal_sample_rate_converter.cpp
+        src/foobar_plugin_manager.cpp
+        src/plugin_error_handler.cpp
+        src/plugin_config.cpp
+        compat/sdk_implementations/foobar_sdk_wrapper.cpp
+        # # src/audio/linear_resampler.cpp  # LinearSampleRateConverter implementation is in sample_rate_converter.cpp  # 已包含在 sample_rate_converter.cpp 中
     )
 else()
     add_executable(music-player
@@ -203,10 +269,17 @@ target_include_directories(music-player PRIVATE
 target_link_libraries(music-player PRIVATE
     core_engine
     platform_abstraction
-    sdk_impl
     ${PLATFORM_LIBS}
     Threads::Threads
 )
+
+# Add sdk_impl dependency only if SDK is available
+if(FOOBAR2000_SDK_FOUND)
+    target_link_libraries(music-player PRIVATE sdk_impl)
+    message(STATUS "Building music-player with foobar2000 SDK support")
+else()
+    message(WARNING "Building music-player without SDK support - some features may be limited")
+endif()
 
 # Windows audio libraries
 if(WIN32)
@@ -252,6 +325,48 @@ else()
     add_executable(test_decoders
         test_simple.cpp
     )
+endif()
+
+# Test Foobar2000 Plugin Manager
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/test_foobar_plugins.cpp)
+    add_executable(test_foobar_plugins
+        test_foobar_plugins.cpp
+        src/foobar_plugin_manager.cpp
+        src/plugin_error_handler.cpp
+        src/plugin_config.cpp
+        compat/sdk_implementations/foobar_sdk_wrapper.cpp
+    )
+
+    target_include_directories(test_foobar_plugins PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/compat/sdk_implementations
+    )
+
+    if(WIN32)
+        target_link_libraries(test_foobar_plugins ole32)
+    endif()
+endif()
+
+# Test Plugin Configuration System
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/test_plugin_config.cpp)
+    add_executable(test_plugin_config
+        test_plugin_config.cpp
+        src/foobar_plugin_manager.cpp
+        src/plugin_error_handler.cpp
+        src/plugin_config.cpp
+        compat/sdk_implementations/foobar_sdk_wrapper.cpp
+    )
+
+    target_include_directories(test_plugin_config PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/compat/sdk_implementations
+    )
+
+    if(WIN32)
+        target_link_libraries(test_plugin_config ole32)
+    endif()
 endif()
 
 target_include_directories(test_audio_direct PRIVATE
@@ -304,6 +419,96 @@ target_include_directories(final_wav_player PRIVATE
 )
 
 target_link_libraries(final_wav_player PRIVATE Threads::Threads)
+
+# Simple Native WAV Player (no dependencies)
+add_executable(simple_wav_player_native
+    src/simple_wav_player_native.cpp
+)
+
+if(WIN32)
+    target_link_libraries(simple_wav_player_native winmm)
+endif()
+
+# Standalone Music Player with Resampling (no SDK dependencies)
+add_executable(standalone_music_player
+    src/standalone_music_player.cpp
+)
+
+if(WIN32)
+    target_link_libraries(standalone_music_player ole32 uuid avrt)
+endif()
+
+# Simple WASAPI Player (simpler version)
+add_executable(simple_wasapi_player
+    src/simple_wasapi_player.cpp
+)
+
+if(WIN32)
+    target_link_libraries(simple_wasapi_player ole32 uuid)
+endif()
+
+# Fixed Standalone Music Player
+add_executable(standalone_music_player_fixed
+    src/standalone_music_player_fixed.cpp
+)
+
+if(WIN32)
+    target_link_libraries(standalone_music_player_fixed ole32 uuid avrt)
+endif()
+
+# Simple Playback Test
+add_executable(test_simple_playback
+    test_simple_playback.cpp
+)
+
+if(WIN32)
+    target_link_libraries(test_simple_playback ole32 uuid)
+endif()
+
+# Simple Performance Test
+add_executable(simple_performance_test
+    src/simple_performance_test.cpp
+)
+
+if(WIN32)
+    target_link_libraries(simple_performance_test)
+endif()
+
+# Optimization Integration Example
+add_executable(optimization_integration_example
+    src/optimization_integration_example.cpp
+)
+
+if(WIN32)
+    target_link_libraries(optimization_integration_example)
+endif()
+
+# Quick Test Configuration
+add_executable(quick_test_config
+    quick_test_config.cpp
+    src/foobar_plugin_manager.cpp
+    src/plugin_config.cpp
+    src/plugin_error_handler.cpp
+    compat/sdk_implementations/foobar_sdk_wrapper.cpp
+)
+
+target_include_directories(quick_test_config PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+if(WIN32)
+    target_link_libraries(quick_test_config ole32)
+endif()
+
+# Simple Direct Music Player
+add_executable(music_player_simple_direct
+    src/music_player_simple_direct.cpp
+)
+
+if(WIN32)
+    target_link_libraries(music_player_simple_direct ole32 uuid)
+endif()
 
 # ============================================================================
 # Summary

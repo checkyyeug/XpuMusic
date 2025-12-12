@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file test_resampler.cpp
  * @brief Test program for sample rate conversion
  * @date 2025-12-10
@@ -77,7 +77,7 @@ void write_wav_file(const std::string& filename, const std::vector<float>& data,
 
 // Test sample rate conversion
 void test_conversion(int input_rate, int output_rate) {
-    std::cout << "\nTesting conversion: " << input_rate << "Hz → " << output_rate << "Hz\n";
+    std::cout << "\nTesting conversion: " << input_rate << "Hz 鈫?" << output_rate << "Hz\n";
     std::cout << "----------------------------------------\n";
 
     try {

@@ -1,4 +1,4 @@
-#include "core_engine.h"
+﻿#include "core_engine.h"
 #include "audio_output_factory.h"
 #include <iostream>
 #include <csignal>
@@ -77,7 +77,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    std::cout << "✓ Core engine initialized successfully" << std::endl;
+    std::cout << "鉁?Core engine initialized successfully" << std::endl;
 
     // Determine plugin directory
     std::string plugin_dir;
@@ -126,7 +126,7 @@ int main(int argc, char** argv) {
     std::cout << "Loading plugins from: " << plugin_dir << std::endl;
     result = engine.load_plugins(plugin_dir.c_str());
     if (result != mp::Result::Success) {
-        std::cout << "⚠️  Plugin loading failed or no plugins found" << std::endl;
+        std::cout << "鈿狅笍  Plugin loading failed or no plugins found" << std::endl;
     }
 
     // Handle commands
@@ -195,26 +195,26 @@ int main(int argc, char** argv) {
 
             result = audio_output->open(audio_config);
             if (result == mp::Result::Success) {
-                std::cout << "✓ Audio device opened successfully" << std::endl;
+                std::cout << "鉁?Audio device opened successfully" << std::endl;
                 std::cout << "  Latency: " << audio_output->get_latency() << " ms" << std::endl;
 
                 result = audio_output->start();
                 if (result == mp::Result::Success) {
-                    std::cout << "✓ Playback started..." << std::endl;
+                    std::cout << "鉁?Playback started..." << std::endl;
                     std::this_thread::sleep_for(std::chrono::seconds(2));
 
                     audio_output->stop();
-                    std::cout << "✓ Playback stopped" << std::endl;
+                    std::cout << "鉁?Playback stopped" << std::endl;
                 } else {
-                    std::cout << "❌ Failed to start playback" << std::endl;
+                    std::cout << "鉂?Failed to start playback" << std::endl;
                 }
 
                 audio_output->close();
             } else {
-                std::cout << "❌ Failed to open audio device" << std::endl;
+                std::cout << "鉂?Failed to open audio device" << std::endl;
             }
         } else {
-            std::cout << "❌ No audio devices found" << std::endl;
+            std::cout << "鉂?No audio devices found" << std::endl;
         }
 
         delete audio_output;
@@ -271,7 +271,7 @@ int main(int argc, char** argv) {
         // Use the core engine to play the file
         result = engine.play_file(file_path);
         if (result == mp::Result::Success) {
-            std::cout << "✓ Playback started successfully" << std::endl;
+            std::cout << "鉁?Playback started successfully" << std::endl;
 
             // Wait for playback to complete or user interrupt
             int wait_count = 0;
@@ -311,7 +311,7 @@ int main(int argc, char** argv) {
                 std::cout << "Playback stopped by user" << std::endl;
             }
         } else {
-            std::cerr << "❌ Failed to start playback: " << static_cast<int>(result) << std::endl;
+            std::cerr << "鉂?Failed to start playback: " << static_cast<int>(result) << std::endl;
 
             // Provide helpful error information
             switch (result) {

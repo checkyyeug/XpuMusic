@@ -1,4 +1,4 @@
-#include "audio_decoder_manager.h"
+﻿#include "audio_decoder_manager.h"
 #include <iostream>
 
 namespace xpumusic::core {
@@ -13,11 +13,11 @@ void AudioDecoderManager::initialize() {
         return;
     }
 
-    // 初始化格式检测器（会自动注册内置格式）
+    // 鍒濆鍖栨牸寮忔娴嬪櫒锛堜細鑷姩娉ㄥ唽鍐呯疆鏍煎紡锛?
     AudioFormatDetector::get_instance();
 
-    // 注册内置解码器会通过 QODER_AUTO_REGISTER_DECODER 宏自动进行
-    // 这里只需要确保已初始化
+    // 娉ㄥ唽鍐呯疆瑙ｇ爜鍣ㄤ細閫氳繃 QODER_AUTO_REGISTER_DECODER 瀹忚嚜鍔ㄨ繘琛?
+    // 杩欓噷鍙渶瑕佺‘淇濆凡鍒濆鍖?
 
     initialized_ = true;
 }
@@ -99,7 +99,7 @@ json_map AudioDecoderManager::get_metadata(const std::string& file_path) {
 }
 
 double AudioDecoderManager::get_duration(const std::string& file_path) {
-    // 先尝试通过解码器获取
+    // 鍏堝皾璇曢€氳繃瑙ｇ爜鍣ㄨ幏鍙?
     auto decoder = open_audio_file(file_path);
     if (decoder) {
         // Use the standard interface get_duration

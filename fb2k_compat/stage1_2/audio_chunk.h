@@ -1,7 +1,7 @@
-#pragma once
+﻿#pragma once
 
-// 阶段1.2：音频块接口
-// 音频数据容器，用于在DSP链和输出设备之间传递音频数据
+// 闃舵1.2锛氶煶棰戝潡鎺ュ彛
+// 闊抽鏁版嵁瀹瑰櫒锛岀敤浜庡湪DSP閾惧拰杈撳嚭璁惧涔嬮棿浼犻€掗煶棰戞暟鎹?
 
 #include <cstdint>
 #include <vector>
@@ -12,73 +12,73 @@
 
 namespace fb2k {
 
-// 音频数据格式定义
+// 闊抽鏁版嵁鏍煎紡瀹氫箟
 enum class audio_format {
-    float32,    // 32-bit浮点
-    int16,      // 16-bit整数
-    int24,      // 24-bit整数
-    int32       // 32-bit整数
+    float32,    // 32-bit娴偣
+    int16,      // 16-bit鏁存暟
+    int24,      // 24-bit鏁存暟
+    int32       // 32-bit鏁存暟
 };
 
-// 声道配置
+// 澹伴亾閰嶇疆
 enum class channel_config : uint32_t {
-    mono        = 0x4,      // 1声道
-    stereo      = 0x3,      // 2声道 (L, R)
-    stereo_lfe  = 0x103,    // 2.1声道 (L, R, LFE)
-    surround_5  = 0x37,     // 5.1声道 (L, R, C, LFE, Ls, Rs)
-    surround_7  = 0xFF      // 7.1声道
+    mono        = 0x4,      // 1澹伴亾
+    stereo      = 0x3,      // 2澹伴亾 (L, R)
+    stereo_lfe  = 0x103,    // 2.1澹伴亾 (L, R, LFE)
+    surround_5  = 0x37,     // 5.1澹伴亾 (L, R, C, LFE, Ls, Rs)
+    surround_7  = 0xFF      // 7.1澹伴亾
 };
 
-// 音频块接口 - 符合foobar2000规范
+// 闊抽鍧楁帴鍙?- 绗﹀悎foobar2000瑙勮寖
 class audio_chunk : public ServiceBase {
 public:
-    // 基础属性
-    virtual float* get_data() = 0;                              // 获取数据指针
-    virtual const float* get_data() const = 0;                  // 获取常量数据指针
-    virtual size_t get_sample_count() const = 0;                // 获取采样数
-    virtual uint32_t get_sample_rate() const = 0;               // 获取采样率
-    virtual uint32_t get_channels() const = 0;                 // 获取声道数
-    virtual uint32_t get_channel_config() const = 0;           // 获取声道配置
-    virtual double get_duration() const = 0;                   // 获取时长（秒）
+    // 鍩虹灞炴€?
+    virtual float* get_data() = 0;                              // 鑾峰彇鏁版嵁鎸囬拡
+    virtual const float* get_data() const = 0;                  // 鑾峰彇甯搁噺鏁版嵁鎸囬拡
+    virtual size_t get_sample_count() const = 0;                // 鑾峰彇閲囨牱鏁?
+    virtual uint32_t get_sample_rate() const = 0;               // 鑾峰彇閲囨牱鐜?
+    virtual uint32_t get_channels() const = 0;                 // 鑾峰彇澹伴亾鏁?
+    virtual uint32_t get_channel_config() const = 0;           // 鑾峰彇澹伴亾閰嶇疆
+    virtual double get_duration() const = 0;                   // 鑾峰彇鏃堕暱锛堢锛?
     
-    // 数据操作
+    // 鏁版嵁鎿嶄綔
     virtual void set_data(const float* data, size_t samples, 
                          uint32_t channels, uint32_t sample_rate) = 0;
-    virtual void set_data_size(size_t samples) = 0;            // 设置数据大小
-    virtual void copy(const audio_chunk& source) = 0;          // 复制数据
+    virtual void set_data_size(size_t samples) = 0;            // 璁剧疆鏁版嵁澶у皬
+    virtual void copy(const audio_chunk& source) = 0;          // 澶嶅埗鏁版嵁
     virtual void copy_from(const float* source, size_t samples, 
                           uint32_t channels, uint32_t sample_rate) = 0;
-    virtual void reset() = 0;                                   // 重置数据
+    virtual void reset() = 0;                                   // 閲嶇疆鏁版嵁
     
-    // 声道数据访问
-    virtual float* get_channel_data(uint32_t channel) = 0;     // 获取声道数据
+    // 澹伴亾鏁版嵁璁块棶
+    virtual float* get_channel_data(uint32_t channel) = 0;     // 鑾峰彇澹伴亾鏁版嵁
     virtual const float* get_channel_data(uint32_t channel) const = 0;
-    virtual size_t get_channel_data_size() const = 0;          // 获取声道数据大小
+    virtual size_t get_channel_data_size() const = 0;          // 鑾峰彇澹伴亾鏁版嵁澶у皬
     
-    // 数据操作
-    virtual void scale(const float& scale) = 0;                // 缩放数据
-    virtual void apply_gain(float gain) = 0;                   // 应用增益
-    virtual void apply_ramp(float start_gain, float end_gain) = 0; // 应用渐变
+    // 鏁版嵁鎿嶄綔
+    virtual void scale(const float& scale) = 0;                // 缂╂斁鏁版嵁
+    virtual void apply_gain(float gain) = 0;                   // 搴旂敤澧炵泭
+    virtual void apply_ramp(float start_gain, float end_gain) = 0; // 搴旂敤娓愬彉
     
-    // 状态检查
-    virtual bool is_valid() const = 0;                         // 数据是否有效
-    virtual bool is_empty() const = 0;                         // 是否为空
-    virtual size_t get_data_bytes() const = 0;                 // 获取数据字节数
+    // 鐘舵€佹鏌?
+    virtual bool is_valid() const = 0;                         // 鏁版嵁鏄惁鏈夋晥
+    virtual bool is_empty() const = 0;                         // 鏄惁涓虹┖
+    virtual size_t get_data_bytes() const = 0;                 // 鑾峰彇鏁版嵁瀛楄妭鏁?
 };
 
-// 音频块具体实现
+// 闊抽鍧楀叿浣撳疄鐜?
 class audio_chunk_impl : public audio_chunk {
 private:
-    std::vector<float> data_;           // 音频数据（交错格式）
-    size_t sample_count_;               // 采样数（每声道）
-    uint32_t sample_rate_;              // 采样率
-    uint32_t channels_;                 // 声道数
-    uint32_t channel_config_;           // 声道配置
+    std::vector<float> data_;           // 闊抽鏁版嵁锛堜氦閿欐牸寮忥級
+    size_t sample_count_;               // 閲囨牱鏁帮紙姣忓０閬擄級
+    uint32_t sample_rate_;              // 閲囨牱鐜?
+    uint32_t channels_;                 // 澹伴亾鏁?
+    uint32_t channel_config_;           // 澹伴亾閰嶇疆
     
 public:
     audio_chunk_impl() : sample_count_(0), sample_rate_(44100), 
-                        channels_(2), channel_config_(3) { // 立体声默认
-        data_.resize(channels_ * 1024); // 默认分配空间
+                        channels_(2), channel_config_(3) { // 绔嬩綋澹伴粯璁?
+        data_.resize(channels_ * 1024); // 榛樿鍒嗛厤绌洪棿
     }
     
     explicit audio_chunk_impl(size_t initial_size) : 
@@ -86,7 +86,7 @@ public:
         data_.resize(std::max(initial_size, size_t(1024)) * channels_);
     }
     
-    // IUnknown 实现
+    // IUnknown 瀹炵幇
     HRESULT QueryInterfaceImpl(REFIID riid, void** ppvObject) override {
         if(IsEqualGUID(riid, __uuidof(audio_chunk))) {
             *ppvObject = static_cast<audio_chunk*>(this);
@@ -95,7 +95,7 @@ public:
         return ServiceBase::QueryInterfaceImpl(riid, ppvObject);
     }
     
-    // 基础属性
+    // 鍩虹灞炴€?
     float* get_data() override { 
         return data_.empty() ? nullptr : data_.data(); 
     }
@@ -124,7 +124,7 @@ public:
         return sample_count_ > 0 ? double(sample_count_) / sample_rate_ : 0.0;
     }
     
-    // 数据操作
+    // 鏁版嵁鎿嶄綔
     void set_data(const float* data, size_t samples, 
                  uint32_t channels, uint32_t sample_rate) override {
         if(!data || samples == 0 || channels == 0 || sample_rate == 0) {
@@ -136,7 +136,7 @@ public:
         sample_rate_ = sample_rate;
         sample_count_ = samples;
         
-        // 设置默认声道配置
+        // 璁剧疆榛樿澹伴亾閰嶇疆
         switch(channels) {
             case 1: channel_config_ = 0x4; break;      // mono
             case 2: channel_config_ = 0x3; break;      // stereo
@@ -146,7 +146,7 @@ public:
             default: channel_config_ = (1u << channels) - 1; break;
         }
         
-        // 分配内存
+        // 鍒嗛厤鍐呭瓨
         data_.resize(samples * channels);
         std::memcpy(data_.data(), data, samples * channels * sizeof(float));
     }
@@ -181,7 +181,7 @@ public:
         sample_rate_ = sample_rate;
         channels_ = channels;
         
-        // 设置声道配置
+        // 璁剧疆澹伴亾閰嶇疆
         switch(channels) {
             case 1: channel_config_ = 0x4; break;
             case 2: channel_config_ = 0x3; break;
@@ -200,11 +200,11 @@ public:
         sample_count_ = 0;
         sample_rate_ = 44100;
         channels_ = 2;
-        channel_config_ = 0x3; // 立体声
-        data_.resize(2048); // 重置为默认大小
+        channel_config_ = 0x3; // 绔嬩綋澹?
+        data_.resize(2048); // 閲嶇疆涓洪粯璁ゅぇ灏?
     }
     
-    // 声道数据访问
+    // 澹伴亾鏁版嵁璁块棶
     float* get_channel_data(uint32_t channel) override {
         if(channel >= channels_ || data_.empty()) return nullptr;
         return data_.data() + channel;
@@ -219,7 +219,7 @@ public:
         return sample_count_;
     }
     
-    // 数据操作
+    // 鏁版嵁鎿嶄綔
     void scale(const float& scale) override {
         if(data_.empty() || scale == 1.0f) return;
         
@@ -244,7 +244,7 @@ public:
         }
     }
     
-    // 状态检查
+    // 鐘舵€佹鏌?
     bool is_valid() const override {
         return !data_.empty() && sample_count_ > 0 && 
                channels_ > 0 && sample_rate_ > 0;
@@ -259,15 +259,15 @@ public:
     }
 };
 
-// 音频块工具函数
+// 闊抽鍧楀伐鍏峰嚱鏁?
 class audio_chunk_utils {
 public:
-    // 创建指定格式的音频块
+    // 鍒涘缓鎸囧畾鏍煎紡鐨勯煶棰戝潡
     static std::unique_ptr<audio_chunk> create_chunk(size_t samples, uint32_t channels, uint32_t sample_rate) {
         auto chunk = std::make_unique<audio_chunk_impl>(samples);
         chunk->set_data_size(samples);
         
-        // 设置格式
+        // 璁剧疆鏍煎紡
         float* data = chunk->get_data();
         if(data) {
             chunk->set_data(data, samples, channels, sample_rate);
@@ -276,7 +276,7 @@ public:
         return chunk;
     }
     
-    // 创建静音音频块
+    // 鍒涘缓闈欓煶闊抽鍧?
     static std::unique_ptr<audio_chunk> create_silence(size_t samples, uint32_t channels, uint32_t sample_rate) {
         auto chunk = std::make_unique<audio_chunk_impl>(samples);
         chunk->set_data_size(samples);
@@ -290,20 +290,20 @@ public:
         return chunk;
     }
     
-    // 复制音频块
+    // 澶嶅埗闊抽鍧?
     static std::unique_ptr<audio_chunk> duplicate_chunk(const audio_chunk& source) {
         auto dest = std::make_unique<audio_chunk_impl>(source.get_sample_count());
         dest->copy(source);
         return dest;
     }
     
-    // 合并音频块（串联）
+    // 鍚堝苟闊抽鍧楋紙涓茶仈锛?
     static std::unique_ptr<audio_chunk> concatenate_chunks(
         const audio_chunk& chunk1, const audio_chunk& chunk2) {
         
         if(chunk1.get_sample_rate() != chunk2.get_sample_rate() ||
            chunk1.get_channels() != chunk2.get_channels()) {
-            return nullptr; // 格式不匹配
+            return nullptr; // 鏍煎紡涓嶅尮閰?
         }
         
         size_t total_samples = chunk1.get_sample_count() + chunk2.get_sample_count();
@@ -312,14 +312,14 @@ public:
         float* dest_data = result->get_data();
         if(!dest_data) return nullptr;
         
-        // 复制第一个块
+        // 澶嶅埗绗竴涓潡
         const float* src1_data = chunk1.get_data();
         if(src1_data) {
             std::memcpy(dest_data, src1_data, 
                        chunk1.get_sample_count() * chunk1.get_channels() * sizeof(float));
         }
         
-        // 复制第二个块
+        // 澶嶅埗绗簩涓潡
         const float* src2_data = chunk2.get_data();
         if(src2_data) {
             std::memcpy(dest_data + chunk1.get_sample_count() * chunk1.get_channels(),
@@ -333,12 +333,12 @@ public:
         return result;
     }
     
-    // 应用增益到音频块
+    // 搴旂敤澧炵泭鍒伴煶棰戝潡
     static void apply_gain_to_chunk(audio_chunk& chunk, float gain) {
         chunk.apply_gain(gain);
     }
     
-    // 获取音频块的RMS值
+    // 鑾峰彇闊抽鍧楃殑RMS鍊?
     static float calculate_rms(const audio_chunk& chunk) {
         if(chunk.is_empty()) return 0.0f;
         
@@ -356,7 +356,7 @@ public:
         return static_cast<float>(std::sqrt(sum_squares / total_samples));
     }
     
-    // 获取音频块的峰值
+    // 鑾峰彇闊抽鍧楃殑宄板€?
     static float calculate_peak(const audio_chunk& chunk) {
         if(chunk.is_empty()) return 0.0f;
         

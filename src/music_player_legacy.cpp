@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file music_player_real.cpp
  * @brief REAL music player - actually plays audio files!
  * @version 0.4.0 - Working WAV playback
@@ -43,7 +43,7 @@ struct WavHeader {
 // ============================================================================
 // AUDIO FORMAT CONVERSION
 // Converts between different audio formats (bit depth, sample rate, channels)
-// Currently supports: 16-bit PCM → 32-bit IEEE float
+// Currently supports: 16-bit PCM 鈫?32-bit IEEE float
 // ============================================================================
 
 /**
@@ -80,7 +80,7 @@ inline UINT32 convert_audio_format(
     }
     
     // Check if we can convert
-    // Support: 16-bit PCM → 32-bit float, with or without sample rate mismatch
+    // Support: 16-bit PCM 鈫?32-bit float, with or without sample rate mismatch
     // Note: WASAPI may return WAVE_FORMAT_EXTENSIBLE (65534) for float formats
     if (wav_header.bits_per_sample == 16 &&
         wasapi_format.wBitsPerSample == 32 &&
@@ -122,8 +122,8 @@ inline UINT32 convert_audio_format(
 
         // Show conversion message only once
         if (!conversion_message_shown) {
-            std::cout << "✓ Converting audio: " << src_channels << "ch "
-                      << wav_header.bits_per_sample << "-bit PCM → "
+            std::cout << "鉁?Converting audio: " << src_channels << "ch "
+                      << wav_header.bits_per_sample << "-bit PCM 鈫?"
                       << dst_channels << "ch " << wasapi_format.wBitsPerSample << "-bit float" << std::endl;
             conversion_message_shown = true;
         }
@@ -133,7 +133,7 @@ inline UINT32 convert_audio_format(
 
 unsupported:
     // Unsupported conversion
-    std::cerr << "⚠️  Unsupported format conversion!" << std::endl;
+    std::cerr << "鈿狅笍  Unsupported format conversion!" << std::endl;
     std::cerr << "  From: " << wav_header.sample_rate << "Hz, " 
               << wav_header.bits_per_sample << "-bit, "
               << wav_header.num_channels << "ch, PCM" << std::endl;
@@ -249,7 +249,7 @@ bool play_test_tone(float frequency = 440.0f, float duration = 2.0f) {
         return false;
     }
     
-    std::cout << "✓ Audio started - Playing " << duration << " second tone..." << std::endl;
+    std::cout << "鉁?Audio started - Playing " << duration << " second tone..." << std::endl;
     std::cout << "  Format: " << mix_format->nSamplesPerSec << " Hz, " 
               << mix_format->nChannels << " channels, Float32" << std::endl;
     std::cout << "  Buffer: " << buffer_frame_count << " frames" << std::endl;
@@ -285,7 +285,7 @@ bool play_test_tone(float frequency = 440.0f, float duration = 2.0f) {
     enumerator->Release();
     audio_client->Release();
     
-    std::cout << "✓ Audio playback complete!" << std::endl;
+    std::cout << "鉁?Audio playback complete!" << std::endl;
     return true;
 }
 #endif
@@ -296,7 +296,7 @@ bool play_wav_file(const std::string& filename) {
     
     std::ifstream file(filename, std::ios::binary);
     if (!file) {
-        std::cerr << "❌ Cannot open file: " << filename << std::endl;
+        std::cerr << "鉂?Cannot open file: " << filename << std::endl;
         return false;
     }
     
@@ -304,7 +304,7 @@ bool play_wav_file(const std::string& filename) {
     char riff[4];
     file.read(riff, 4);
     if (std::strncmp(riff, "RIFF", 4) != 0) {
-        std::cerr << "❌ Not a RIFF file" << std::endl;
+        std::cerr << "鉂?Not a RIFF file" << std::endl;
         file.close();
         return false;
     }
@@ -315,12 +315,12 @@ bool play_wav_file(const std::string& filename) {
     char wave[4];
     file.read(wave, 4);
     if (std::strncmp(wave, "WAVE", 4) != 0) {
-        std::cerr << "❌ Not a WAVE file" << std::endl;
+        std::cerr << "鉂?Not a WAVE file" << std::endl;
         file.close();
         return false;
     }
     
-    std::cout << "✓ Valid WAV file" << std::endl;
+    std::cout << "鉁?Valid WAV file" << std::endl;
     
     // Find fmt chunk
     char chunk_id[4];
@@ -348,7 +348,7 @@ bool play_wav_file(const std::string& filename) {
             }
             
             found_fmt = true;
-            std::cout << "\n✓ Format chunk found:" << std::endl;
+            std::cout << "\n鉁?Format chunk found:" << std::endl;
             std::cout << "  Format: " << (header.audio_format == 1 ? "PCM" : "Other") << std::endl;
             std::cout << "  Channels: " << header.num_channels << std::endl;
             std::cout << "  Sample Rate: " << header.sample_rate << " Hz" << std::endl;
@@ -356,7 +356,7 @@ bool play_wav_file(const std::string& filename) {
             std::cout << "  Byte Rate: " << header.byte_rate << std::endl;
             
             if (header.audio_format != 1) {
-                std::cerr << "❌ Only PCM WAV files supported" << std::endl;
+                std::cerr << "鉂?Only PCM WAV files supported" << std::endl;
                 file.close();
                 return false;
             }
@@ -375,18 +375,18 @@ bool play_wav_file(const std::string& filename) {
     }
     
     if (!found_fmt) {
-        std::cerr << "❌ No format chunk found" << std::endl;
+        std::cerr << "鉂?No format chunk found" << std::endl;
         file.close();
         return false;
     }
     
     if (!found_data) {
-        std::cerr << "❌ No data chunk found" << std::endl;
+        std::cerr << "鉂?No data chunk found" << std::endl;
         file.close();
         return false;
     }
     
-    std::cout << "✓ Data chunk found: " << header.data_size << " bytes" << std::endl;
+    std::cout << "鉁?Data chunk found: " << header.data_size << " bytes" << std::endl;
     std::cout << "  Duration: " << (float)header.data_size / header.byte_rate << " seconds" << std::endl;
     
     // Read audio data
@@ -395,19 +395,19 @@ bool play_wav_file(const std::string& filename) {
     file.read(reinterpret_cast<char*>(audio_data.data()), header.data_size);
     
     if (!file || file.gcount() != header.data_size) {
-        std::cerr << "❌ Failed to read audio data" << std::endl;
+        std::cerr << "鉂?Failed to read audio data" << std::endl;
         file.close();
         return false;
     }
     
     file.close();
-    std::cout << "✓ Read " << header.data_size << " bytes of audio data" << std::endl;
+    std::cout << "鉁?Read " << header.data_size << " bytes of audio data" << std::endl;
     
     // Now play the audio data via WASAPI
 #ifdef _WIN32
     return play_wav_via_wasapi(audio_data.data(), header);
 #else
-    std::cerr << "❌ WASAPI playback only supported on Windows" << std::endl;
+    std::cerr << "鉂?WASAPI playback only supported on Windows" << std::endl;
     return false;
 #endif
 }
@@ -419,7 +419,7 @@ bool play_wav_via_wasapi(const uint8_t* wav_data, const WavHeader& wav_header) {
     
     HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
     if (FAILED(hr) && hr != RPC_E_CHANGED_MODE) {
-        std::cerr << "❌ Failed to initialize COM" << std::endl;
+        std::cerr << "鉂?Failed to initialize COM" << std::endl;
         return false;
     }
     
@@ -446,7 +446,7 @@ bool play_wav_via_wasapi(const uint8_t* wav_data, const WavHeader& wav_header) {
     wfx.nBlockAlign = wav_header.block_align;
     wfx.nAvgBytesPerSec = wav_header.byte_rate;
     
-    std::cout << "✓ Audio format configured:" << std::endl;
+    std::cout << "鉁?Audio format configured:" << std::endl;
     std::cout << "  - Channels: " << wfx.nChannels << std::endl;
     std::cout << "  - Sample Rate: " << wfx.nSamplesPerSec << " Hz" << std::endl;
     std::cout << "  - Bits per Sample: " << wfx.wBitsPerSample << std::endl;
@@ -457,7 +457,7 @@ bool play_wav_via_wasapi(const uint8_t* wav_data, const WavHeader& wav_header) {
     hr = device->Activate(__uuidof(IAudioClient), CLSCTX_ALL,
                          NULL, (void**)&audio_client);
     if (FAILED(hr)) {
-        std::cerr << "❌ Failed to activate audio client" << std::endl;
+        std::cerr << "鉂?Failed to activate audio client" << std::endl;
         device->Release();
         enumerator->Release();
         return false;
@@ -472,15 +472,15 @@ bool play_wav_via_wasapi(const uint8_t* wav_data, const WavHeader& wav_header) {
     hr = audio_client->Initialize(AUDCLNT_SHAREMODE_SHARED,
                                   0, 10000000, 0, &wfx, NULL);
     if (SUCCEEDED(hr)) {
-        std::cout << "✅ Successfully initialized with file format!" << std::endl;
+        std::cout << "鉁?Successfully initialized with file format!" << std::endl;
         actual_format = wfx;  // Use file format
         wasapi_format = &actual_format;
     } else {
         // Try with system default format if initialization fails
-        std::cout << "⚠️  File format not supported, trying system default..." << std::endl;
+        std::cout << "鈿狅笍  File format not supported, trying system default..." << std::endl;
         hr = audio_client->GetMixFormat(&wasapi_format);
         if (FAILED(hr)) {
-            std::cerr << "❌ Failed to get system mix format" << std::endl;
+            std::cerr << "鉂?Failed to get system mix format" << std::endl;
             audio_client->Release();
             device->Release();
             enumerator->Release();
@@ -491,7 +491,7 @@ bool play_wav_via_wasapi(const uint8_t* wav_data, const WavHeader& wav_header) {
                                       0, 10000000, 0, wasapi_format, NULL);
         if (FAILED(hr)) {
             CoTaskMemFree(wasapi_format);
-            std::cerr << "❌ Failed to initialize with system format" << std::endl;
+            std::cerr << "鉂?Failed to initialize with system format" << std::endl;
             audio_client->Release();
             device->Release();
             enumerator->Release();
@@ -502,7 +502,7 @@ bool play_wav_via_wasapi(const uint8_t* wav_data, const WavHeader& wav_header) {
         actual_format = *wasapi_format;  // Copy to local storage
         wasapi_format = &actual_format;  // Point to local copy
         
-        std::cout << "✅ Using system default format:" << std::endl;
+        std::cout << "鉁?Using system default format:" << std::endl;
         std::cout << "  - Channels: " << wasapi_format->nChannels << std::endl;
         std::cout << "  - Sample Rate: " << wasapi_format->nSamplesPerSec << " Hz" << std::endl;
         std::cout << "  - Bits per Sample: " << wasapi_format->wBitsPerSample << std::endl;
@@ -532,8 +532,8 @@ bool play_wav_via_wasapi(const uint8_t* wav_data, const WavHeader& wav_header) {
         return false;
     }
     
-    std::cout << "✅ Audio playback started" << std::endl;
-    std::cout << "✅ Buffer size: " << buffer_size << " frames" << std::endl;
+    std::cout << "鉁?Audio playback started" << std::endl;
+    std::cout << "鉁?Buffer size: " << buffer_size << " frames" << std::endl;
     
     // Check if conversion is needed
     bool format_matches = (wav_header.sample_rate == wasapi_format->nSamplesPerSec &&
@@ -544,11 +544,11 @@ bool play_wav_via_wasapi(const uint8_t* wav_data, const WavHeader& wav_header) {
                             wasapi_format->wFormatTag == WAVE_FORMAT_IEEE_FLOAT);
     
     if (!format_matches && needs_float_conv) {
-        std::cout << "⚠️  Converting 16-bit PCM → 32-bit Float (format mismatch)" << std::endl;
+        std::cout << "鈿狅笍  Converting 16-bit PCM 鈫?32-bit Float (format mismatch)" << std::endl;
     } else if (format_matches) {
-        std::cout << "✅ Audio format matches (optimal, no conversion needed)" << std::endl;
+        std::cout << "鉁?Audio format matches (optimal, no conversion needed)" << std::endl;
     } else {
-        std::cout << "⚠️  Format mismatch but no conversion available" << std::endl;
+        std::cout << "鈿狅笍  Format mismatch but no conversion available" << std::endl;
     }
     std::cout << std::endl;
     
@@ -597,7 +597,7 @@ bool play_wav_via_wasapi(const uint8_t* wav_data, const WavHeader& wav_header) {
             }
         }
         
-        // FIX: Sleep for 1ms instead of 100μs to avoid CPU spinning
+        // FIX: Sleep for 1ms instead of 100渭s to avoid CPU spinning
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
     
@@ -612,7 +612,7 @@ bool play_wav_via_wasapi(const uint8_t* wav_data, const WavHeader& wav_header) {
     
     // Cleanup
     float seconds_played = static_cast<float>(frames_played) / wav_header.sample_rate;
-    std::cout << "✅ Playback complete (" << frames_played << " frames, " 
+    std::cout << "鉁?Playback complete (" << frames_played << " frames, " 
               << std::fixed << std::setprecision(1) << seconds_played << "s)" << std::endl;
     audio_client->Stop();
     render_client->Release();
@@ -639,12 +639,12 @@ int main(int argc, char** argv) {
         play_test_tone(440.0f, 2.0f);
         
         std::cout << "\n========================================" << std::endl;
-        std::cout << "✅ Test complete!" << std::endl;
+        std::cout << "鉁?Test complete!" << std::endl;
         std::cout << "Now try: music-player yourfile.wav" << std::endl;
         std::cout << "========================================" << std::endl;
         return 0;
 #else
-        std::cout << "❌ Audio playback only works on Windows in this demo" << std::endl;
+        std::cout << "鉂?Audio playback only works on Windows in this demo" << std::endl;
         return 1;
 #endif
     }

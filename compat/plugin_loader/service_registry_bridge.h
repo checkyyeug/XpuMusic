@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @file service_registry_bridge.h
- * @brief ServiceRegistryBridge 实现
+ * @brief ServiceRegistryBridge 瀹炵幇
  * @date 2025-12-09
  */
 
@@ -16,21 +16,21 @@ namespace compat {
 
 /**
  * @class ServiceRegistryBridgeImpl
- * @brief ServiceRegistryBridge 的具体实现
+ * @brief ServiceRegistryBridge 鐨勫叿浣撳疄鐜?
  * 
- * 这个类桥接了 XpuMusic 的服务模型（基于 GUID）和
- * 我们的 ServiceRegistry（基于 ServiceID 哈希）。
+ * 杩欎釜绫绘ˉ鎺ヤ簡 XpuMusic 鐨勬湇鍔℃ā鍨嬶紙鍩轰簬 GUID锛夊拰
+ * 鎴戜滑鐨?ServiceRegistry锛堝熀浜?ServiceID 鍝堝笇锛夈€?
  */
 class ServiceRegistryBridgeImpl : public ServiceRegistryBridge {
 private:
-    // 指向我们的服务注册表
+    // 鎸囧悜鎴戜滑鐨勬湇鍔℃敞鍐岃〃
     core::ServiceRegistry* service_registry_;
     
-    // 映射 GUID -> ServiceFactoryWrapper
+    // 鏄犲皠 GUID -> ServiceFactoryWrapper
     struct ServiceEntry {
         GUID guid;
         ServiceFactoryWrapper* wrapper;
-        service_ptr instance;  // 可选的单例缓存
+        service_ptr instance;  // 鍙€夌殑鍗曚緥缂撳瓨
         bool is_singleton;
         
         ServiceEntry() : wrapper(nullptr), is_singleton(false) {
@@ -40,83 +40,83 @@ private:
     
     std::unordered_map<uint64_t, ServiceEntry> services_;
     
-    // 互斥锁用于线程安全
+    // 浜掓枼閿佺敤浜庣嚎绋嬪畨鍏?
     mutable std::mutex mutex_;
     
     /**
-     * @brief GUID -> uint64_t 哈希（用于 unordered_map）
+     * @brief GUID -> uint64_t 鍝堝笇锛堢敤浜?unordered_map锛?
      * @param guid foobar2000 GUID
-     * @return 64-bit 哈希值
+     * @return 64-bit 鍝堝笇鍊?
      */
     static uint64_t hash_guid(const GUID& guid);
     
     /**
-     * @brief 从 GUID 计算 ServiceID
+     * @brief 浠?GUID 璁＄畻 ServiceID
      * @param guid foobar2000 GUID
-     * @return ServiceID（哈希）
+     * @return ServiceID锛堝搱甯岋級
      */
     static mp::ServiceID guid_to_service_id(const GUID& guid);
     
 public:
     /**
-     * @brief 构造函数
-     * @param service_registry 父服务注册表
+     * @brief 鏋勯€犲嚱鏁?
+     * @param service_registry 鐖舵湇鍔℃敞鍐岃〃
      */
     explicit ServiceRegistryBridgeImpl(core::ServiceRegistry* service_registry);
     
     /**
-     * @brief 析构函数
+     * @brief 鏋愭瀯鍑芥暟
      */
     ~ServiceRegistryBridgeImpl() override;
     
     /**
-     * @brief 注册服务
-     * @param guid XpuMusic 服务 GUID
-     * @param factory_wrapper 包装工厂
-     * @return Result 成功或错误
+     * @brief 娉ㄥ唽鏈嶅姟
+     * @param guid XpuMusic 鏈嶅姟 GUID
+     * @param factory_wrapper 鍖呰宸ュ巶
+     * @return Result 鎴愬姛鎴栭敊璇?
      */
     Result register_service(const xpumusic_sdk::GUID& guid, ServiceFactoryWrapper* factory_wrapper) override;
 
     /**
-     * @brief 注销服务
-     * @param guid 服务 GUID
-     * @return Result 成功或错误
+     * @brief 娉ㄩ攢鏈嶅姟
+     * @param guid 鏈嶅姟 GUID
+     * @return Result 鎴愬姛鎴栭敊璇?
      */
     Result unregister_service(const xpumusic_sdk::GUID& guid) override;
 
     /**
-     * @brief 按 GUID 查询服务
-     * @param guid 服务 GUID
-     * @return 服务实例或 nullptr
+     * @brief 鎸?GUID 鏌ヨ鏈嶅姟
+     * @param guid 鏈嶅姟 GUID
+     * @return 鏈嶅姟瀹炰緥鎴?nullptr
      */
     xpumusic_sdk::service_ptr query_service(const xpumusic_sdk::GUID& guid) override;
 
     /**
-     * @brief 按 GUID 查询工厂
-     * @param guid 服务 GUID
-     * @return 工厂指针或 nullptr
+     * @brief 鎸?GUID 鏌ヨ宸ュ巶
+     * @param guid 鏈嶅姟 GUID
+     * @return 宸ュ巶鎸囬拡鎴?nullptr
      */
     xpumusic_sdk::service_factory_base* query_factory(const xpumusic_sdk::GUID& guid) override;
 
     /**
-     * @brief 获取所有已注册服务
-     * @return GUID 向量
+     * @brief 鑾峰彇鎵€鏈夊凡娉ㄥ唽鏈嶅姟
+     * @return GUID 鍚戦噺
      */
     std::vector<xpumusic_sdk::GUID> get_registered_services() const override;
     
     /**
-     * @brief 获取服务数量
-     * @return 服务数量
+     * @brief 鑾峰彇鏈嶅姟鏁伴噺
+     * @return 鏈嶅姟鏁伴噺
      */
     size_t get_service_count() const override;
 
     /**
-     * @brief 清除所有服务
+     * @brief 娓呴櫎鎵€鏈夋湇鍔?
      */
     void clear() override;
 };
 
-// ServiceRegistryBridgeImpl 实现
+// ServiceRegistryBridgeImpl 瀹炵幇
 
 ServiceRegistryBridgeImpl::ServiceRegistryBridgeImpl(core::ServiceRegistry* service_registry)
     : service_registry_(service_registry) {
@@ -130,12 +130,12 @@ ServiceRegistryBridgeImpl::~ServiceRegistryBridgeImpl() {
 }
 
 uint64_t ServiceRegistryBridgeImpl::hash_guid(const GUID& guid) {
-    // 简单哈希：组合 GUID 的字段
+    // 绠€鍗曞搱甯岋細缁勫悎 GUID 鐨勫瓧娈?
     uint64_t hash = guid.Data1;
     hash = (hash << 16) ^ guid.Data2;
     hash = (hash << 16) ^ guid.Data3;
     
-    // 也包括前 8 字节的 Data4
+    // 涔熷寘鎷墠 8 瀛楄妭鐨?Data4
     uint32_t* data4_int = reinterpret_cast<uint32_t*>(const_cast<uint8_t*>(guid.Data4));
     hash ^= data4_int[0];
     hash ^= (static_cast<uint64_t>(data4_int[1]) << 32);
@@ -144,8 +144,8 @@ uint64_t ServiceRegistryBridgeImpl::hash_guid(const GUID& guid) {
 }
 
 mp::ServiceID ServiceRegistryBridgeImpl::guid_to_service_id(const GUID& guid) {
-    // 生成一致的 ServiceID 从 GUID
-    // 使用 MP 的 hash_string 算法，但适应 GUID 结构
+    // 鐢熸垚涓€鑷寸殑 ServiceID 浠?GUID
+    // 浣跨敤 MP 鐨?hash_string 绠楁硶锛屼絾閫傚簲 GUID 缁撴瀯
     
     std::stringstream ss;
     ss << guid.Data1 << "-" << guid.Data2 << "-" << guid.Data3 << "-";
@@ -153,8 +153,8 @@ mp::ServiceID ServiceRegistryBridgeImpl::guid_to_service_id(const GUID& guid) {
         ss << static_cast<int>(guid.Data4[i]);
     }
     
-    // 注意：直接返回 GUID 哈希作为 ServiceID
-    // 这不是理想的方法，但最简单的桥接方式
+    // 娉ㄦ剰锛氱洿鎺ヨ繑鍥?GUID 鍝堝笇浣滀负 ServiceID
+    // 杩欎笉鏄悊鎯崇殑鏂规硶锛屼絾鏈€绠€鍗曠殑妗ユ帴鏂瑰紡
     return static_cast<mp::ServiceID>(hash_guid(guid));
 }
 
@@ -168,29 +168,29 @@ Result ServiceRegistryBridgeImpl::register_service(const GUID& guid,
     
     uint64_t hash = hash_guid(guid);
     
-    // 检查是否已注册
+    // 妫€鏌ユ槸鍚﹀凡娉ㄥ唽
     auto it = services_.find(hash);
     if (it != services_.end()) {
         return Result::AlreadyInitialized;
     }
     
-    // 创建服务条目
+    // 鍒涘缓鏈嶅姟鏉＄洰
     ServiceEntry entry;
     entry.guid = guid;
     entry.wrapper = factory_wrapper;
-    entry.is_singleton = false;  // TODO: 检测单例模式
+    entry.is_singleton = false;  // TODO: 妫€娴嬪崟渚嬫ā寮?
     
-    // 计算 ServiceID（从 GUID）
+    // 璁＄畻 ServiceID锛堜粠 GUID锛?
     mp::ServiceID service_id = guid_to_service_id(guid);
     
-    // 注册到我们的服务注册表
-    // 注意：这需要注册 void* 指针（服务实例或工厂）
+    // 娉ㄥ唽鍒版垜浠殑鏈嶅姟娉ㄥ唽琛?
+    // 娉ㄦ剰锛氳繖闇€瑕佹敞鍐?void* 鎸囬拡锛堟湇鍔″疄渚嬫垨宸ュ巶锛?
     Result result = service_registry_->register_service(service_id, factory_wrapper);
     if (result != Result::Success) {
         return result;
     }
     
-    // 保存条目
+    // 淇濆瓨鏉＄洰
     services_[hash] = entry;
     
     return Result::Success;
@@ -206,7 +206,7 @@ Result ServiceRegistryBridgeImpl::unregister_service(const GUID& guid) {
         return Result::FileNotFound;
     }
     
-    // 从我们的服务注册表注销
+    // 浠庢垜浠殑鏈嶅姟娉ㄥ唽琛ㄦ敞閿€
     mp::ServiceID service_id = guid_to_service_id(guid);
     Result result = service_registry_->unregister_service(service_id);
     
@@ -229,23 +229,23 @@ service_ptr ServiceRegistryBridgeImpl::query_service(const GUID& guid) {
     
     ServiceEntry& entry = it->second;
     
-    // 如果这是单例且我们已有实例，返回它
+    // 濡傛灉杩欐槸鍗曚緥涓旀垜浠凡鏈夊疄渚嬶紝杩斿洖瀹?
     if (entry.is_singleton && entry.instance.is_valid()) {
-        // 调用 add_ref 增加引用计数
+        // 璋冪敤 add_ref 澧炲姞寮曠敤璁℃暟
         if (entry.instance.get_ptr()) {
             entry.instance.get_ptr()->service_add_ref();
         }
         return entry.instance;
     }
     
-    // 否则从工厂创建新实例
+    // 鍚﹀垯浠庡伐鍘傚垱寤烘柊瀹炰緥
     if (!entry.wrapper) {
         return service_ptr();
     }
     
     service_ptr instance = entry.wrapper->create_service();
     
-    // 如果是单例，缓存实例
+    // 濡傛灉鏄崟渚嬶紝缂撳瓨瀹炰緥
     if (entry.is_singleton) {
         entry.instance = instance;
     }
@@ -287,7 +287,7 @@ size_t ServiceRegistryBridgeImpl::get_service_count() const {
 void ServiceRegistryBridgeImpl::clear() {
     std::lock_guard<std::mutex> lock(mutex_);
     
-    // 注销所有服务
+    // 娉ㄩ攢鎵€鏈夋湇鍔?
     for (const auto& pair : services_) {
         const GUID& guid = pair.second.guid;
         mp::ServiceID service_id = guid_to_service_id(guid);

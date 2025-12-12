@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "fb2k_com_base.h"
 #include <windows.h>
@@ -15,7 +15,7 @@
 
 namespace fb2k {
 
-// foobar2000组件接口定义
+// foobar2000缁勪欢鎺ュ彛瀹氫箟
 
 // {A1B2C3D4-E5F6-7890-ABCD-EF1234567891}
 static const GUID IID_IFB2KComponent = 
@@ -33,24 +33,24 @@ static const GUID IID_IFB2KPluginLoader =
 static const GUID IID_IFB2KInitQuit = 
     { 0xd4e5f6a7, 0xb8c9, 0x0123, { 0xde, 0xf0, 0x34, 0x56, 0x78, 0x90, 0x12, 0x34 } };
 
-// 组件类型枚举
+// 缁勪欢绫诲瀷鏋氫妇
 enum class component_type {
     unknown = 0,
-    input,          // 输入解码器
-    output,         // 输出设备
-    dsp,            // DSP效果器
-    visualisation,  // 可视化
-    general,        // 通用插件
-    context_menu,   // 上下文菜单
-    toolbar,        // 工具栏
-    playlist_view,  // 播放列表视图
-    album_art,      // 专辑封面
-    library,        // 媒体库
-    tagger,         // 标签编辑器
-    encoder         // 编码器
+    input,          // 杈撳叆瑙ｇ爜鍣?
+    output,         // 杈撳嚭璁惧
+    dsp,            // DSP鏁堟灉鍣?
+    visualisation,  // 鍙鍖?
+    general,        // 閫氱敤鎻掍欢
+    context_menu,   // 涓婁笅鏂囪彍鍗?
+    toolbar,        // 宸ュ叿鏍?
+    playlist_view,  // 鎾斁鍒楄〃瑙嗗浘
+    album_art,      // 涓撹緫灏侀潰
+    library,        // 濯掍綋搴?
+    tagger,         // 鏍囩缂栬緫鍣?
+    encoder         // 缂栫爜鍣?
 };
 
-// 组件信息结构
+// 缁勪欢淇℃伅缁撴瀯
 struct component_info {
     std::string name;
     std::string version;
@@ -67,12 +67,12 @@ struct component_info {
     size_t file_size;
 };
 
-// 组件接口
+// 缁勪欢鎺ュ彛
 struct IFB2KComponent : public IFB2KService {
     static const GUID iid;
     static const char* interface_name;
     
-    // 组件基本信息
+    // 缁勪欢鍩烘湰淇℃伅
     virtual HRESULT STDMETHODCALLTYPE GetComponentName(const char** name) = 0;
     virtual HRESULT STDMETHODCALLTYPE GetComponentVersion(const char** version) = 0;
     virtual HRESULT STDMETHODCALLTYPE GetComponentDescription(const char** description) = 0;
@@ -80,102 +80,102 @@ struct IFB2KComponent : public IFB2KService {
     virtual HRESULT STDMETHODCALLTYPE GetComponentGUID(const char** guid) = 0;
     virtual HRESULT STDMETHODCALLTYPE GetComponentType(component_type* type) = 0;
     
-    // 组件状态
+    // 缁勪欢鐘舵€?
     virtual HRESULT STDMETHODCALLTYPE IsComponentLoaded() = 0;
     virtual HRESULT STDMETHODCALLTYPE IsComponentEnabled() = 0;
     virtual HRESULT STDMETHODCALLTYPE SetComponentEnabled(bool enabled) = 0;
     virtual HRESULT STDMETHODCALLTYPE GetLoadOrder(DWORD* order) = 0;
     
-    // 依赖管理
+    // 渚濊禆绠＄悊
     virtual HRESULT STDMETHODCALLTYPE GetDependencies(const char** dependencies) = 0;
     virtual HRESULT STDMETHODCALLTYPE CheckDependencies(bool* satisfied) = 0;
     virtual HRESULT STDMETHODCALLTYPE LoadDependencies() = 0;
     
-    // 配置支持
+    // 閰嶇疆鏀寔
     virtual HRESULT STDMETHODCALLTYPE HasConfigDialog(bool* has_dialog) = 0;
     virtual HRESULT STDMETHODCALLTYPE ShowConfigDialog(HWND parent) = 0;
     virtual HRESULT STDMETHODCALLTYPE GetConfigData(BYTE** data, DWORD* size) = 0;
     virtual HRESULT STDMETHODCALLTYPE SetConfigData(const BYTE* data, DWORD size) = 0;
 };
 
-// 初始化/退出接口（所有组件必须实现）
+// 鍒濆鍖?閫€鍑烘帴鍙ｏ紙鎵€鏈夌粍浠跺繀椤诲疄鐜帮級
 struct IFB2KInitQuit : public IFB2KUnknown {
     static const GUID iid;
     static const char* interface_name;
     
-    // 生命周期管理
-    virtual HRESULT STDMETHODCALLTYPE OnInit() = 0;  // 系统初始化时调用
-    virtual HRESULT STDMETHODCALLTYPE OnQuit() = 0;  // 系统退出时调用
+    // 鐢熷懡鍛ㄦ湡绠＄悊
+    virtual HRESULT STDMETHODCALLTYPE OnInit() = 0;  // 绯荤粺鍒濆鍖栨椂璋冪敤
+    virtual HRESULT STDMETHODCALLTYPE OnQuit() = 0;  // 绯荤粺閫€鍑烘椂璋冪敤
     
-    // 高级生命周期
-    virtual HRESULT STDMETHODCALLTYPE OnSystemInit() = 0;   // 在所有组件加载后调用
-    virtual HRESULT STDMETHODCALLTYPE OnSystemQuit() = 0;   // 在所有组件卸载前调用
-    virtual HRESULT STDMETHODCALLTYPE OnConfigChanged() = 0; // 配置改变时调用
+    // 楂樼骇鐢熷懡鍛ㄦ湡
+    virtual HRESULT STDMETHODCALLTYPE OnSystemInit() = 0;   // 鍦ㄦ墍鏈夌粍浠跺姞杞藉悗璋冪敤
+    virtual HRESULT STDMETHODCALLTYPE OnSystemQuit() = 0;   // 鍦ㄦ墍鏈夌粍浠跺嵏杞藉墠璋冪敤
+    virtual HRESULT STDMETHODCALLTYPE OnConfigChanged() = 0; // 閰嶇疆鏀瑰彉鏃惰皟鐢?
 };
 
-// 组件管理器接口
+// 缁勪欢绠＄悊鍣ㄦ帴鍙?
 struct IFB2KComponentManager : public IFB2KService {
     static const GUID iid;
     static const char* interface_name;
     
-    // 组件发现
+    // 缁勪欢鍙戠幇
     virtual HRESULT STDMETHODCALLTYPE ScanComponents(const char* directory) = 0;
     virtual HRESULT STDMETHODCALLTYPE EnumComponents(component_info** components, DWORD* count) = 0;
     virtual HRESULT STDMETHODCALLTYPE GetComponentCount(DWORD* count) = 0;
     virtual HRESULT STDMETHODCALLTYPE FindComponent(const char* guid, IFB2KComponent** component) = 0;
     
-    // 组件加载/卸载
+    // 缁勪欢鍔犺浇/鍗歌浇
     virtual HRESULT STDMETHODCALLTYPE LoadComponent(const char* file_path) = 0;
     virtual HRESULT STDMETHODCALLTYPE UnloadComponent(const char* guid) = 0;
     virtual HRESULT STDMETHODCALLTYPE ReloadComponent(const char* guid) = 0;
     virtual HRESULT STDMETHODCALLTYPE LoadAllComponents() = 0;
     virtual HRESULT STDMETHODCALLTYPE UnloadAllComponents() = 0;
     
-    // 组件状态管理
+    // 缁勪欢鐘舵€佺鐞?
     virtual HRESULT STDMETHODCALLTYPE EnableComponent(const char* guid, bool enable) = 0;
     virtual HRESULT STDMETHODCALLTYPE IsComponentEnabled(const char* guid, bool* enabled) = 0;
     virtual HRESULT STDMETHODCALLTYPE SetComponentLoadOrder(const char* guid, DWORD order) = 0;
     virtual HRESULT STDMETHODCALLTYPE GetComponentLoadOrder(const char* guid, DWORD* order) = 0;
     
-    // 组件类型管理
+    // 缁勪欢绫诲瀷绠＄悊
     virtual HRESULT STDMETHODCALLTYPE GetComponentsByType(component_type type, IFB2KComponent*** components, DWORD* count) = 0;
     virtual HRESULT STDMETHODCALLTYPE GetComponentTypes(component_type** types, DWORD* count) = 0;
     
-    // 错误处理
+    // 閿欒澶勭悊
     virtual HRESULT STDMETHODCALLTYPE GetLastErrorMessage(char** message) = 0;
     virtual HRESULT STDMETHODCALLTYPE ClearErrorLog() = 0;
     virtual HRESULT STDMETHODCALLTYPE GetErrorLog(char** log, DWORD* count) = 0;
 };
 
-// 插件加载器接口
+// 鎻掍欢鍔犺浇鍣ㄦ帴鍙?
 struct IFB2KPluginLoader : public IFB2KUnknown {
     static const GUID iid;
     static const char* interface_name;
     
-    // DLL加载
+    // DLL鍔犺浇
     virtual HRESULT STDMETHODCALLTYPE LoadPlugin(const char* dll_path) = 0;
     virtual HRESULT STDMETHODCALLTYPE UnloadPlugin(const char* dll_path) = 0;
     virtual HRESULT STDMETHODCALLTYPE IsPluginLoaded(const char* dll_path, bool* loaded) = 0;
     
-    // 组件提取
+    // 缁勪欢鎻愬彇
     virtual HRESULT STDMETHODCALLTYPE GetComponentsFromPlugin(const char* dll_path, IFB2KComponent*** components, DWORD* count) = 0;
     virtual HRESULT STDMETHODCALLTYPE GetPluginInfo(const char* dll_path, component_info* info) = 0;
     
-    // 依赖管理
+    // 渚濊禆绠＄悊
     virtual HRESULT STDMETHODCALLTYPE CheckPluginDependencies(const char* dll_path, bool* satisfied) = 0;
     virtual HRESULT STDMETHODCALLTYPE GetPluginDependencies(const char* dll_path, char*** dependencies, DWORD* count) = 0;
     
-    // 安全检查
+    // 瀹夊叏妫€鏌?
     virtual HRESULT STDMETHODCALLTYPE VerifyPluginSignature(const char* dll_path, bool* verified) = 0;
     virtual HRESULT STDMETHODCALLTYPE ScanPluginForMalware(const char* dll_path, bool* clean) = 0;
     
-    // 版本兼容性
+    // 鐗堟湰鍏煎鎬?
     virtual HRESULT STDMETHODCALLTYPE CheckPluginCompatibility(const char* dll_path, bool* compatible) = 0;
     virtual HRESULT STDMETHODCALLTYPE GetPluginVersion(const char* dll_path, DWORD* version) = 0;
     virtual HRESULT STDMETHODCALLTYPE GetRequiredAPIVersion(const char* dll_path, DWORD* api_version) = 0;
 };
 
-// 组件工厂模板
+// 缁勪欢宸ュ巶妯℃澘
 template<typename ComponentClass>
 class fb2k_component_factory {
 public:
@@ -186,7 +186,7 @@ public:
     static void register_component(const char* guid, component_type type) {
         auto* manager = fb2k_get_component_manager();
         if (manager) {
-            // 注册组件工厂函数
+            // 娉ㄥ唽缁勪欢宸ュ巶鍑芥暟
             component_factory_functions_[guid] = create_instance;
             component_types_[guid] = type;
         }
@@ -213,14 +213,14 @@ private:
     static std::map<std::string, component_type> component_types_;
 };
 
-// 静态成员定义
+// 闈欐€佹垚鍛樺畾涔?
 template<typename ComponentClass>
 std::map<std::string, std::function<IUnknown*()>> fb2k_component_factory<ComponentClass>::component_factory_functions_;
 
 template<typename ComponentClass>
 std::map<std::string, component_type> fb2k_component_factory<ComponentClass>::component_types_;
 
-// 组件注册宏
+// 缁勪欢娉ㄥ唽瀹?
 #define FB2K_REGISTER_COMPONENT(ComponentClass, ComponentGUID, ComponentType) \
     namespace { \
         struct ComponentClass##_registrar { \
@@ -230,7 +230,7 @@ std::map<std::string, component_type> fb2k_component_factory<ComponentClass>::co
         } ComponentClass##_registrar_instance; \
     }
 
-// 组件管理器实现
+// 缁勪欢绠＄悊鍣ㄥ疄鐜?
 class fb2k_component_manager_impl : public fb2k_service_impl<IFB2KComponentManager> {
 public:
     fb2k_component_manager_impl();
@@ -240,7 +240,7 @@ protected:
     HRESULT do_initialize() override;
     HRESULT do_shutdown() override;
     
-    // IFB2KComponentManager实现
+    // IFB2KComponentManager瀹炵幇
     HRESULT STDMETHODCALLTYPE ScanComponents(const char* directory) override;
     HRESULT STDMETHODCALLTYPE EnumComponents(component_info** components, DWORD* count) override;
     HRESULT STDMETHODCALLTYPE GetComponentCount(DWORD* count) override;
@@ -288,13 +288,13 @@ private:
     bool extract_component_info(const std::string& file_path, component_info& info);
 };
 
-// 插件加载器实现
+// 鎻掍欢鍔犺浇鍣ㄥ疄鐜?
 class fb2k_plugin_loader_impl : public fb2k_com_object<IFB2KPluginLoader> {
 public:
     fb2k_plugin_loader_impl();
     ~fb2k_plugin_loader_impl();
     
-    // IFB2KPluginLoader实现
+    // IFB2KPluginLoader瀹炵幇
     HRESULT STDMETHODCALLTYPE LoadPlugin(const char* dll_path) override;
     HRESULT STDMETHODCALLTYPE UnloadPlugin(const char* dll_path) override;
     HRESULT STDMETHODCALLTYPE IsPluginLoaded(const char* dll_path, bool* loaded) override;
@@ -323,7 +323,7 @@ private:
     std::map<std::string, plugin_info> loaded_plugins_;
     std::mutex plugins_mutex_;
     
-    // 插件入口点定义
+    // 鎻掍欢鍏ュ彛鐐瑰畾涔?
     typedef HRESULT (*FB2KGetComponentCountFunc)(DWORD* count);
     typedef HRESULT (*FB2KGetComponentInfoFunc)(DWORD index, char** guid, char** name, char** version, component_type* type);
     typedef HRESULT (*FB2KCreateComponentFunc)(const char* guid, IUnknown** component);
@@ -340,17 +340,17 @@ private:
     std::string get_plugin_error_string(DWORD error_code);
 };
 
-// 全局组件管理器访问
+// 鍏ㄥ眬缁勪欢绠＄悊鍣ㄨ闂?
 inline IFB2KComponentManager* fb2k_get_component_manager() {
     return fb2k_get_service<IFB2KComponentManager>();
 }
 
-// 全局插件加载器访问
+// 鍏ㄥ眬鎻掍欢鍔犺浇鍣ㄨ闂?
 inline IFB2KPluginLoader* fb2k_get_plugin_loader() {
     return fb2k_get_service<IFB2KPluginLoader>();
 }
 
-// 接口IID定义
+// 鎺ュ彛IID瀹氫箟
 template<> const GUID fb2k::IFB2KComponent::iid = IID_IFB2KComponent;
 template<> const char* fb2k::IFB2KComponent::interface_name = "IFB2KComponent";
 

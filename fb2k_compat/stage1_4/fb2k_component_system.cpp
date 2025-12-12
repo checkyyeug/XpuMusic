@@ -1,4 +1,4 @@
-#include "fb2k_component_system.h"
+﻿#include "fb2k_component_system.h"
 #include <windows.h>
 #include <shlwapi.h>
 #include <fstream>
@@ -11,23 +11,23 @@
 
 namespace fb2k {
 
-// 组件管理器实现
+// 缁勪欢绠＄悊鍣ㄥ疄鐜?
 fb2k_component_manager_impl::fb2k_component_manager_impl() {
-    std::cout << "[FB2K Component] 创建组件管理器" << std::endl;
+    std::cout << "[FB2K Component] 鍒涘缓缁勪欢绠＄悊鍣? << std::endl;
 }
 
 fb2k_component_manager_impl::~fb2k_component_manager_impl() {
-    std::cout << "[FB2K Component] 销毁组件管理器" << std::endl;
+    std::cout << "[FB2K Component] 閿€姣佺粍浠剁鐞嗗櫒" << std::endl;
     UnloadAllComponents();
 }
 
 HRESULT fb2k_component_manager_impl::do_initialize() {
-    std::cout << "[FB2K Component] 初始化组件管理器" << std::endl;
+    std::cout << "[FB2K Component] 鍒濆鍖栫粍浠剁鐞嗗櫒" << std::endl;
     
-    // 创建插件加载器
+    // 鍒涘缓鎻掍欢鍔犺浇鍣?
     plugin_loader_ = std::make_unique<fb2k_plugin_loader_impl>();
     
-    // 设置默认组件目录
+    // 璁剧疆榛樿缁勪欢鐩綍
     char buffer[MAX_PATH];
     if (GetModuleFileNameA(nullptr, buffer, MAX_PATH) > 0) {
         std::string exe_path = buffer;
@@ -37,7 +37,7 @@ HRESULT fb2k_component_manager_impl::do_initialize() {
         }
     }
     
-    // 扫描默认组件目录
+    // 鎵弿榛樿缁勪欢鐩綍
     if (!components_directory_.empty() && std::filesystem::exists(components_directory_)) {
         ScanComponents(components_directory_.c_str());
     }
@@ -46,7 +46,7 @@ HRESULT fb2k_component_manager_impl::do_initialize() {
 }
 
 HRESULT fb2k_component_manager_impl::do_shutdown() {
-    std::cout << "[FB2K Component] 关闭组件管理器" << std::endl;
+    std::cout << "[FB2K Component] 鍏抽棴缁勪欢绠＄悊鍣? << std::endl;
     UnloadAllComponents();
     plugin_loader_.reset();
     return S_OK;
@@ -57,11 +57,11 @@ HRESULT fb2k_component_manager_impl::ScanComponents(const char* directory) {
     
     std::string dir_path = directory;
     if (!std::filesystem::exists(dir_path)) {
-        add_error("组件目录不存在: " + dir_path);
+        add_error("缁勪欢鐩綍涓嶅瓨鍦? " + dir_path);
         return E_FAIL;
     }
     
-    std::cout << "[FB2K Component] 扫描组件目录: " << dir_path << std::endl;
+    std::cout << "[FB2K Component] 鎵弿缁勪欢鐩綍: " << dir_path << std::endl;
     
     return scan_component_directory(dir_path) ? S_OK : E_FAIL;
 }
@@ -77,8 +77,8 @@ HRESULT fb2k_component_manager_impl::EnumComponents(component_info** components,
         return S_OK;
     }
     
-    // 这里应该分配内存并填充组件信息
-    // 简化实现：直接返回数量
+    // 杩欓噷搴旇鍒嗛厤鍐呭瓨骞跺～鍏呯粍浠朵俊鎭?
+    // 绠€鍖栧疄鐜帮細鐩存帴杩斿洖鏁伴噺
     *count = component_count;
     return S_OK;
 }
@@ -134,58 +134,58 @@ HRESULT fb2k_component_manager_impl::ReloadComponent(const char* guid) {
     
     const std::string& file_path = it->second.info.file_path;
     
-    // 先卸载
+    // 鍏堝嵏杞?
     if (!unload_component_internal(guid)) {
         return E_FAIL;
     }
     
-    // 再重新加载
+    // 鍐嶉噸鏂板姞杞?
     return load_component_file(file_path) ? S_OK : E_FAIL;
 }
 
 HRESULT fb2k_component_manager_impl::LoadAllComponents() {
     std::lock_guard<std::mutex> lock(components_mutex_);
     
-    std::cout << "[FB2K Component] 加载所有组件..." << std::endl;
+    std::cout << "[FB2K Component] 鍔犺浇鎵€鏈夌粍浠?.." << std::endl;
     
     bool all_success = true;
     std::vector<std::string> load_order;
     
-    // 按加载顺序排序
+    // 鎸夊姞杞介『搴忔帓搴?
     for (const auto& [guid, entry] : components_) {
         if (!entry.info.is_loaded && entry.info.is_enabled) {
             load_order.push_back(guid);
         }
     }
     
-    // 按加载顺序排序
+    // 鎸夊姞杞介『搴忔帓搴?
     std::sort(load_order.begin(), load_order.end(), 
         [this](const std::string& a, const std::string& b) {
             return components_[a].info.load_order < components_[b].info.load_order;
         });
     
-    // 解析依赖关系
+    // 瑙ｆ瀽渚濊禆鍏崇郴
     if (!resolve_dependencies()) {
-        add_error("依赖关系解析失败");
+        add_error("渚濊禆鍏崇郴瑙ｆ瀽澶辫触");
         all_success = false;
     }
     
-    // 加载组件
+    // 鍔犺浇缁勪欢
     for (const std::string& guid : load_order) {
         auto& entry = components_[guid];
         
         if (!entry.dependency_satisfied) {
-            std::cout << "[FB2K Component] 跳过加载（依赖未满足）: " << entry.info.name << std::endl;
+            std::cout << "[FB2K Component] 璺宠繃鍔犺浇锛堜緷璧栨湭婊¤冻锛? " << entry.info.name << std::endl;
             continue;
         }
         
-        std::cout << "[FB2K Component] 加载组件: " << entry.info.name << std::endl;
+        std::cout << "[FB2K Component] 鍔犺浇缁勪欢: " << entry.info.name << std::endl;
         
-        // 这里应该实际加载组件
-        // 简化实现：标记为已加载
+        // 杩欓噷搴旇瀹為檯鍔犺浇缁勪欢
+        // 绠€鍖栧疄鐜帮細鏍囪涓哄凡鍔犺浇
         entry.info.is_loaded = true;
         
-        // 调用组件的初始化
+        // 璋冪敤缁勪欢鐨勫垵濮嬪寲
         if (entry.component) {
             IFB2KInitQuit* init_quit = nullptr;
             if (SUCCEEDED(entry.component->QueryInterface(IID_IFB2KInitQuit, (void**)&init_quit))) {
@@ -195,7 +195,7 @@ HRESULT fb2k_component_manager_impl::LoadAllComponents() {
         }
     }
     
-    // 调用所有组件的OnSystemInit
+    // 璋冪敤鎵€鏈夌粍浠剁殑OnSystemInit
     for (auto& [guid, entry] : components_) {
         if (entry.info.is_loaded && entry.component) {
             IFB2KInitQuit* init_quit = nullptr;
@@ -206,16 +206,16 @@ HRESULT fb2k_component_manager_impl::LoadAllComponents() {
         }
     }
     
-    std::cout << "[FB2K Component] 组件加载完成" << std::endl;
+    std::cout << "[FB2K Component] 缁勪欢鍔犺浇瀹屾垚" << std::endl;
     return all_success ? S_OK : S_FALSE;
 }
 
 HRESULT fb2k_component_manager_impl::UnloadAllComponents() {
     std::lock_guard<std::mutex> lock(components_mutex_);
     
-    std::cout << "[FB2K Component] 卸载所有组件..." << std::endl;
+    std::cout << "[FB2K Component] 鍗歌浇鎵€鏈夌粍浠?.." << std::endl;
     
-    // 反向卸载（按加载顺序的逆序）
+    // 鍙嶅悜鍗歌浇锛堟寜鍔犺浇椤哄簭鐨勯€嗗簭锛?
     std::vector<std::string> unload_order;
     for (const auto& [guid, entry] : components_) {
         if (entry.info.is_loaded) {
@@ -223,13 +223,13 @@ HRESULT fb2k_component_manager_impl::UnloadAllComponents() {
         }
     }
     
-    // 按加载顺序的逆序排序
+    // 鎸夊姞杞介『搴忕殑閫嗗簭鎺掑簭
     std::sort(unload_order.begin(), unload_order.end(),
         [this](const std::string& a, const std::string& b) {
             return components_[a].info.load_order > components_[b].info.load_order;
         });
     
-    // 调用所有组件的OnSystemQuit
+    // 璋冪敤鎵€鏈夌粍浠剁殑OnSystemQuit
     for (const std::string& guid : unload_order) {
         auto& entry = components_[guid];
         if (entry.component) {
@@ -241,13 +241,13 @@ HRESULT fb2k_component_manager_impl::UnloadAllComponents() {
         }
     }
     
-    // 卸载组件
+    // 鍗歌浇缁勪欢
     for (const std::string& guid : unload_order) {
         auto& entry = components_[guid];
         
-        std::cout << "[FB2K Component] 卸载组件: " << entry.info.name << std::endl;
+        std::cout << "[FB2K Component] 鍗歌浇缁勪欢: " << entry.info.name << std::endl;
         
-        // 调用组件的退出
+        // 璋冪敤缁勪欢鐨勯€€鍑?
         if (entry.component) {
             IFB2KInitQuit* init_quit = nullptr;
             if (SUCCEEDED(entry.component->QueryInterface(IID_IFB2KInitQuit, (void**)&init_quit))) {
@@ -259,7 +259,7 @@ HRESULT fb2k_component_manager_impl::UnloadAllComponents() {
             entry.component = nullptr;
         }
         
-        // 卸载DLL
+        // 鍗歌浇DLL
         if (entry.dll_handle) {
             FreeLibrary(entry.dll_handle);
             entry.dll_handle = nullptr;
@@ -268,7 +268,7 @@ HRESULT fb2k_component_manager_impl::UnloadAllComponents() {
         entry.info.is_loaded = false;
     }
     
-    std::cout << "[FB2K Component] 组件卸载完成" << std::endl;
+    std::cout << "[FB2K Component] 缁勪欢鍗歌浇瀹屾垚" << std::endl;
     return S_OK;
 }
 
@@ -288,7 +288,7 @@ HRESULT fb2k_component_manager_impl::EnableComponent(const char* guid, bool enab
         it->second.component->EnableService(enable);
     }
     
-    std::cout << "[FB2K Component] " << (enable ? "启用" : "禁用") << "组件: " << it->second.info.name << std::endl;
+    std::cout << "[FB2K Component] " << (enable ? "鍚敤" : "绂佺敤") << "缁勪欢: " << it->second.info.name << std::endl;
     return S_OK;
 }
 
@@ -352,7 +352,7 @@ HRESULT fb2k_component_manager_impl::GetComponentsByType(component_type type, IF
         return S_OK;
     }
     
-    // 这里应该分配内存并返回组件数组
+    // 杩欓噷搴旇鍒嗛厤鍐呭瓨骞惰繑鍥炵粍浠舵暟缁?
     *count = static_cast<DWORD>(type_components.size());
     return S_OK;
 }
@@ -395,7 +395,7 @@ HRESULT fb2k_component_manager_impl::GetLastErrorMessage(char** message) {
         return S_FALSE;
     }
     
-    // 返回最后一条错误消息
+    // 杩斿洖鏈€鍚庝竴鏉￠敊璇秷鎭?
     std::string last_error = error_log_.back();
     char* error_copy = new char[last_error.length() + 1];
     strcpy(error_copy, last_error.c_str());
@@ -417,11 +417,11 @@ HRESULT fb2k_component_manager_impl::GetErrorLog(char** log, DWORD* count) {
     *count = static_cast<DWORD>(error_log_.size());
     if (!log) return S_OK;
     
-    // 这里应该分配内存并返回错误日志
+    // 杩欓噷搴旇鍒嗛厤鍐呭瓨骞惰繑鍥為敊璇棩蹇?
     return S_OK;
 }
 
-// 私有辅助方法
+// 绉佹湁杈呭姪鏂规硶
 bool fb2k_component_manager_impl::scan_component_directory(const std::string& directory) {
     try {
         for (const auto& entry : std::filesystem::directory_iterator(directory)) {
@@ -429,7 +429,7 @@ bool fb2k_component_manager_impl::scan_component_directory(const std::string& di
                 std::string file_path = entry.path().string();
                 std::string extension = entry.path().extension().string();
                 
-                // 检查文件扩展名
+                // 妫€鏌ユ枃浠舵墿灞曞悕
                 std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
                 
                 if (extension == ".dll" || extension == ".fb2k-component") {
@@ -439,7 +439,7 @@ bool fb2k_component_manager_impl::scan_component_directory(const std::string& di
         }
         return true;
     } catch (const std::exception& e) {
-        add_error("扫描组件目录失败: " + std::string(e.what()));
+        add_error("鎵弿缁勪欢鐩綍澶辫触: " + std::string(e.what()));
         return false;
     }
 }
@@ -453,9 +453,9 @@ bool fb2k_component_manager_impl::load_component_file(const std::string& file_pa
         
         std::lock_guard<std::mutex> lock(components_mutex_);
         
-        // 检查是否已存在
+        // 妫€鏌ユ槸鍚﹀凡瀛樺湪
         if (components_.find(info.guid) != components_.end()) {
-            std::cout << "[FB2K Component] 组件已存在，跳过: " << info.name << std::endl;
+            std::cout << "[FB2K Component] 缁勪欢宸插瓨鍦紝璺宠繃: " << info.name << std::endl;
             return false;
         }
         
@@ -465,12 +465,12 @@ bool fb2k_component_manager_impl::load_component_file(const std::string& file_pa
         entry.dll_handle = nullptr;
         entry.dependency_satisfied = false;
         
-        // 解析依赖关系
+        // 瑙ｆ瀽渚濊禆鍏崇郴
         if (!info.dependencies.empty()) {
             std::stringstream ss(info.dependencies);
             std::string dep;
             while (std::getline(ss, dep, ',')) {
-                // 去除空格
+                // 鍘婚櫎绌烘牸
                 dep.erase(0, dep.find_first_not_of(" \t"));
                 dep.erase(dep.find_last_not_of(" \t") + 1);
                 if (!dep.empty()) {
@@ -481,11 +481,11 @@ bool fb2k_component_manager_impl::load_component_file(const std::string& file_pa
         
         components_[info.guid] = entry;
         
-        std::cout << "[FB2K Component] 发现组件: " << info.name << " (" << info.guid << ")" << std::endl;
+        std::cout << "[FB2K Component] 鍙戠幇缁勪欢: " << info.name << " (" << info.guid << ")" << std::endl;
         return true;
         
     } catch (const std::exception& e) {
-        add_error("加载组件文件失败: " + std::string(e.what()));
+        add_error("鍔犺浇缁勪欢鏂囦欢澶辫触: " + std::string(e.what()));
         return false;
     }
 }
@@ -501,7 +501,7 @@ bool fb2k_component_manager_impl::unload_component_internal(const std::string& g
     auto& entry = it->second;
     
     if (entry.info.is_loaded) {
-        // 调用组件的退出
+        // 璋冪敤缁勪欢鐨勯€€鍑?
         if (entry.component) {
             IFB2KInitQuit* init_quit = nullptr;
             if (SUCCEEDED(entry.component->QueryInterface(IID_IFB2KInitQuit, (void**)&init_quit))) {
@@ -513,7 +513,7 @@ bool fb2k_component_manager_impl::unload_component_internal(const std::string& g
             entry.component = nullptr;
         }
         
-        // 卸载DLL
+        // 鍗歌浇DLL
         if (entry.dll_handle) {
             FreeLibrary(entry.dll_handle);
             entry.dll_handle = nullptr;
@@ -549,7 +549,7 @@ bool fb2k_component_manager_impl::resolve_dependencies() {
                 if (satisfied) {
                     entry.dependency_satisfied = true;
                     changed = true;
-                    std::cout << "[FB2K Component] 依赖关系满足: " << entry.info.name << std::endl;
+                    std::cout << "[FB2K Component] 渚濊禆鍏崇郴婊¤冻: " << entry.info.name << std::endl;
                 } else {
                     all_resolved = false;
                 }
@@ -563,7 +563,7 @@ bool fb2k_component_manager_impl::resolve_dependencies() {
 void fb2k_component_manager_impl::add_error(const std::string& error) {
     std::lock_guard<std::mutex> lock(error_mutex_);
     error_log_.push_back(error);
-    std::cerr << "[FB2K Component] 错误: " << error << std::endl;
+    std::cerr << "[FB2K Component] 閿欒: " << error << std::endl;
 }
 
 void fb2k_component_manager_impl::clear_error_log_internal() {
@@ -572,7 +572,7 @@ void fb2k_component_manager_impl::clear_error_log_internal() {
 }
 
 component_type fb2k_component_manager_impl::detect_component_type(const std::string& file_path) {
-    // 根据文件名和路径推断组件类型
+    // 鏍规嵁鏂囦欢鍚嶅拰璺緞鎺ㄦ柇缁勪欢绫诲瀷
     std::string filename = std::filesystem::path(file_path).filename().string();
     std::transform(filename.begin(), filename.end(), filename.begin(), ::tolower);
     
@@ -586,13 +586,13 @@ component_type fb2k_component_manager_impl::detect_component_type(const std::str
 }
 
 bool fb2k_component_manager_impl::extract_component_info(const std::string& file_path, component_info& info) {
-    // 简化实现：从文件名提取基本信息
+    // 绠€鍖栧疄鐜帮細浠庢枃浠跺悕鎻愬彇鍩烘湰淇℃伅
     std::filesystem::path path(file_path);
     
     info.file_path = file_path;
     info.name = path.stem().string();
     info.version = "1.0.0";
-    info.description = "foobar2000组件";
+    info.description = "foobar2000缁勪欢";
     info.author = "Unknown";
     info.guid = "{" + info.name + "-0000-0000-0000-000000000000}";
     info.type = detect_component_type(file_path);
@@ -603,7 +603,7 @@ bool fb2k_component_manager_impl::extract_component_info(const std::string& file
     info.last_modified = std::filesystem::last_write_time(path);
     info.file_size = std::filesystem::file_size(path);
     
-    // 尝试从DLL获取版本信息
+    // 灏濊瘯浠嶥LL鑾峰彇鐗堟湰淇℃伅
     DWORD dummy;
     DWORD version_info_size = GetFileVersionInfoSizeA(file_path.c_str(), &dummy);
     if (version_info_size > 0) {
@@ -623,7 +623,7 @@ bool fb2k_component_manager_impl::extract_component_info(const std::string& file
                 }
             }
             
-            // 获取产品名称和描述
+            // 鑾峰彇浜у搧鍚嶇О鍜屾弿杩?
             struct LANGANDCODEPAGE {
                 WORD wLanguage;
                 WORD wCodePage;
@@ -662,19 +662,19 @@ bool fb2k_component_manager_impl::extract_component_info(const std::string& file
     return true;
 }
 
-// 插件加载器实现
+// 鎻掍欢鍔犺浇鍣ㄥ疄鐜?
 fb2k_plugin_loader_impl::fb2k_plugin_loader_impl() {
-    std::cout << "[FB2K Plugin] 创建插件加载器" << std::endl;
+    std::cout << "[FB2K Plugin] 鍒涘缓鎻掍欢鍔犺浇鍣? << std::endl;
 }
 
 fb2k_plugin_loader_impl::~fb2k_plugin_loader_impl() {
-    std::cout << "[FB2K Plugin] 销毁插件加载器" << std::endl;
+    std::cout << "[FB2K Plugin] 閿€姣佹彃浠跺姞杞藉櫒" << std::endl;
     
-    // 卸载所有插件
+    // 鍗歌浇鎵€鏈夋彃浠?
     std::lock_guard<std::mutex> lock(plugins_mutex_);
     for (auto& [path, info] : loaded_plugins_) {
         if (info.handle) {
-            // 调用插件退出函数
+            // 璋冪敤鎻掍欢閫€鍑哄嚱鏁?
             typedef HRESULT (*FB2KQuitPluginFunc)();
             auto quit_func = (FB2KQuitPluginFunc)GetProcAddress(info.handle, "FB2KQuitPlugin");
             if (quit_func) {
@@ -691,10 +691,10 @@ HRESULT fb2k_plugin_loader_impl::LoadPlugin(const char* dll_path) {
     
     std::lock_guard<std::mutex> lock(plugins_mutex_);
     
-    // 检查是否已加载
+    // 妫€鏌ユ槸鍚﹀凡鍔犺浇
     auto it = loaded_plugins_.find(dll_path);
     if (it != loaded_plugins_.end()) {
-        return S_OK; // 已加载
+        return S_OK; // 宸插姞杞?
     }
     
     plugin_info info;
@@ -703,7 +703,7 @@ HRESULT fb2k_plugin_loader_impl::LoadPlugin(const char* dll_path) {
     }
     
     loaded_plugins_[dll_path] = info;
-    std::cout << "[FB2K Plugin] 插件加载成功: " << dll_path << std::endl;
+    std::cout << "[FB2K Plugin] 鎻掍欢鍔犺浇鎴愬姛: " << dll_path << std::endl;
     
     return S_OK;
 }
@@ -738,8 +738,8 @@ HRESULT fb2k_plugin_loader_impl::GetComponentsFromPlugin(const char* dll_path, I
     
     if (!components) return S_OK;
     
-    // 这里应该创建组件实例并返回
-    // 简化实现
+    // 杩欓噷搴旇鍒涘缓缁勪欢瀹炰緥骞惰繑鍥?
+    // 绠€鍖栧疄鐜?
     return S_OK;
 }
 
@@ -755,11 +755,11 @@ HRESULT fb2k_plugin_loader_impl::GetPluginInfo(const char* dll_path, component_i
     
     const plugin_info& plugin_info = it->second;
     
-    // 填充组件信息
+    // 濉厖缁勪欢淇℃伅
     info->name = std::filesystem::path(dll_path).stem().string();
     info->version = std::to_string(HIWORD(plugin_info.version)) + "." + 
                    std::to_string(LOWORD(plugin_info.version));
-    info->description = "foobar2000插件";
+    info->description = "foobar2000鎻掍欢";
     info->author = "Unknown";
     info->file_path = dll_path;
     info->guid = "{" + info->name + "-plugin-0000-0000-000000000000}";
@@ -803,14 +803,14 @@ HRESULT fb2k_plugin_loader_impl::GetPluginDependencies(const char* dll_path, cha
     
     if (!dependencies) return S_OK;
     
-    // 这里应该分配内存并返回依赖列表
+    // 杩欓噷搴旇鍒嗛厤鍐呭瓨骞惰繑鍥炰緷璧栧垪琛?
     return S_OK;
 }
 
 HRESULT fb2k_plugin_loader_impl::VerifyPluginSignature(const char* dll_path, bool* verified) {
     if (!dll_path || !verified) return E_POINTER;
     
-    // 简化实现：总是验证通过
+    // 绠€鍖栧疄鐜帮細鎬绘槸楠岃瘉閫氳繃
     *verified = true;
     return S_OK;
 }
@@ -818,7 +818,7 @@ HRESULT fb2k_plugin_loader_impl::VerifyPluginSignature(const char* dll_path, boo
 HRESULT fb2k_plugin_loader_impl::ScanPluginForMalware(const char* dll_path, bool* clean) {
     if (!dll_path || !clean) return E_POINTER;
     
-    // 简化实现：总是安全
+    // 绠€鍖栧疄鐜帮細鎬绘槸瀹夊叏
     *clean = true;
     return S_OK;
 }
@@ -866,39 +866,39 @@ HRESULT fb2k_plugin_loader_impl::GetRequiredAPIVersion(const char* dll_path, DWO
     return S_OK;
 }
 
-// 私有辅助方法
+// 绉佹湁杈呭姪鏂规硶
 bool fb2k_plugin_loader_impl::load_plugin_internal(const std::string& dll_path, plugin_info& info) {
-    // 加载DLL
+    // 鍔犺浇DLL
     HMODULE handle = LoadLibraryA(dll_path.c_str());
     if (!handle) {
-        std::cerr << "[FB2K Plugin] 加载DLL失败: " << dll_path << std::endl;
+        std::cerr << "[FB2K Plugin] 鍔犺浇DLL澶辫触: " << dll_path << std::endl;
         return false;
     }
     
     info.path = dll_path;
     info.handle = handle;
     
-    // 获取插件信息
+    // 鑾峰彇鎻掍欢淇℃伅
     FB2KGetPluginInfoFunc get_info_func = (FB2KGetPluginInfoFunc)GetProcAddress(handle, "FB2KGetPluginInfo");
     if (get_info_func) {
         get_info_func(&info.version, &info.api_version, nullptr);
     }
     
-    // 调用插件初始化函数
+    // 璋冪敤鎻掍欢鍒濆鍖栧嚱鏁?
     FB2KInitPluginFunc init_func = (FB2KInitPluginFunc)GetProcAddress(handle, "FB2KInitPlugin");
     if (init_func) {
         HRESULT hr = init_func();
         if (FAILED(hr)) {
-            std::cerr << "[FB2K Plugin] 插件初始化失败: " << dll_path << std::endl;
+            std::cerr << "[FB2K Plugin] 鎻掍欢鍒濆鍖栧け璐? " << dll_path << std::endl;
             FreeLibrary(handle);
             return false;
         }
     }
     
-    // 提取组件信息
+    // 鎻愬彇缁勪欢淇℃伅
     extract_component_info(dll_path, info);
     
-    // 检查兼容性和依赖关系
+    // 妫€鏌ュ吋瀹规€у拰渚濊禆鍏崇郴
     info.compatible = check_plugin_compatibility(info);
     info.verified = verify_plugin_dependencies(info);
     
@@ -915,27 +915,27 @@ bool fb2k_plugin_loader_impl::unload_plugin_internal(const std::string& dll_path
     
     plugin_info& info = it->second;
     
-    // 调用插件退出函数
+    // 璋冪敤鎻掍欢閫€鍑哄嚱鏁?
     FB2KQuitPluginFunc quit_func = (FB2KQuitPluginFunc)GetProcAddress(info.handle, "FB2KQuitPlugin");
     if (quit_func) {
         quit_func();
     }
     
-    // 卸载DLL
+    // 鍗歌浇DLL
     FreeLibrary(info.handle);
     
     loaded_plugins_.erase(it);
     
-    std::cout << "[FB2K Plugin] 插件卸载成功: " << dll_path << std::endl;
+    std::cout << "[FB2K Plugin] 鎻掍欢鍗歌浇鎴愬姛: " << dll_path << std::endl;
     return true;
 }
 
 bool fb2k_plugin_loader_impl::verify_plugin_dependencies(const plugin_info& info) {
-    // 检查依赖的系统库
+    // 妫€鏌ヤ緷璧栫殑绯荤粺搴?
     for (const std::string& dep : info.dependencies) {
         HMODULE dep_handle = GetModuleHandleA(dep.c_str());
         if (!dep_handle) {
-            // 尝试加载依赖
+            // 灏濊瘯鍔犺浇渚濊禆
             dep_handle = LoadLibraryA(dep.c_str());
             if (!dep_handle) {
                 return false;
@@ -946,7 +946,7 @@ bool fb2k_plugin_loader_impl::verify_plugin_dependencies(const plugin_info& info
 }
 
 bool fb2k_plugin_loader_impl::check_plugin_compatibility(const plugin_info& info) {
-    // 检查API版本兼容性
+    // 妫€鏌PI鐗堟湰鍏煎鎬?
     DWORD current_api_version = 0x00010000; // 1.0.0.0
     return info.api_version <= current_api_version;
 }
@@ -955,14 +955,14 @@ bool fb2k_plugin_loader_impl::extract_component_info(const std::string& dll_path
     HMODULE handle = info.handle;
     if (!handle) return false;
     
-    // 获取组件数量
+    // 鑾峰彇缁勪欢鏁伴噺
     FB2KGetComponentCountFunc get_count_func = (FB2KGetComponentCountFunc)GetProcAddress(handle, "FB2KGetComponentCount");
     if (!get_count_func) return false;
     
     DWORD count = 0;
     if (FAILED(get_count_func(&count))) return false;
     
-    // 获取组件信息
+    // 鑾峰彇缁勪欢淇℃伅
     FB2KGetComponentInfoFunc get_info_func = (FB2KGetComponentInfoFunc)GetProcAddress(handle, "FB2KGetComponentInfo");
     if (!get_info_func) return false;
     
@@ -976,7 +976,7 @@ bool fb2k_plugin_loader_impl::extract_component_info(const std::string& dll_path
             if (guid) {
                 info.component_guids.push_back(guid);
             }
-            // 释放字符串内存（假设使用CoTaskMemAlloc分配）
+            // 閲婃斁瀛楃涓插唴瀛橈紙鍋囪浣跨敤CoTaskMemAlloc鍒嗛厤锛?
             if (guid) CoTaskMemFree(guid);
             if (name) CoTaskMemFree(name);
             if (version) CoTaskMemFree(version);
@@ -986,11 +986,11 @@ bool fb2k_plugin_loader_impl::extract_component_info(const std::string& dll_path
     return true;
 }
 
-// 全局组件系统初始化
+// 鍏ㄥ眬缁勪欢绯荤粺鍒濆鍖?
 void initialize_fb2k_component_system() {
-    std::cout << "[FB2K Component] 初始化组件系统..." << std::endl;
+    std::cout << "[FB2K Component] 鍒濆鍖栫粍浠剁郴缁?.." << std::endl;
     
-    // 创建组件管理器
+    // 鍒涘缓缁勪欢绠＄悊鍣?
     auto* manager = new fb2k_component_manager_impl();
     auto* provider = fb2k_service_provider_impl::get_instance();
     if (provider) {
@@ -998,24 +998,24 @@ void initialize_fb2k_component_system() {
         manager->Release();
     }
     
-    // 创建插件加载器
+    // 鍒涘缓鎻掍欢鍔犺浇鍣?
     auto* loader = new fb2k_plugin_loader_impl();
     if (provider) {
         provider->RegisterService(IID_IFB2KPluginLoader, loader);
         loader->Release();
     }
     
-    // 初始化组件管理器
+    // 鍒濆鍖栫粍浠剁鐞嗗櫒
     if (manager) {
         manager->Initialize();
     }
     
-    std::cout << "[FB2K Component] 组件系统初始化完成" << std::endl;
+    std::cout << "[FB2K Component] 缁勪欢绯荤粺鍒濆鍖栧畬鎴? << std::endl;
 }
 
-// 全局组件系统清理
+// 鍏ㄥ眬缁勪欢绯荤粺娓呯悊
 void shutdown_fb2k_component_system() {
-    std::cout << "[FB2K Component] 关闭组件系统..." << std::endl;
+    std::cout << "[FB2K Component] 鍏抽棴缁勪欢绯荤粺..." << std::endl;
     
     auto* provider = fb2k_service_provider_impl::get_instance();
     if (provider) {
@@ -1023,7 +1023,7 @@ void shutdown_fb2k_component_system() {
         provider->UnregisterService(IID_IFB2KPluginLoader);
     }
     
-    std::cout << "[FB2K Component] 组件系统已关闭" << std::endl;
+    std::cout << "[FB2K Component] 缁勪欢绯荤粺宸插叧闂? << std::endl;
 }
 
 } // namespace fb2k

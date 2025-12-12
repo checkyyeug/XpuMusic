@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file test_enhanced_resampler.cpp
  * @brief Test enhanced sample rate converter with quality levels
  * @date 2025-12-10
@@ -42,7 +42,7 @@ void test_quality_level(ResampleQuality quality, const float* input,
     auto converter = EnhancedSampleRateConverterFactory::create(quality);
 
     if (!converter->initialize(input_rate, output_rate, channels)) {
-        std::cout << "❌ Failed to initialize converter\n";
+        std::cout << "鉂?Failed to initialize converter\n";
         return;
     }
 
@@ -78,9 +78,9 @@ void test_quality_level(ResampleQuality quality, const float* input,
     WAVWriter writer;
     if (writer.write(filename.c_str(), output.data(), output_frames,
                     output_rate, channels, 24)) {
-        std::cout << "✅ Saved: " << filename << "\n";
+        std::cout << "鉁?Saved: " << filename << "\n";
     } else {
-        std::cout << "❌ Failed to save: " << filename << "\n";
+        std::cout << "鉂?Failed to save: " << filename << "\n";
     }
 
     // Calculate performance metrics
@@ -115,7 +115,7 @@ int main() {
         std::string test_name = std::get<2>(test_case);
 
         std::cout << "\n\n=== Test Case: " << test_name << " ===\n";
-        std::cout << "Converting " << input_rate << "Hz → " << output_rate << "Hz\n";
+        std::cout << "Converting " << input_rate << "Hz 鈫?" << output_rate << "Hz\n";
 
         // Generate test signal
         int input_frames = input_rate * test_duration;
@@ -184,17 +184,17 @@ int main() {
     }
 
     std::cout << "\n=== Implementation Status ===\n";
-    std::cout << "✅ Fast (Linear): Current implementation, 3388x real-time\n";
-    std::cout << "✅ Good (Cubic): NEW! ~1000x real-time, 3x quality improvement\n";
-    std::cout << "⏳ High (Sinc 4-tap): Planned, ~100x real-time\n";
-    std::cout << "⏳ Best (Sinc 16-tap): Planned, ~10x real-time\n\n";
+    std::cout << "鉁?Fast (Linear): Current implementation, 3388x real-time\n";
+    std::cout << "鉁?Good (Cubic): NEW! ~1000x real-time, 3x quality improvement\n";
+    std::cout << "鈴?High (Sinc 4-tap): Planned, ~100x real-time\n";
+    std::cout << "鈴?Best (Sinc 16-tap): Planned, ~10x real-time\n\n";
 
     std::cout << "=== Benefits Achieved ===\n";
-    std::cout << "✅ Quality improvement: 20dB better THD with Cubic\n";
-    std::cout << "✅ Anti-aliasing: Added Kaiser-windowed FIR filter\n";
-    std::cout << "✅ Flexibility: Users can choose quality vs speed\n";
-    std::cout << "✅ Compatibility: Maintains existing API\n";
-    std::cout << "✅ Performance: Still much faster than foobar2000\n\n";
+    std::cout << "鉁?Quality improvement: 20dB better THD with Cubic\n";
+    std::cout << "鉁?Anti-aliasing: Added Kaiser-windowed FIR filter\n";
+    std::cout << "鉁?Flexibility: Users can choose quality vs speed\n";
+    std::cout << "鉁?Compatibility: Maintains existing API\n";
+    std::cout << "鉁?Performance: Still much faster than foobar2000\n\n";
 
     std::cout << "=== Next Steps ===\n";
     std::cout << "1. Integrate libsamplerate for High/Best quality\n";
@@ -202,7 +202,7 @@ int main() {
     std::cout << "3. Implement in the main music player\n";
     std::cout << "4. Add user configuration options\n\n";
 
-    std::cout << "✅ Enhanced sample rate converter implementation complete!\n";
+    std::cout << "鉁?Enhanced sample rate converter implementation complete!\n";
 
     return 0;
 }

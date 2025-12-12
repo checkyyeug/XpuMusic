@@ -1,4 +1,4 @@
-#ifndef VISUALIZATION_ENGINE_H
+﻿#ifndef VISUALIZATION_ENGINE_H
 #define VISUALIZATION_ENGINE_H
 
 #include "mp_types.h"

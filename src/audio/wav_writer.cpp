@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file wav_writer.cpp
  * @brief Simple WAV file writer implementation
  * @date 2025-12-10

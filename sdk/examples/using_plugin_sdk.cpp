@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @file using_plugin_sdk.cpp
- * @brief XpuMusic 插件SDK使用示例
+ * @brief XpuMusic 鎻掍欢SDK浣跨敤绀轰緥
  * @date 2025-12-10
  */
 
@@ -22,14 +22,14 @@ using xpumusic::PluginType;
 int main() {
     std::cout << "=== XpuMusic Plugin SDK Demo ===\n\n";
 
-    // 1. 创建插件管理器
+    // 1. 鍒涘缓鎻掍欢绠＄悊鍣?
     PluginManager manager;
 
-    // 2. 加载插件目录中的所有插件
+    // 2. 鍔犺浇鎻掍欢鐩綍涓殑鎵€鏈夋彃浠?
     std::cout << "Loading plugins from ./plugins directory...\n";
     manager.load_plugins_from_directory("./plugins");
 
-    // 3. 显示加载的插件
+    // 3. 鏄剧ず鍔犺浇鐨勬彃浠?
     std::cout << "\nLoaded plugins:\n";
     auto plugins = manager.get_plugin_list();
     for (const auto& plugin : plugins) {
@@ -37,14 +37,14 @@ int main() {
                   << " by " << plugin.author << "\n";
     }
 
-    // 4. 显示支持的格式
+    // 4. 鏄剧ず鏀寔鐨勬牸寮?
     std::cout << "\nSupported formats:\n";
     auto formats = manager.get_supported_formats();
     for (const auto& format : formats) {
         std::cout << "- ." << format << "\n";
     }
 
-    // 5. 打开音频文件
+    // 5. 鎵撳紑闊抽鏂囦欢
     std::string file_path = "test.wav";
     std::cout << "\nOpening file: " << file_path << "\n";
 
@@ -54,7 +54,7 @@ int main() {
         return 1;
     }
 
-    // 6. 打开文件并获取信息
+    // 6. 鎵撳紑鏂囦欢骞惰幏鍙栦俊鎭?
     if (!decoder->open(file_path)) {
         std::cerr << "Failed to open file: " << decoder->get_last_error() << "\n";
         return 1;
@@ -67,7 +67,7 @@ int main() {
     std::cout << "- Bits per sample: " << format.bits_per_sample << "\n";
     std::cout << "- Duration: " << decoder->get_duration() << " seconds\n";
 
-    // 7. 显示元数据
+    // 7. 鏄剧ず鍏冩暟鎹?
     auto metadata = decoder->get_metadata();
     if (!metadata.empty()) {
         std::cout << "\nMetadata:\n";
@@ -76,7 +76,7 @@ int main() {
         }
     }
 
-    // 8. 解码示例
+    // 8. 瑙ｇ爜绀轰緥
     const int buffer_size = 4096;
     std::vector<float> buffer(buffer_size);
 
@@ -87,35 +87,35 @@ int main() {
 
     std::cout << "Decoded " << frames_decoded << " frames\n";
 
-    // 9. 使用DSP插件
+    // 9. 浣跨敤DSP鎻掍欢
     std::cout << "\n--- DSP Plugin Demo ---\n";
 
-    // 加载码率转换器插件
+    // 鍔犺浇鐮佺巼杞崲鍣ㄦ彃浠?
     if (manager.load_native_plugin("./plugins/resampler_dsp.so")) {
-        // 获取DSP插件工厂
+        // 鑾峰彇DSP鎻掍欢宸ュ巶
         auto* factory = manager.get_factory("XpuMusic Sample Rate Converter");
         if (factory) {
             auto dsp_plugin = std::unique_ptr<IDSPProcessor>(
                 static_cast<IDSPProcessor*>(factory->create()));
 
             if (dsp_plugin && dsp_plugin->initialize()) {
-                // 配置DSP
+                // 閰嶇疆DSP
                 AudioFormat output_format = format;
-                output_format.sample_rate = 96000; // 转换到96kHz
+                output_format.sample_rate = 96000; // 杞崲鍒?6kHz
 
                 if (dsp_plugin->configure(format, output_format)) {
                     std::cout << "Configured resampler to convert "
                               << format.sample_rate << "Hz to "
                               << output_format.sample_rate << "Hz\n";
 
-                    // 设置质量
+                    // 璁剧疆璐ㄩ噺
                     dsp_plugin->set_parameter("quality", 3.0); // Best quality
                     std::cout << "Set quality to Best\n";
 
-                    // 创建输出缓冲区
+                    // 鍒涘缓杈撳嚭缂撳啿鍖?
                     std::vector<float> output_buffer(buffer_size * 2);
 
-                    // 处理音频
+                    // 澶勭悊闊抽
                     AudioBuffer input_buf = {buffer.data(), frames_decoded, format.channels};
                     AudioBuffer output_buf = {output_buffer.data(), buffer_size * 2, format.channels};
 
@@ -127,7 +127,7 @@ int main() {
         }
     }
 
-    // 10. 清理
+    // 10. 娓呯悊
     decoder->close();
 
     std::cout << "\nDemo completed successfully!\n";

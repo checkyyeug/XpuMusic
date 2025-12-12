@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @file plugin_registry.cpp
- * @brief 插件注册表实现
+ * @brief 鎻掍欢娉ㄥ唽琛ㄥ疄鐜?
  * @date 2025-12-10
  */
 
@@ -18,28 +18,28 @@ bool PluginRegistry::register_factory(const std::string& key,
         return false;
     }
 
-    // 检查兼容性
+    // 妫€鏌ュ吋瀹规€?
     if (!factory->is_compatible(host_api_version_)) {
         std::cerr << "Plugin API version mismatch: " << key << std::endl;
         return false;
     }
 
-    // 检查是否已存在
+    // 妫€鏌ユ槸鍚﹀凡瀛樺湪
     if (factories_.find(key) != factories_.end()) {
         std::cerr << "Plugin already registered: " << key << std::endl;
         return false;
     }
 
-    // 获取插件信息
+    // 鑾峰彇鎻掍欢淇℃伅
     PluginInfo info = factory->get_info();
 
-    // 注册工厂
+    // 娉ㄥ唽宸ュ巶
     factories_[key] = std::move(factory);
 
-    // 更新类型映射
+    // 鏇存柊绫诲瀷鏄犲皠
     type_map_[info.type].push_back(key);
 
-    // 如果是解码器，更新扩展名映射
+    // 濡傛灉鏄В鐮佸櫒锛屾洿鏂版墿灞曞悕鏄犲皠
     if (info.type == PluginType::AudioDecoder) {
         for (const auto& ext : info.supported_formats) {
             std::string lower_ext = ext;
@@ -60,10 +60,10 @@ bool PluginRegistry::unregister_factory(const std::string& key) {
         return false;
     }
 
-    // 获取插件信息
+    // 鑾峰彇鎻掍欢淇℃伅
     PluginInfo info = it->second->get_info();
 
-    // 从类型映射中移除
+    // 浠庣被鍨嬫槧灏勪腑绉婚櫎
     auto& type_list = type_map_[info.type];
     type_list.erase(std::remove(type_list.begin(), type_list.end(), key),
                    type_list.end());
@@ -71,7 +71,7 @@ bool PluginRegistry::unregister_factory(const std::string& key) {
         type_map_.erase(info.type);
     }
 
-    // 从扩展名映射中移除
+    // 浠庢墿灞曞悕鏄犲皠涓Щ闄?
     if (info.type == PluginType::AudioDecoder) {
         for (const auto& ext : info.supported_formats) {
             std::string lower_ext = ext;
@@ -86,7 +86,7 @@ bool PluginRegistry::unregister_factory(const std::string& key) {
         }
     }
 
-    // 移除工厂
+    // 绉婚櫎宸ュ巶
     factories_.erase(it);
 
     return true;
