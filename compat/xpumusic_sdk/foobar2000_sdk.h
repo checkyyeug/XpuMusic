@@ -11,6 +11,8 @@
 #include <memory>
 #include <cstring>
 #include <unordered_map>
+#include <algorithm>
+#include <cctype>
 
 namespace xpumusic_sdk {
 
@@ -308,30 +310,80 @@ public:
 };
 
 
-// Helper template for service creation
-template<typename T>
-service_ptr_t<T> standard_api_create_t() {
-    // For now return empty smart pointer since we don't have concrete implementations
-    return service_ptr_t<T>();
-}
-
 // Concrete implementations (minimal for testing)
-class concrete_input_manager : public input_manager {
-public:
-    bool instantiate() override { return true; }
-    bool open(const char* filename, service_ptr_t<input_decoder>& decoder, abort_callback& abort) override {
-        // Return false for now
-        return false;
-    }
-};
-
 class concrete_input_decoder : public input_decoder {
 public:
     bool get_info(uint32_t subsong, file_info& info, abort_callback& abort) override {
         // Return false for now
         return false;
     }
+    
+    // Reference counting implementation
+    int service_add_ref() override {
+        // Simple reference counting for testing
+        return ++ref_count_;
+    }
+    
+    int service_release() override {
+        int count = --ref_count_;
+        if (count <= 0) {
+            delete this;
+        }
+        return count;
+    }
+    
+private:
+    int ref_count_ = 1;  // Start with 1 reference
 };
+
+class concrete_input_manager : public input_manager {
+public:
+    bool instantiate() override { return true; }
+    bool open(const char* filename, service_ptr_t<input_decoder>& decoder, abort_callback& abort) override {
+        // Check if it's a WAV file
+        std::string fname(filename);
+        std::transform(fname.begin(), fname.end(), fname.begin(), ::tolower);
+
+        // Check for .wav extension (compatible with C++17)
+        if (fname.length() >= 4 && fname.compare(fname.length() - 4, 4, ".wav") == 0) {
+            decoder = service_ptr_t<input_decoder>(new concrete_input_decoder());
+            return true;
+        }
+
+        // For other formats, return false
+        return false;
+    }
+    
+    // Reference counting implementation
+    int service_add_ref() override {
+        // Simple reference counting for testing
+        return ++ref_count_;
+    }
+    
+    int service_release() override {
+        int count = --ref_count_;
+        if (count <= 0) {
+            delete this;
+        }
+        return count;
+    }
+    
+private:
+    int ref_count_ = 1;  // Start with 1 reference
+};
+
+// Helper template for service creation
+template<typename T>
+service_ptr_t<T> standard_api_create_t() {
+    // Create concrete implementations for known services
+    if constexpr (std::is_same_v<T, input_manager>) {
+        return service_ptr_t<T>(new concrete_input_manager());
+    } else if constexpr (std::is_same_v<T, input_decoder>) {
+        return service_ptr_t<T>(new concrete_input_decoder());
+    }
+    // For other services, return empty for now
+    return service_ptr_t<T>();
+}
 
 // Metadb handle interface - ABSTRACT INTERFACE
 class metadb_handle {

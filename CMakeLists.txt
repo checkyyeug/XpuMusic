@@ -204,6 +204,84 @@ if(FOOBAR2000_SDK_FOUND)
 endif()
 
 # ============================================================================
+# Chaos Testing Framework
+# ============================================================================
+
+# Chaos Testing Library
+add_library(chaos_testing
+    testing/chaos_test_runner.cpp
+)
+
+target_include_directories(chaos_testing PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/testing
+)
+
+target_link_libraries(chaos_testing PUBLIC Threads::Threads)
+
+# Chaos Test Demo
+add_executable(chaos_test_demo
+    src/chaos_test_demo.cpp
+)
+
+target_link_libraries(chaos_test_demo PRIVATE
+    chaos_testing
+)
+
+# Diversity Strategies Library
+add_library(diversity_strategies
+    src/diversity_strategies.cpp
+)
+
+target_include_directories(diversity_strategies PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+target_link_libraries(diversity_strategies PUBLIC Threads::Threads)
+
+# Diversity Demo
+add_executable(diversity_demo
+    src/diversity_demo.cpp
+)
+
+target_link_libraries(diversity_demo PRIVATE
+    diversity_strategies
+)
+
+# Failure Learning System
+add_library(failure_learning
+    src/failure_learning_system.cpp
+)
+
+target_include_directories(failure_learning PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+target_link_libraries(failure_learning PUBLIC Threads::Threads)
+
+# Failure Learning Demo
+add_executable(failure_learning_demo
+    src/failure_learning_demo.cpp
+)
+
+target_link_libraries(failure_learning_demo PRIVATE
+    failure_learning
+)
+
+# Antifragility Integration Demo
+add_executable(antifragility_integration
+    src/antifragility_integration.cpp
+)
+
+target_link_libraries(antifragility_integration PRIVATE
+    chaos_testing
+    diversity_strategies
+    failure_learning
+)
+
+# ============================================================================
 # Plugin Ecosystem
 # ============================================================================
 
@@ -248,6 +326,7 @@ if(WIN32)
         src/audio/sample_rate_converter.cpp
         src/audio/universal_sample_rate_converter.cpp
         src/foobar_plugin_manager.cpp
+        src/foobar2000_modern_loader.cpp
         src/plugin_error_handler.cpp
         src/plugin_config.cpp
         compat/sdk_implementations/foobar_sdk_wrapper.cpp
