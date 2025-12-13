@@ -1,0 +1,307 @@
+name: Chaos Testing
+
+on:
+  schedule:
+    # Run chaos tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      duration_minutes:
+        description: 'Chaos session duration in minutes'
+        required: true
+        default: '5'
+      chaos_level:
+        description: 'Chaos level'
+        required: true
+        default: 'MODERATE'
+        type: choice
+        options:
+          - GENTLE
+          - MODERATE
+          - INTENSE
+          - EXTREME
+
+env:
+  CHAOS_DURATION: ${{ github.event.inputs.duration_minutes || 10 }}
+  CHAOS_LEVEL: ${{ github.event.inputs.chaos_level || 'MODERATE' }}
+
+jobs:
+  # Windows chaos testing
+  chaos-windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        config: [Debug, Release]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Visual Studio
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Setup MSVC
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: x64
+
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=${{ matrix.config }}
+
+    - name: Build
+      run: |
+        cd build
+        cmake --build . --config ${{ matrix.config }} --parallel
+
+    - name: Run Chaos Tests
+      run: |
+        cd build/bin/${{ matrix.config }}
+
+        # Create test files for chaos
+        echo "Test file for chaos testing" > test_config.txt
+        echo "Audio test data" > test_audio.wav
+
+        # Run chaos test demo
+        .\chaos_test_demo.exe
+
+        # Check if chaos report was generated
+        if (Test-Path "chaos_session_report.txt") {
+          Write-Host "Chaos report generated successfully"
+          Get-Content chaos_session_report.txt | Select-Object -First 20
+        }
+
+    - name: Upload Chaos Reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: chaos-reports-windows-${{ matrix.config }}
+        path: |
+          build/bin/${{ matrix.config }}/chaos_*.txt
+          chaos_*.wav
+        retention-days: 7
+
+  # Linux chaos testing
+  chaos-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        compiler: [gcc, clang]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake ninja-build
+
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        CC=${{ matrix.compiler }} CXX=${{ matrix.compiler }}++ \
+        cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Debug
+
+    - name: Build
+      run: |
+        cd build
+        cmake --build . --config Debug
+
+    - name: Run Chaos Tests
+      run: |
+        cd build/bin
+
+        # Create test files for chaos
+        echo "Test file for chaos testing" > test_config.txt
+        echo "Audio test data" > test_audio.wav
+
+        # Run chaos test demo with memory limits
+        timeout 120 ./chaos_test_demo || true
+
+        # Check if chaos report was generated
+        if [ -f "chaos_session_report.txt" ]; then
+          echo "Chaos report generated successfully"
+          head -20 chaos_session_report.txt
+        fi
+
+    - name: Upload Chaos Reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: chaos-reports-linux-${{ matrix.compiler }}
+        path: |
+          build/bin/chaos_*.txt
+          chaos_*.wav
+        retention-days: 7
+
+  # macOS chaos testing
+  chaos-macos:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        brew install cmake ninja
+
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Debug
+
+    - name: Build
+      run: |
+        cd build
+        cmake --build . --config Debug
+
+    - name: Run Chaos Tests
+      run: |
+        cd build/bin
+
+        # Create test files for chaos
+        echo "Test file for chaos testing" > test_config.txt
+        echo "Audio test data" > test_audio.wav
+
+        # Run chaos test demo
+        timeout 120 ./chaos_test_demo || true
+
+        # Check if chaos report was generated
+        if [ -f "chaos_session_report.txt" ]; then
+          echo "Chaos report generated successfully"
+          head -20 chaos_session_report.txt
+        fi
+
+    - name: Upload Chaos Reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: chaos-reports-macos
+        path: |
+          build/bin/chaos_*.txt
+          chaos_*.wav
+        retention-days: 7
+
+  # Analyze chaos results
+  analyze-chaos:
+    runs-on: ubuntu-latest
+    needs: [chaos-windows, chaos-linux, chaos-macos]
+    if: always()
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Download all chaos reports
+      uses: actions/download-artifact@v4
+      with:
+        path: ./chaos-artifacts
+
+    - name: Install Python for analysis
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3 python3-pip
+
+    - name: Create chaos analysis script
+      run: |
+        cat > analyze_chaos.py << 'EOF'
+        import os
+        import json
+        import glob
+        from collections import defaultdict
+
+        def analyze_chaos_reports():
+            results = {
+                'total_experiments': 0,
+                'successful_recoveries': 0,
+                'avg_antifragility': 0,
+                'platforms': {},
+                'failure_patterns': defaultdict(int)
+            }
+
+            # Find all chaos reports
+            for root, dirs, files in os.walk('./chaos-artifacts'):
+                for file in files:
+                    if file.startswith('chaos_session_report') and file.endswith('.txt'):
+                        platform = root.split('/')[-2] if '/' in root else 'unknown'
+                        with open(os.path.join(root, file), 'r') as f:
+                            content = f.read()
+
+                            # Parse metrics (simplified)
+                            if 'Antifragility Score:' in content:
+                                score = float(content.split('Antifragility Score:')[1].split()[0])
+                                results['platforms'][platform] = score
+                                results['avg_antifragility'] += score
+
+            # Calculate averages
+            if results['platforms']:
+                results['avg_antifragility'] /= len(results['platforms'])
+
+            # Save analysis
+            with open('chaos_analysis.json', 'w') as f:
+                json.dump(results, f, indent=2)
+
+            # Print summary
+            print("\n=== Chaos Testing Analysis ===")
+            print(f"Average Antifragility Score: {results['avg_antifragility']:.2f}")
+            print("\nPlatform Scores:")
+            for platform, score in results['platforms'].items():
+                print(f"  {platform}: {score:.2f}")
+
+        if __name__ == '__main__':
+            analyze_chaos_reports()
+        EOF
+
+    - name: Analyze chaos results
+      run: |
+        python3 analyze_chaos.py
+
+    - name: Upload analysis
+      uses: actions/upload-artifact@v4
+      with:
+        name: chaos-analysis
+        path: |
+          chaos_analysis.json
+          analyze_chaos.py
+        retention-days: 30
+
+    - name: Create issue for low antifragility
+      if: failure()
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+
+          try {
+            const analysis = JSON.parse(fs.readFileSync('chaos_analysis.json', 'utf8'));
+
+            if (analysis.avg_antifragility < 0.5) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: 'Chaos Testing Alert - Low Antifragility Detected',
+                body: `## Chaos Testing Results
+
+                **Average Antifragility Score**: ${analysis.avg_antifragility.toFixed(2)}
+
+                The system's antifragility score is below the recommended threshold of 0.5.
+
+                **Platform Scores**:
+                ${Object.entries(analysis.platforms).map(([platform, score]) =>
+                  `- ${platform}: ${score.toFixed(2)}`).join('\n')}
+
+                Please review the chaos testing reports and consider:
+                1. Improving error handling
+                2. Adding redundancy
+                3. Implementing better recovery mechanisms
+                4. Reviewing system architecture for single points of failure
+                `,
+                labels: ['chaos-testing', 'antifragility', 'maintenance']
+              });
+            }
+          } catch (error) {
+            console.log('Could not analyze chaos results:', error);
+          }

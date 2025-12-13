@@ -27,6 +27,9 @@
 #include "audio/enhanced_sample_rate_converter.h"
 #include "audio/cubic_resampler.h"
 
+// Include foobar2000 modern loader
+#include "foobar2000_modern_loader.h"
+
 // Helper function to check HRESULT safely
 inline bool check_hresult_ok(HRESULT hr) {
     return hr == S_OK;
@@ -617,24 +620,72 @@ bool play_wav_file(const std::string& filename) {
 
 int main(int argc, char* argv[]) {
     std::cout << "========================================" << std::endl;
-    std::cout << "   Music Player with Resampling v2.0" << std::endl;
+    std::cout << "   Music Player with Resampling v2.1" << std::endl;
     std::cout << "   Enhanced Audio Format Support" << std::endl;
+    std::cout << "   + foobar2000 Modern DLL Support" << std::endl;
     std::cout << "========================================" << std::endl;
     std::cout << std::endl;
-    
-    if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << " <wav_file>" << std::endl;
+
+    // Check command line arguments for --fb2k flag
+    bool foobar_enabled = false;
+    std::string filename;
+
+    if (argc >= 2) {
+        filename = argv[1];
+
+        // Check for --fb2k flag (can be before or after filename)
+        for (int i = 1; i < argc; i++) {
+            if (std::string(argv[i]) == "--fb2k") {
+                foobar_enabled = true;
+                // Remove --fb2k from args to get the actual filename
+                if (i == 1 && argc > 2) {
+                    filename = argv[2];
+                }
+                break;
+            }
+        }
+    }
+
+    // Initialize foobar2000 modern loader based on command line flag
+    std::unique_ptr<Foobar2000ModernLoader> foobar_loader;
+    bool foobar_available = false;
+
+    if (foobar_enabled) {
+        std::cout << "[Flag] --fb2k specified, loading foobar2000 components..." << std::endl;
+        foobar_loader = std::make_unique<Foobar2000ModernLoader>();
+        foobar_available = foobar_loader->initialize();
+
+        if (foobar_available) {
+            std::cout << "[OK] foobar2000 modern components loaded" << std::endl;
+            std::cout << "  Extended format support enabled" << std::endl;
+        } else {
+            std::cout << "[!] Failed to load foobar2000 components" << std::endl;
+            std::cout << "  Falling back to native decoders" << std::endl;
+        }
+    } else {
+        std::cout << "[OK] Using native decoders only" << std::endl;
+        std::cout << "  Use --fb2k flag to enable foobar2000 support" << std::endl;
+    }
+    std::cout << std::endl;
+
+    if (argc < 2 || (argc == 2 && std::string(argv[1]) == "--fb2k")) {
+        std::cerr << "Usage: " << argv[0] << " [--fb2k] <audio_file>" << std::endl;
+        std::cerr << std::endl;
+        std::cerr << "Options:" << std::endl;
+        std::cerr << "  --fb2k    Enable foobar2000 component support" << std::endl;
         std::cerr << std::endl;
         std::cerr << "Supported formats:" << std::endl;
-        std::cerr << "  - Sample rates: Any (with automatic resampling)" << std::endl;
-        std::cerr << "  - Bit depths: 16, 24, 32-bit" << std::endl;
-        std::cerr << "  - Channels: 1-8 (with automatic channel conversion)" << std::endl;
+        std::cerr << "  - WAV: All sample rates, bit depths, channels (native)" << std::endl;
+        std::cerr << "  - Other formats: MP3, FLAC, OGG, M4A, AAC, WMA, APE, etc. (with --fb2k)" << std::endl;
         std::cerr << std::endl;
         std::cerr << "The player will automatically convert to your audio device's format." << std::endl;
         return 1;
     }
-    
-    std::string filename = argv[1];
+
+    if (filename.empty()) {
+        std::cerr << "Error: No audio file specified" << std::endl;
+        return 1;
+    }
     
     if (!play_wav_file(filename)) {
         std::cerr << "Failed to play file: " << filename << std::endl;

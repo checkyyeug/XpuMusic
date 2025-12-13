@@ -24,7 +24,21 @@
         ],
         "auto_load_plugins": true,
         "plugin_scan_interval": 0,
-        "plugin_timeout": 5000
+        "plugin_timeout": 5000,
+        "foobar2000": {
+            "enable_compatibility": false,
+            "sdk_path": "./foobar2000_sdk",
+            "load_legacy_plugins": true,
+            "plugin_directories": [
+                "./foobar2000_sdk/plugins",
+                "./components",
+                "%APPDATA%/foobar2000/components"
+            ],
+            "enable_wrapper_mode": true,
+            "strict_mode": false,
+            "log_plugin_loading": true,
+            "fallback_to_native": true
+        }
     },
 
     "resampler": {

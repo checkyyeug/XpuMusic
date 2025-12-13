@@ -1,0 +1,112 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  clang-tidy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install clang-tidy
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang-tidy
+
+    - name: Run clang-tidy
+      run: |
+        # Generate compile_commands.json
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        cd ..
+
+        # Run clang-tidy
+        find src/ -name "*.cpp" -o -name "*.h" | xargs clang-tidy -p build/ 2> clang-tidy-report.txt || true
+
+    - name: Upload clang-tidy report
+      uses: actions/upload-artifact@v4
+      with:
+        name: clang-tidy-report
+        path: clang-tidy-report.txt
+        retention-days: 7
+
+  complexity-analysis:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install complexity tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3 python3-pip
+        pip3 install lizard radon
+
+    - name: Analyze code complexity
+      run: |
+        # Lizard for complexity analysis
+        lizard src/ -l cpp -x "*/test/*" -o lizard-report.html || true
+
+        # Radon for Python files (if any)
+        find . -name "*.py" -exec radon cc {} --min B \; > radon-report.txt || true
+
+    - name: Complexity summary
+      run: |
+        lizard src/ -l cpp -x "*/test/*" -C > complexity-summary.txt || true
+        cat complexity-summary.txt
+
+    - name: Upload complexity reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: complexity-reports
+        path: |
+          lizard-report.html
+          radon-report.txt
+          complexity-summary.txt
+        retention-days: 7
+
+  documentation-check:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Check documentation coverage
+      run: |
+        # Install doxygen
+        sudo apt-get update
+        sudo apt-get install -y doxygen graphviz
+
+        # Generate documentation
+        doxygen Doxyfile 2> doxygen.log || true
+
+        # Check for undocumented items
+        if grep -i "warning" doxygen.log; then
+          echo "Documentation warnings found"
+          cat doxygen.log
+        fi
+
+    - name: Link check
+      run: |
+        # Install markdown link checker
+        sudo apt-get update
+        sudo apt-get install -y npm
+        npm install -g markdown-link-check
+
+        # Check all markdown files
+        find . -name "*.md" -exec markdown-link-check {} \; > link-check.txt 2>&1 || true
+
+    - name: Upload documentation reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: documentation-reports
+        path: |
+          doxygen.log
+          link-check.txt
+        retention-days: 7

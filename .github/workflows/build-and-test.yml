@@ -1,0 +1,361 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main, develop, optimization/compile-compatibility ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+env:
+  # Build configuration
+  BUILD_TYPE: Debug
+  # Cache version
+  CACHE_VERSION: v1
+
+jobs:
+  # Windows build
+  build-windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        platform: [x64, x86]
+        config: [Debug, Release]
+        include:
+          - platform: x64
+            arch: x64
+          - platform: x86
+            arch: Win32
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Cache build
+      uses: actions/cache@v4
+      with:
+        path: |
+          build
+          !build/**/*.obj
+          !build/**/*.pdb
+        key: windows-${{env.CACHE_VERSION}}-${{matrix.platform}}-${{matrix.config}}-${{hashFiles('**/CMakeLists.txt', '**/*.cpp', '**/*.h')}}
+        restore-keys: |
+          windows-${{env.CACHE_VERSION}}-${{matrix.platform}}-${{matrix.config}}-
+          windows-${{env.CACHE_VERSION}}-${{matrix.platform}}-
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Setup Visual Studio
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: ${{ matrix.arch }}
+
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake .. -G "Visual Studio 17 2022" -A ${{ matrix.arch }} -DCMAKE_BUILD_TYPE=${{ matrix.config }}
+
+    - name: Build
+      run: |
+        cd build
+        cmake --build . --config ${{ matrix.config }} --parallel
+
+    - name: Test basic executables
+      run: |
+        cd build/bin/${{ matrix.config }}
+        if (Test-Path "test_decoders.exe") {
+          echo "Running decoder tests..."
+          .\test_decoders.exe
+        }
+        if (Test-Path "playlist_demo.exe") {
+          echo "Running playlist demo..."
+          .\playlist_demo.exe --version
+        }
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      if: matrix.config == 'Release'
+      with:
+        name: windows-${{ matrix.platform }}-binaries
+        path: |
+          build/bin/Release/*.exe
+          build/lib/Release/*.lib
+          build/plugins/Release/*.dll
+        retention-days: 30
+
+  # Linux build
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        compiler: [gcc, clang]
+        config: [Debug, Release]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          cmake \
+          ninja-build \
+          libasound2-dev \
+          libpulse-dev \
+          portaudio19-dev
+
+    - name: Cache build
+      uses: actions/cache@v4
+      with:
+        path: |
+          build
+          !build/**/*.o
+        key: linux-${{env.CACHE_VERSION}}-${{ matrix.compiler }}-${{ matrix.config }}-${{hashFiles('**/CMakeLists.txt', '**/*.cpp', '**/*.h')}}
+        restore-keys: |
+          linux-${{env.CACHE_VERSION}}-${{ matrix.compiler }}-${{ matrix.config }}-
+          linux-${{env.CACHE_VERSION}}-${{ matrix.compiler }}-
+
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        CC=${{ matrix.compiler }} CXX=${{ matrix.compiler }}++ \
+        cmake .. -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.config }}
+
+    - name: Build
+      run: |
+        cd build
+        cmake --build . --config ${{ matrix.config }}
+
+    - name: Test
+      run: |
+        cd build
+        ctest --output-on-failure --parallel 4
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      if: matrix.config == 'Release'
+      with:
+        name: linux-${{ matrix.compiler }}-binaries
+        path: |
+          build/bin/*
+          build/lib/*
+          build/plugins/*
+        retention-days: 30
+
+  # macOS build
+  build-macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        config: [Debug, Release]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install dependencies
+      run: |
+        brew install cmake ninja portaudio
+
+    - name: Cache build
+      uses: actions/cache@v4
+      with:
+        path: |
+          build
+          !build/**/*.o
+        key: macos-${{env.CACHE_VERSION}}-${{ matrix.config }}-${{hashFiles('**/CMakeLists.txt', '**/*.cpp', '**/*.h')}}
+        restore-keys: |
+          macos-${{env.CACHE_VERSION}}-${{ matrix.config }}-
+          macos-${{env.CACHE_VERSION }}-
+
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake .. -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.config }}
+
+    - name: Build
+      run: |
+        cd build
+        cmake --build . --config ${{ matrix.config }}
+
+    - name: Test
+      run: |
+        cd build
+        ctest --output-on-failure --parallel 4
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      if: matrix.config == 'Release'
+      with:
+        name: macos-binaries
+        path: |
+          build/bin/*
+          build/lib/*
+          build/plugins/*
+        retention-days: 30
+
+  # Code quality checks
+  code-quality:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cppcheck clang-format-14
+
+    - name: Run Cppcheck
+      run: |
+        cppcheck --enable=all --error-exitcode=1 --xml src/ 2> cppcheck.xml || true
+        cppcheck --enable=all src/ 2>&1 | tee cppcheck-report.txt
+
+    - name: Check code formatting
+      run: |
+        find src/ -name "*.cpp" -o -name "*.h" | xargs clang-format-14 --dry-run --Werror
+
+    - name: Upload quality reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: code-quality-reports
+        path: |
+          cppcheck.xml
+          cppcheck-report.txt
+        retention-days: 7
+
+  # Performance tests
+  performance:
+    runs-on: ubuntu-latest
+    needs: build-linux
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: linux-gcc-binaries
+        path: ./build
+
+    - name: Make binaries executable
+      run: chmod +x build/bin/*
+
+    - name: Run performance tests
+      run: |
+        cd build/bin
+        if [ -f "simple_performance_test.exe" ] || [ -f "simple_performance_test" ]; then
+          ./simple_performance_test > performance-report.txt 2>&1 || true
+          cat performance-report.txt
+        else
+          echo "Performance test binary not found"
+        fi
+
+    - name: Upload performance report
+      uses: actions/upload-artifact@v4
+      with:
+        name: performance-report
+        path: build/bin/performance-report.txt
+        retention-days: 7
+
+  # Security scan
+  security:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  # Create release if on main tag
+  create-release:
+    runs-on: ubuntu-latest
+    needs: [build-windows, build-linux, build-macos]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: ./artifacts
+
+    - name: Create release package
+      run: |
+        mkdir -p XpuMusic-Release
+        mkdir -p XpuMusic-Release/windows
+        mkdir -p XpuMusic-Release/linux
+        mkdir -p XpuMusic-Release/macos
+
+        # Copy Windows binaries
+        cp -r artifacts/windows-x64-binaries/* XpuMusic-Release/windows/ 2>/dev/null || true
+        cp -r artifacts/windows-x86-binaries/* XpuMusic-Release/windows/ 2>/dev/null || true
+
+        # Copy Linux binaries
+        cp -r artifacts/linux-gcc-binaries/* XpuMusic-Release/linux/ 2>/dev/null || true
+        cp -r artifacts/linux-clang-binaries/* XpuMusic-Release/linux/ 2>/dev/null || true
+
+        # Copy macOS binaries
+        cp -r artifacts/macos-binaries/* XpuMusic-Release/macos/ 2>/dev/null || true
+
+        # Copy documentation
+        cp -r docs/* XpuMusic-Release/ 2>/dev/null || true
+
+        # Create README for release
+        cat > XpuMusic-Release/README.md << 'EOF'
+        XpuMusic Audio Player
+        ======================
+
+        This release contains pre-built binaries for Windows, Linux, and macOS.
+
+        Installation:
+        - Windows: Extract and run music-player.exe
+        - Linux: Extract and run ./music-player
+        - macOS: Extract and run ./music-player
+
+        For detailed instructions, see the documentation included in this package.
+        EOF
+
+        # Create tar.gz
+        tar -czf XpuMusic-$(basename ${{ github.ref }})-release.tar.gz XpuMusic-Release
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          XpuMusic-*.tar.gz
+        body: |
+          XpuMusic Audio Player Release
+
+          ### Changes in this release
+          - See commit history for detailed changes
+
+          ### Installation
+          - Extract the appropriate package for your platform
+          - Run the music-player executable
+
+          ### Documentation
+          - See included documentation for detailed usage instructions

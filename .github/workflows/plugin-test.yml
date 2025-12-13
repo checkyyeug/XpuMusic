@@ -1,0 +1,63 @@
+name: Plugin Testing
+
+on:
+  push:
+    paths:
+      - 'plugins/**'
+      - 'src/playlist/**'
+      - 'compat/**'
+  pull_request:
+    paths:
+      - 'plugins/**'
+      - 'src/playlist/**'
+      - 'compat/**'
+  workflow_dispatch:
+
+jobs:
+  test-plugins:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Visual Studio
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Setup MSVC
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: x64
+
+    - name: Build core
+      run: |
+        mkdir build
+        cd build
+        cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Debug
+        cmake --build . --config Debug --target core_engine platform_abstraction sdk_impl playlist
+
+    - name: Build plugin example
+      run: |
+        cd plugins/example_volume
+        mkdir build
+        cd build
+        cmake .. -G "Visual Studio 17 2022" -A x64
+        cmake --build . --config Debug
+
+    - name: Test plugin loading
+      run: |
+        cd build/bin/Debug
+        # Run plugin test if available
+        if (Test-Path "test_plugins.exe") {
+          echo "Running plugin tests..."
+          .\test_plugins.exe
+        }
+
+    - name: Verify plugin artifact
+      run: |
+        if (Test-Path "plugins/example_volume/build/Debug/volume_plugin.dll") {
+          echo "✅ Volume plugin built successfully"
+          ls -la plugins/example_volume/build/Debug/
+        } else {
+          echo "❌ Volume plugin not found"
+          exit 1
+        }
