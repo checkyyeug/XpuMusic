@@ -510,6 +510,48 @@ if(WIN32)
     target_link_libraries(music_player_simple_direct ole32 uuid)
 endif()
 
+# Playlist Library
+add_library(playlist
+    src/playlist/playlist_manager.cpp
+)
+
+target_include_directories(playlist PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+# Playlist Demo
+add_executable(playlist_demo
+    src/examples/playlist_demo.cpp
+)
+
+target_include_directories(playlist_demo PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+target_link_libraries(playlist_demo PRIVATE
+    playlist
+)
+
+# Enhanced Music Player with Playlist Support
+add_executable(music_player_with_playlist
+    src/examples/music_player_with_playlist.cpp
+)
+
+target_include_directories(music_player_with_playlist PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+target_link_libraries(music_player_with_playlist PRIVATE
+    playlist
+    core_engine
+    platform_abstraction
+    ${PLATFORM_LIBS}
+)
+
+if(WIN32)
+    target_link_libraries(music_player_with_playlist PRIVATE ole32 uuid)
+endif()
+
 # ============================================================================
 # Summary
 # ============================================================================
